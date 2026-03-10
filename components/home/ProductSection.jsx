@@ -17,7 +17,7 @@ export default function ProductSection({ title, subtitle, products, id }) {
   };
 
   return (
-    <section id={id} className="py-20 bg-white scroll-mt-20">
+    <section id={id} className="py-20 bg-white dark:bg-[#0d1333] scroll-mt-20 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -27,15 +27,12 @@ export default function ProductSection({ title, subtitle, products, id }) {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <span
-            className="text-sm font-semibold tracking-widest uppercase"
-            style={{ color: '#785d32' }}
-          >
+          <span className="text-sm font-semibold tracking-widest uppercase text-[#785d32] dark:text-[#c4a97e]">
             {subtitle || 'Premium Collection'}
           </span>
           <h2
-            className="text-4xl md:text-5xl font-bold mt-3 mb-4"
-            style={{ color: '#050a30', fontFamily: 'var(--font-playfair)' }}
+            className="text-4xl md:text-5xl font-bold mt-3 mb-4 text-[#050a30] dark:text-[#f0ebe3]"
+            style={{ fontFamily: 'var(--font-playfair)' }}
           >
             {title}
           </h2>
@@ -69,8 +66,7 @@ export default function ProductSection({ title, subtitle, products, id }) {
           <motion.button
             whileHover={{ x: 5 }}
             whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 rounded-lg font-semibold text-white inline-flex items-center gap-2 transition-all"
-            style={{ backgroundColor: '#050a30' }}
+            className="cursor-pointer px-8 py-3 rounded-lg font-semibold text-white inline-flex items-center gap-2 transition-all bg-[#050a30] dark:bg-[#785d32]"
           >
             View All Products
             <ArrowRight size={20} />

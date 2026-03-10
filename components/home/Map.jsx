@@ -18,7 +18,7 @@ export default function Map() {
   };
 
   return (
-    <section id="contact" className="py-20 bg-white scroll-mt-20">
+    <section id="contact" className="py-20 bg-white dark:bg-[#0d1333] scroll-mt-20 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -35,8 +35,8 @@ export default function Map() {
             Get in Touch
           </span>
           <h2
-            className="text-4xl md:text-5xl font-bold mt-3 mb-4"
-            style={{ color: '#050a30', fontFamily: 'var(--font-playfair)' }}
+            className="text-4xl md:text-5xl font-bold mt-3 mb-4 text-[#050a30] dark:text-[#f0ebe3]"
+            style={{ fontFamily: 'var(--font-playfair)' }}
           >
             Visit Our Showroom
           </h2>
@@ -84,10 +84,10 @@ export default function Map() {
                 <MapPin size={24} />
               </motion.div>
               <div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: '#050a30' }}>
+                <h3 className="text-lg font-bold mb-2 text-[#050a30] dark:text-[#f0ebe3]">
                   Our Showroom
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-[#9fa8cc]">
                   123 Design Street<br />
                   New York, NY 10001<br />
                   United States
@@ -105,10 +105,10 @@ export default function Map() {
                 <Phone size={24} />
               </motion.div>
               <div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: '#050a30' }}>
+                <h3 className="text-lg font-bold mb-2 text-[#050a30] dark:text-[#f0ebe3]">
                   Phone
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-[#9fa8cc]">
                   +1 (555) 123-4567<br />
                   +1 (555) 987-6543
                 </p>
@@ -125,10 +125,10 @@ export default function Map() {
                 <Mail size={24} />
               </motion.div>
               <div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: '#050a30' }}>
+                <h3 className="text-lg font-bold mb-2 text-[#050a30] dark:text-[#f0ebe3]">
                   Email
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-[#9fa8cc]">
                   info@talukdar.com<br />
                   support@talukdar.com
                 </p>
@@ -145,10 +145,10 @@ export default function Map() {
                 <Clock size={24} />
               </motion.div>
               <div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: '#050a30' }}>
+                <h3 className="text-lg font-bold mb-2 text-[#050a30] dark:text-[#f0ebe3]">
                   Hours
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-[#9fa8cc]">
                   Monday - Friday: 10 AM - 6 PM<br />
                   Saturday: 11 AM - 5 PM<br />
                   Sunday: Closed
@@ -160,8 +160,7 @@ export default function Map() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full px-8 py-3 rounded-lg font-semibold text-white transition-all"
-              style={{ backgroundColor: '#050a30' }}
+              className="cursor-pointer w-full px-8 py-3 rounded-lg font-semibold text-white transition-all bg-[#050a30] dark:bg-[#785d32]"
             >
               Schedule a Consultation
             </motion.button>

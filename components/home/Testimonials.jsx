@@ -70,7 +70,7 @@ export default function Testimonials() {
   };
 
   return (
-    <section className="py-16 md:py-20 bg-linear-to-b from-white to-gray-50 relative overflow-hidden">
+    <section className="py-16 md:py-20 bg-linear-to-b from-white to-gray-50 dark:from-[#0d1333] dark:to-[#0a0f2e] relative overflow-hidden transition-colors duration-300">
       {/* Decorative background elements */}
       <motion.div
         animate={{ y: [0, 30, 0] }}
@@ -95,12 +95,12 @@ export default function Testimonials() {
             Testimonials
           </span>
           <h2
-            className="text-3xl md:text-5xl font-bold mt-3 mb-4"
-            style={{ color: '#050a30', fontFamily: 'var(--font-playfair)' }}
+            className="text-3xl md:text-5xl font-bold mt-3 mb-4 text-[#050a30] dark:text-[#f0ebe3]"
+            style={{ fontFamily: 'var(--font-playfair)' }}
           >
             Trusted by Luxury Enthusiasts
           </h2>
-          <p className="text-gray-600 text-base md:text-lg max-w-2xl mx-auto">
+          <p className="text-gray-600 dark:text-[#9fa8cc] text-base md:text-lg max-w-2xl mx-auto">
             See how our clients transformed their spaces with Talukdar&apos;s premium collections
           </p>
           <div
@@ -124,7 +124,7 @@ export default function Testimonials() {
                 opacity: { duration: 0.5 },
               }}
             >
-              <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-12 flex flex-col md:flex-row items-center gap-6 md:gap-8 border border-gray-100">
+              <div className="bg-white dark:bg-[#0a0f2e] rounded-2xl border border-gray-100 dark:border-[#1c2444] p-6 md:p-12 flex flex-col md:flex-row items-center gap-6 md:gap-8">
                 {/* Left: Image & Info */}
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -141,13 +141,13 @@ export default function Testimonials() {
                     />
                   </div>
 
-                  <h3 className="text-lg font-bold" style={{ color: '#050a30' }}>
+                  <h3 className="text-lg font-bold text-[#050a30] dark:text-[#f0ebe3]">
                     {testimonials[currentIndex].name}
                   </h3>
                   <p className="text-sm font-semibold" style={{ color: '#785d32' }}>
                     {testimonials[currentIndex].role}
                   </p>
-                  <p className="text-xs text-gray-600">{testimonials[currentIndex].company}</p>
+                  <p className="text-xs text-gray-600 dark:text-[#9fa8cc]">{testimonials[currentIndex].company}</p>
 
                   {/* Rating */}
                   <div className="flex gap-1 mt-3">
@@ -170,7 +170,7 @@ export default function Testimonials() {
                     <Quote size={28} style={{ color: '#785d32', opacity: 0.3 }} />
                   </div>
 
-                  <p className="text-base md:text-xl text-gray-700 leading-relaxed mb-6 italic">
+                  <p className="text-base md:text-xl text-gray-700 dark:text-[#c4b89a] leading-relaxed mb-6 italic">
                     &ldquo;{testimonials[currentIndex].content}&rdquo;
                   </p>
 
@@ -193,7 +193,7 @@ export default function Testimonials() {
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.95 }}
             onClick={prev}
-            className="p-3 rounded-full transition-all shadow-lg hover:shadow-xl"
+            className="cursor-pointer p-3 rounded-full transition-all"
             style={{ backgroundColor: '#050a30', color: 'white' }}
           >
             <ChevronLeft size={24} />
@@ -207,7 +207,7 @@ export default function Testimonials() {
                   setDirection(index > currentIndex ? 1 : -1);
                   setCurrentIndex(index);
                 }}
-                className="h-2 rounded-full transition-all"
+                className="cursor-pointer h-2 rounded-full transition-all"
                 animate={{
                   width: index === currentIndex ? 32 : 8,
                   backgroundColor: index === currentIndex ? '#785d32' : '#d1d5db',
@@ -220,7 +220,7 @@ export default function Testimonials() {
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.95 }}
             onClick={next}
-            className="p-3 rounded-full transition-all shadow-lg hover:shadow-xl"
+            className="cursor-pointer p-3 rounded-full transition-all"
             style={{ backgroundColor: '#785d32', color: 'white' }}
           >
             <ChevronRight size={24} />
@@ -235,9 +235,9 @@ export default function Testimonials() {
           transition={{ delay: 0.4 }}
           className="mt-12 text-center"
         >
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-[#9fa8cc]">
             Trusted by{' '}
-            <span className="font-bold" style={{ color: '#050a30' }}>
+            <span className="font-bold text-[#050a30] dark:text-[#f0ebe3]">
               500+
             </span>{' '}
             satisfied customers worldwide

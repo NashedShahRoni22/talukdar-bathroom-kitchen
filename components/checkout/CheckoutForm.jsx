@@ -1,0 +1,360 @@
+'use client';
+
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Lock, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { useApp } from '@/components/context/AppContext';
+
+// ─── Set your API endpoint here (or via NEXT_PUBLIC_ORDERS_API_URL env var) ───
+const ORDERS_API_URL = process.env.NEXT_PUBLIC_ORDERS_API_URL ?? 'https://your-api.com/orders';
+// ─────────────────────────────────────────────────────────────────────────────
+
+const EMPTY_ADDRESS = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  address: '',
+  city: '',
+  state: '',
+  zip: '',
+  country: 'United States',
+};
+
+const COUNTRIES = [
+  'United States',
+  'United Kingdom',
+  'Canada',
+  'Australia',
+  'Germany',
+  'France',
+  'Other',
+];
+
+function InputField({ label, name, value, onChange, error, type = 'text', span2 = false }) {
+  return (
+    <div className={span2 ? 'col-span-2' : 'col-span-1'}>
+      <label className="block text-sm font-medium text-gray-600 dark:text-[#9fa8cc] mb-1.5">{label}</label>
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={label}
+        className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none transition-colors bg-white dark:bg-[#111840] dark:text-[#f0ebe3] dark:placeholder-[#6b7498] ${
+          error
+            ? 'border-red-400 focus:border-red-400'
+            : 'border-gray-200 dark:border-[#2a3460] focus:border-[#050a30] dark:focus:border-[#c4a97e]'
+        }`}
+      />
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+    </div>
+  );
+}
+
+function SelectField({ label, name, value, onChange }) {
+  return (
+    <div className="col-span-2">
+      <label className="block text-sm font-medium text-gray-600 dark:text-[#9fa8cc] mb-1.5">{label}</label>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="cursor-pointer w-full px-4 py-3 border border-gray-200 dark:border-[#2a3460] rounded-lg text-sm focus:outline-none focus:border-[#050a30] dark:focus:border-[#c4a97e] transition-colors bg-white dark:bg-[#111840] dark:text-[#f0ebe3]"
+      >
+        {COUNTRIES.map((c) => (
+          <option key={c}>{c}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function Checkbox({ checked, onChange, children }) {
+  return (
+    <label className="flex items-start gap-3 cursor-pointer select-none">
+      <button
+        type="button"
+        onClick={onChange}
+        className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${
+          checked ? 'border-[#785d32] bg-[#785d32]' : 'border-gray-300 dark:border-[#2a3460] bg-white dark:bg-[#111840] hover:border-[#785d32]'
+        }`}
+        aria-checked={checked}
+        role="checkbox"
+      >
+        {checked && (
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+            <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
+      </button>
+      <span className="text-sm text-gray-600 dark:text-[#9fa8cc] leading-relaxed">{children}</span>
+    </label>
+  );
+}
+
+function AddressForm({ title, prefix, data, onChange, errors }) {
+  const field = (name, label, opts = {}) => (
+    <InputField
+      key={name}
+      label={label}
+      name={name}
+      value={data[name]}
+      onChange={onChange}
+      error={errors?.[`${prefix}_${name}`]}
+      {...opts}
+    />
+  );
+
+  return (
+    <div>
+      <h3
+        className="text-base font-bold uppercase tracking-widest mb-5 pb-3 border-b border-gray-100 dark:border-[#1c2444] text-[#050a30] dark:text-[#f0ebe3]"
+      >
+        {title}
+      </h3>
+      <div className="grid grid-cols-2 gap-4">
+        {field('firstName', 'First Name')}
+        {field('lastName', 'Last Name')}
+        {field('email', 'Email Address', { type: 'email', span2: true })}
+        {field('phone', 'Phone Number', { type: 'tel', span2: true })}
+        {field('address', 'Street Address', { span2: true })}
+        {field('city', 'City')}
+        {field('state', 'State / Province')}
+        {field('zip', 'ZIP / Postal Code')}
+        <SelectField
+          label="Country"
+          name="country"
+          value={data.country}
+          onChange={onChange}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default function CheckoutForm() {
+  const router = useRouter();
+  const { cartItems, cartTotal, clearCart } = useApp();
+
+  const [shipping, setShipping] = useState(EMPTY_ADDRESS);
+  const [billing, setBilling] = useState(EMPTY_ADDRESS);
+  const [sameAsShipping, setSameAsShipping] = useState(true);
+  const [agreedTerms, setAgreedTerms] = useState(false);
+  const [agreedPrivacy, setAgreedPrivacy] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  function makeHandler(setter) {
+    return (e) => {
+      const { name, value } = e.target;
+      setter((prev) => ({ ...prev, [name]: value }));
+    };
+  }
+
+  function validate() {
+    const errs = {};
+    const required = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'zip'];
+
+    required.forEach((f) => {
+      if (!shipping[f]?.trim()) errs[`shipping_${f}`] = 'This field is required';
+    });
+
+    if (!sameAsShipping) {
+      required.forEach((f) => {
+        if (!billing[f]?.trim()) errs[`billing_${f}`] = 'This field is required';
+      });
+    }
+
+    if (cartItems.length === 0) errs.cart = 'Your cart is empty';
+    if (!agreedTerms) errs.terms = 'You must accept the Terms & Conditions';
+    if (!agreedPrivacy) errs.privacy = 'You must accept the Privacy Policy';
+
+    return errs;
+  }
+
+  function buildPayload() {
+    const shippingCharge = cartTotal > 5000 ? 0 : 250;
+    const taxRate = 0.10;
+    const tax = parseFloat((cartTotal * taxRate).toFixed(2));
+    const total = parseFloat((cartTotal + shippingCharge + tax).toFixed(2));
+
+    return {
+      shipping: { ...shipping },
+      billing: sameAsShipping ? { ...shipping } : { ...billing },
+      items: cartItems.map(({ id, name, category, price, image, quantity }) => ({
+        id,
+        name,
+        category,
+        price,
+        image,
+        quantity,
+        lineTotal: parseFloat((price * quantity).toFixed(2)),
+      })),
+      summary: {
+        subtotal: parseFloat(cartTotal.toFixed(2)),
+        shippingCharge,
+        taxRate,
+        tax,
+        total,
+      },
+    };
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    const errs = validate();
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      document.querySelector('[data-error]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    setErrors({});
+    setIsLoading(true);
+
+    try {
+      const payload = buildPayload();
+
+      const res = await fetch(ORDERS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.message ?? `Server error: ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      // Clear cart after successful order creation
+      clearCart();
+
+      // Redirect to payment URL returned by the API
+      if (data?.paymentUrl) {
+        router.push(data.paymentUrl);
+      } else {
+        toast.success('Order placed! Redirecting to payment…');
+      }
+    } catch (err) {
+      toast.error(err.message ?? 'Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} noValidate className="space-y-10">
+      {/* Shipping */}
+      <AddressForm
+        title="Shipping Information"
+        prefix="shipping"
+        data={shipping}
+        onChange={makeHandler(setShipping)}
+        errors={errors}
+      />
+
+      {/* Billing same toggle */}
+      <Checkbox checked={sameAsShipping} onChange={() => setSameAsShipping((v) => !v)}>
+          <span className="font-medium text-gray-700 dark:text-[#f0ebe3]">Billing address same as shipping</span>
+      </Checkbox>
+
+      {/* Billing (conditional) */}
+      <AnimatePresence>
+        {!sameAsShipping && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <AddressForm
+              title="Billing Information"
+              prefix="billing"
+              data={billing}
+              onChange={makeHandler(setBilling)}
+              errors={errors}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Divider */}
+      <div className="border-t border-gray-100 dark:border-[#1c2444]" />
+
+      {/* Terms & Privacy */}
+      <div className="space-y-4">
+        <h3
+          className="text-base font-bold uppercase tracking-widest text-[#050a30] dark:text-[#f0ebe3]"
+        >
+          Agreements
+        </h3>
+
+        <div data-error={errors.terms ? true : undefined}>
+          <Checkbox checked={agreedTerms} onChange={() => setAgreedTerms((v) => !v)}>
+            I have read and agree to the{' '}
+            <button
+              type="button"
+              className="underline font-semibold hover:opacity-75 transition-opacity"
+              style={{ color: '#785d32' }}
+            >
+              Terms & Conditions
+            </button>
+          </Checkbox>
+          {errors.terms && (
+            <p className="text-xs text-red-500 mt-1 ml-8">{errors.terms}</p>
+          )}
+        </div>
+
+        <div data-error={errors.privacy ? true : undefined}>
+          <Checkbox checked={agreedPrivacy} onChange={() => setAgreedPrivacy((v) => !v)}>
+            I have read and agree to the{' '}
+            <button
+              type="button"
+              className="underline font-semibold hover:opacity-75 transition-opacity"
+              style={{ color: '#785d32' }}
+            >
+              Privacy Policy
+            </button>
+          </Checkbox>
+          {errors.privacy && (
+            <p className="text-xs text-red-500 mt-1 ml-8">{errors.privacy}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Cart empty error */}
+      {errors.cart && (
+        <p className="text-sm text-red-500 text-center">{errors.cart}</p>
+      )}
+
+      {/* Submit */}
+      <motion.button
+        type="submit"
+        disabled={isLoading}
+        whileHover={isLoading ? {} : { scale: 1.02 }}
+        whileTap={isLoading ? {} : { scale: 0.97 }}
+        className="w-full py-4 rounded-xl text-white font-semibold text-base flex items-center justify-center gap-2.5 shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+        style={{ backgroundColor: '#050a30' }}
+      >
+        {isLoading ? (
+          <>
+            <Loader2 size={18} className="animate-spin" />
+            Processing…
+          </>
+        ) : (
+          <>
+            <Lock size={16} />
+            Proceed to Payment
+          </>
+        )}
+      </motion.button>
+    </form>
+  );
+}

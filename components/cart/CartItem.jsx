@@ -15,7 +15,7 @@ export default function CartItem({ item }) {
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -30, height: 0 }}
       transition={{ duration: 0.2 }}
-      className="flex gap-4 py-4 border-b border-gray-100"
+      className="flex gap-4 py-4 border-b border-gray-100 dark:border-[#1c2444]"
     >
       {/* Product Image */}
       <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-100">
@@ -30,10 +30,10 @@ export default function CartItem({ item }) {
         >
           {item.category}
         </span>
-        <h4 className="text-sm font-semibold text-gray-800 leading-tight line-clamp-2 mt-0.5">
+        <h4 className="text-sm font-semibold text-gray-800 dark:text-[#e8d9c4] leading-tight line-clamp-2 mt-0.5">
           {item.name}
         </h4>
-        <p className="text-sm font-bold mt-1" style={{ color: '#050a30' }}>
+        <p className="text-sm font-bold mt-1 text-[#050a30] dark:text-[#e8d9c4]">
           ${item.price.toFixed(2)}
         </p>
 
@@ -45,17 +45,17 @@ export default function CartItem({ item }) {
           >
             <button
               onClick={() => updateQuantity(item.id, item.quantity - 1)}
-              className="w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+              className="cursor-pointer w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-[#1a2340] transition-colors"
               aria-label="Decrease quantity"
             >
               <Minus size={12} />
             </button>
-            <span className="w-8 text-center text-sm font-semibold text-gray-700">
+            <span className="w-8 text-center text-sm font-semibold text-gray-700 dark:text-[#e8d9c4]">
               {item.quantity}
             </span>
             <button
               onClick={() => updateQuantity(item.id, item.quantity + 1)}
-              className="w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+              className="cursor-pointer w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-[#1a2340] transition-colors"
               aria-label="Increase quantity"
             >
               <Plus size={12} />
@@ -64,7 +64,7 @@ export default function CartItem({ item }) {
 
           <div className="flex items-center gap-3">
             {/* Line Total */}
-            <span className="text-sm font-bold" style={{ color: '#050a30' }}>
+            <span className="text-sm font-bold text-[#050a30] dark:text-[#e8d9c4]">
               ${(item.price * item.quantity).toFixed(2)}
             </span>
             {/* Remove Button */}

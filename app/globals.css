@@ -41,3 +41,61 @@
     background-color: #e8d9c4;
   }
 }
+
+/* Dark mode */
+.dark {
+  color-scheme: dark;
+}
+
+/* ─── Hero Slider: Desktop pagination ─── */
+.hero-bullet {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: all 0.35s ease;
+}
+
+.hero-bullet-active {
+  background: #ffffff;
+  width: 26px;
+  border-radius: 4px;
+}
+
+/* ─── Hero Slider: Mobile pagination ─── */
+.hero-mobile .swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.4);
+  opacity: 1;
+  transition: all 0.35s ease;
+}
+
+.hero-mobile .swiper-pagination-bullet-active {
+  background: #ffffff;
+  width: 24px !important;
+  border-radius: 4px;
+}
+
+/* ─── Hero Cards: Desktop card slider ─── */
+
+/* Vertically centre all cards so active one grows upward & downward */
+.hero-cards .swiper-wrapper {
+  align-items: center;
+}
+
+/* Portrait rectangle base style — shorter inactive cards */
+.hero-card-slide {
+  height: 40vh;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  transition: height 0.5s ease, box-shadow 0.5s ease;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+/* Active card: significantly taller */
+.hero-cards .swiper-slide-active.hero-card-slide {
+  height: 78vh;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+}

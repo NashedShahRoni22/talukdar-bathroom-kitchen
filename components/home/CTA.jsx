@@ -35,12 +35,12 @@ export default function CTA() {
             Ready to Transform Your Space?
           </span>
           <h2
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
-            style={{ color: '#050a30', fontFamily: 'var(--font-playfair)' }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-[#050a30] dark:text-[#f0ebe3]"
+            style={{ fontFamily: 'var(--font-playfair)' }}
           >
             Schedule Your Free Consultation
           </h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-[#9fa8cc] mb-8 max-w-2xl mx-auto">
             Let our luxury design consultants help you create the bathroom or kitchen of your
             dreams. Expert guidance, premium products, exceptional results.
           </p>
@@ -49,8 +49,7 @@ export default function CTA() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 rounded-lg font-semibold text-white text-lg flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-2xl"
-              style={{ backgroundColor: '#050a30' }}
+              className="cursor-pointer px-8 py-4 rounded-lg font-semibold text-white text-lg flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-2xl bg-[#050a30] dark:bg-[#785d32]"
             >
               <Calendar size={20} />
               Book Consultation
@@ -60,14 +59,7 @@ export default function CTA() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 rounded-lg font-semibold border-2 text-lg transition-all hover:shadow-lg"
-              style={{
-                borderColor: '#785d32',
-                color: '#050a30',
-                backgroundColor: '#e8d9c4',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#785d32')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#e8d9c4')}
+              className="cursor-pointer px-8 py-4 rounded-lg font-semibold border-2 border-[#785d32] text-lg transition-all hover:shadow-lg text-[#050a30] dark:text-[#f0ebe3] bg-[#e8d9c4] dark:bg-transparent hover:bg-[#785d32] hover:text-white dark:hover:bg-[#785d32] dark:hover:text-white"
             >
               View Catalog
             </motion.button>
@@ -82,7 +74,7 @@ export default function CTA() {
             className="mt-12 flex flex-wrap justify-center gap-8 text-sm"
           >
             {['Free Consultation', 'Expert Design Team', 'Luxury Guarantee'].map((badge, i) => (
-              <div key={i} className="flex items-center gap-2" style={{ color: '#050a30' }}>
+              <div key={i} className="flex items-center gap-2 text-[#050a30] dark:text-[#f0ebe3]">
                 <span className="font-bold" style={{ color: '#785d32' }}>
                   ✓
                 </span>

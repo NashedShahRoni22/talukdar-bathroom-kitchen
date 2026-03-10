@@ -1,4 +1,4 @@
-import { Playfair_Display, Inter } from "next/font/google";
+import { Playfair_Display, Open_Sans } from "next/font/google";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import { AppProvider } from "@/components/context/AppContext";
@@ -11,8 +11,8 @@ const playfair = Playfair_Display({
   weight: ["400", "500", "600", "700"],
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const openSans = Open_Sans({
+  variable: "--font-open-sans",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
 });
@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${playfair.variable} ${inter.variable} antialiased bg-white`}
+        className={`${playfair.variable} ${openSans.variable} antialiased bg-white dark:bg-[#060b20] transition-colors duration-300`}
       >
         <AppProvider>
           <Navbar />

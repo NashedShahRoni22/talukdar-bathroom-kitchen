@@ -1,16 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, ShoppingCart, Search } from 'lucide-react';
-import { motion } from 'framer-motion';
-import logo from "@/public/images/logo.png";
+import { Menu, X, ShoppingCart, Sun, Moon, Instagram, Facebook, Youtube, Twitter } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import logo from '@/public/images/logo.png';
+import logoWhite from '@/public/images/logo-white.png';
 import { useApp } from '@/components/context/AppContext';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { cartCount, toggleCart } = useApp();
+  const [scrolled, setScrolled] = useState(false);
+  const { cartCount, toggleCart, isDark, toggleTheme } = useApp();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const menuItems = [
     { label: 'Home', href: '#' },
@@ -20,130 +28,229 @@ export default function Navbar() {
     { label: 'Contact', href: '#contact' },
   ];
 
-  const navVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
-
-  const menuVariants = {
-    hidden: { opacity: 0, height: 0 },
-    visible: {
-      opacity: 1,
-      height: 'auto',
-      transition: { duration: 0.3 },
-    },
-  };
+  const socialLinks = [
+    { Icon: Instagram, href: '#', label: 'Instagram' },
+    { Icon: Facebook, href: '#', label: 'Facebook' },
+    { Icon: Youtube, href: '#', label: 'YouTube' },
+    { Icon: Twitter, href: '#', label: 'Twitter' },
+  ];
 
   return (
-    <motion.nav
-      initial="hidden"
-      animate="visible"
-      variants={navVariants}
-      className="fixed top-0 w-full z-50 bg-white shadow-sm"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-        <div className="flex justify-between items-center">
-          {/* Logo for mobile */}
-          <Link href="/" className="flex items-center gap-2 md:hidden">
-            <Image
-              src={logo}
-              alt="Talukdar Logo"
-              width={120}
-              height={60}
-              className="object-contain"
-            />
-          </Link>
+    <>
+      <motion.nav
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+          scrolled
+            ? 'bg-white dark:bg-[#0a0f2e] border-b border-gray-100 dark:border-[#1c2444] shadow-sm dark:shadow-none'
+            : 'bg-transparent border-b border-transparent shadow-none'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            {/* Logo */}
+            <Link href="/" className="flex items-center">
+              <Image
+                src={!scrolled ? logoWhite : isDark ? logoWhite : logo}
+                alt="Talukdar Logo"
+                width={140}
+                height={70}
+                className="object-contain transition-all"
+              />
+            </Link>
 
-          {/* Logo for desktop */}
-          <Link href="/" className="hidden md:flex items-center gap-2">
-            <Image
-              src={logo}
-              alt="Talukdar Logo"
-              width={160}
-              height={80}
-              className="object-contain"
-            />
-          </Link>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-8">
-            {menuItems.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium text-sm"
-                style={{ color: '#050a30' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#785d32')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#050a30')}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Right Actions */}
-          <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Search size={20} style={{ color: '#050a30' }} />
-            </button>
-            <button
-              onClick={toggleCart}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
-              aria-label="Open cart"
-            >
-              <ShoppingCart size={20} style={{ color: '#050a30' }} />
-              {cartCount > 0 && (
-                <motion.span
-                  key={cartCount}
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-white text-xs font-bold flex items-center justify-center"
-                  style={{ backgroundColor: '#785d32' }}
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center gap-8">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={`text-sm font-medium transition-colors duration-200 hover:text-brand-gold dark:hover:text-[#c4a97e] ${
+                    scrolled ? 'text-brand-navy dark:text-brand-pale' : 'text-white'
+                  }`}
                 >
-                  {cartCount > 99 ? '99+' : cartCount}
-                </motion.span>
-              )}
-            </button>
+                  {item.label}
+                </Link>
+              ))}
+            </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden p-2"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              {isOpen ? (
-                <X size={24} style={{ color: '#050a30' }} />
-              ) : (
-                <Menu size={24} style={{ color: '#050a30' }} />
-              )}
-            </button>
+            {/* Right Actions */}
+            <div className="flex items-center gap-1">
+              {/* Theme Toggle */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={toggleTheme}
+                className={`cursor-pointer p-2.5 rounded-xl transition-colors ${
+                    scrolled ? 'hover:bg-gray-100 dark:hover:bg-[#1a2340]' : 'hover:bg-white/10'
+                  }`}
+                aria-label="Toggle theme"
+              >
+                <AnimatePresence mode="wait">
+                  {isDark ? (
+                    <motion.span
+                      key="sun"
+                      initial={{ rotate: -90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: 90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="block"
+                    >
+                      <Sun size={19} className="text-[#e8d9c4]" />
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="moon"
+                      initial={{ rotate: 90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: -90, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="block"
+                    >
+                      <Moon size={19} className={scrolled ? 'text-brand-navy' : 'text-white'} />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.button>
+
+              {/* Cart */}
+              <button
+                onClick={toggleCart}
+                className={`cursor-pointer p-2.5 rounded-xl transition-colors relative ${
+                    scrolled ? 'hover:bg-gray-100 dark:hover:bg-[#1a2340]' : 'hover:bg-white/10'
+                  }`}
+                aria-label="Open cart"
+              >
+                <ShoppingCart size={19} className={scrolled ? 'text-brand-navy dark:text-brand-pale' : 'text-white'} />
+                {cartCount > 0 && (
+                  <motion.span
+                    key={cartCount}
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-white text-xs font-bold flex items-center justify-center"
+                    style={{ backgroundColor: '#785d32' }}
+                  >
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </motion.span>
+                )}
+              </button>
+
+              {/* Mobile Menu Button */}
+              <button
+                className={`md:hidden cursor-pointer p-2.5 rounded-xl transition-colors ${
+                    scrolled ? 'hover:bg-gray-100 dark:hover:bg-[#1a2340]' : 'hover:bg-white/10'
+                  }`}
+                onClick={() => setIsOpen(true)}
+                aria-label="Open menu"
+              >
+                <Menu size={22} className={scrolled ? 'text-brand-navy dark:text-brand-pale' : 'text-white'} />
+              </button>
+            </div>
           </div>
         </div>
+      </motion.nav>
 
-        {/* Mobile Menu */}
-        <motion.div
-          initial="hidden"
-          animate={isOpen ? 'visible' : 'hidden'}
-          variants={menuVariants}
-          className="md:hidden overflow-hidden"
-        >
-          <div className="px-2 pt-2 pb-3 space-y-2">
-            {menuItems.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100"
+      {/* Full-Screen Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, clipPath: 'circle(0% at calc(100% - 44px) 44px)' }}
+            animate={{ opacity: 1, clipPath: 'circle(170% at calc(100% - 44px) 44px)' }}
+            exit={{ opacity: 0, clipPath: 'circle(0% at calc(100% - 44px) 44px)' }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 z-[60] flex flex-col md:hidden overflow-hidden"
+            style={{ backgroundColor: '#050a30' }}
+          >
+            {/* Top Bar */}
+            <div className="flex items-center justify-between px-6 py-5 shrink-0">
+              <Image
+                src={logo}
+                alt="Talukdar Logo"
+                width={120}
+                height={56}
+                className="object-contain brightness-0 invert"
+              />
+              <motion.button
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                transition={{ delay: 0.25 }}
                 onClick={() => setIsOpen(false)}
+                className="cursor-pointer p-3 rounded-full hover:bg-white/10 transition-colors"
+                aria-label="Close menu"
               >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </motion.nav>
+                <X size={26} color="white" />
+              </motion.button>
+            </div>
+
+            {/* Gold Divider */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              className="h-px mx-6 origin-left shrink-0"
+              style={{ backgroundColor: '#785d32' }}
+            />
+
+            {/* Menu Items */}
+            <div className="flex-1 flex flex-col justify-center px-8 overflow-hidden">
+              {menuItems.map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.15 + i * 0.08, duration: 0.4, ease: 'easeOut' }}
+                >
+                  <Link
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex items-center justify-between py-4 border-b border-white/10 hover:border-[#785d32]/60 transition-all"
+                  >
+                    <span
+                      className="text-3xl font-bold text-white group-hover:text-[#e8d9c4] transition-colors"
+                      style={{ fontFamily: 'var(--font-playfair)' }}
+                    >
+                      {item.label}
+                    </span>
+                    <span className="text-[#785d32] text-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                      →
+                    </span>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Bottom: Social Links */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55, duration: 0.4 }}
+              className="px-8 pb-10 pt-6 border-t border-white/10 shrink-0"
+            >
+              <p className="text-white/40 text-xs uppercase tracking-widest mb-5">Follow Us</p>
+              <div className="flex gap-4 mb-6">
+                {socialLinks.map(({ Icon, href, label }) => (
+                  <motion.a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.15, y: -3 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="cursor-pointer w-11 h-11 rounded-full border border-white/20 flex items-center justify-center hover:border-[#785d32] hover:bg-[#785d32]/20 transition-all"
+                    aria-label={label}
+                  >
+                    <Icon size={18} color="white" />
+                  </motion.a>
+                ))}
+              </div>
+              <p className="text-white/30 text-xs">
+                &copy; {new Date().getFullYear()} Talukdar Bathroom &amp; Kitchens
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

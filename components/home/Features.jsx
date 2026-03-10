@@ -48,7 +48,7 @@ export default function Features() {
   };
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-white dark:bg-[#0d1333] transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -65,8 +65,8 @@ export default function Features() {
             Why Choose Us
           </span>
           <h2
-            className="text-4xl md:text-5xl font-bold mt-3 mb-4"
-            style={{ color: '#050a30', fontFamily: 'var(--font-playfair)' }}
+            className="text-4xl md:text-5xl font-bold mt-3 mb-4 text-[#050a30] dark:text-[#f0ebe3]"
+            style={{ fontFamily: 'var(--font-playfair)' }}
           >
             Excellence in Every Detail
           </h2>
@@ -93,16 +93,13 @@ export default function Features() {
                 whileHover={{ y: -10 }}
                 className="group"
               >
-                <div
-                  className="h-16 w-16 rounded-lg flex items-center justify-center mb-4 transition-all group-hover:shadow-lg"
-                  style={{ backgroundColor: '#e8d9c4' }}
-                >
-                  <Icon size={28} style={{ color: '#050a30' }} />
+                <div className="h-16 w-16 rounded-lg flex items-center justify-center mb-4 transition-all group-hover:shadow-lg bg-[#e8d9c4] dark:bg-[#1a2340]">
+                  <Icon size={28} className="text-[#050a30] dark:text-[#c4a97e]" />
                 </div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: '#050a30' }}>
+                <h3 className="text-lg font-bold mb-2 text-[#050a30] dark:text-[#f0ebe3]">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                <p className="text-gray-600 dark:text-[#9fa8cc] text-sm leading-relaxed">{feature.description}</p>
                 <motion.div
                   initial={{ width: 0 }}
                   whileHover={{ width: '100%' }}

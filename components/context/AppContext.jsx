@@ -8,6 +8,7 @@ const AppContext = createContext(null);
 export function AppProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isDark, setIsDark] = useState(false);
 
   // Hydrate cart from localStorage on first mount
   useEffect(() => {
@@ -23,6 +24,17 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('talukdar-cart', JSON.stringify(cartItems));
   }, [cartItems]);
+
+  // Hydrate theme preference on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('talukdar-theme');
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark');
+        setIsDark(true);
+      }
+    } catch {}
+  }, []);
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -58,6 +70,13 @@ export function AppProvider({ children }) {
     toast('Cart cleared', { icon: '🗑️' });
   }
 
+  function toggleTheme() {
+    const next = !isDark;
+    setIsDark(next);
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('talukdar-theme', next ? 'dark' : 'light');
+  }
+
   function toggleCart() {
     setIsCartOpen((prev) => !prev);
   }
@@ -77,7 +96,9 @@ export function AppProvider({ children }) {
         cartCount,
         cartTotal,
         isCartOpen,
+        isDark,
         toggleCart,
+        toggleTheme,
         openCart,
         closeCart,
         addToCart,
