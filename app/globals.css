@@ -99,3 +99,120 @@
   height: 78vh;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
 }
+
+/* ─── Hero: Keyframe animations ─── */
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideLeft {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes lineExpand {
+  from { transform: scaleX(0); opacity: 0; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
+
+@keyframes bgKen {
+  from { transform: scale(1); }
+  to   { transform: scale(1.06); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* ─── Hero: Text reveal (re-fires on each slide) ─── */
+.hero-label   { animation: fadeSlideUp 0.55s cubic-bezier(.22, 1, .36, 1) both; }
+.hero-title   { animation: fadeSlideUp 0.65s cubic-bezier(.22, 1, .36, 1) 0.08s both; }
+.hero-divider { animation: lineExpand  0.6s  cubic-bezier(.22, 1, .36, 1) 0.18s both; transform-origin: left; }
+.hero-sub     { animation: fadeSlideUp 0.65s cubic-bezier(.22, 1, .36, 1) 0.22s both; }
+.hero-btns    { animation: fadeSlideUp 0.65s cubic-bezier(.22, 1, .36, 1) 0.34s both; }
+
+/* ─── Hero: Mount animations (initial load only) ─── */
+.mount-bg    { animation: fadeIn        1.1s cubic-bezier(.22, 1, .36, 1) both; }
+.mount-cards { animation: fadeSlideLeft 0.9s cubic-bezier(.22, 1, .36, 1) 0.4s both; }
+.mount-nav   { animation: fadeIn        0.8s cubic-bezier(.22, 1, .36, 1) 0.6s both; }
+
+/* ─── Hero: Background Ken Burns ─── */
+.bg-kenburns { animation: bgKen 8s ease-in-out forwards; }
+
+/* ─── Hero: Card hover lift ─── */
+.hero-card-slide:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* ─── Hero: Active card float ─── */
+.swiper-slide-active .card-float { animation: cardFloat 5s ease-in-out infinite; }
+
+/* ─── Hero: Swiper overrides
+   !important is required here because Swiper's CSS is injected as a JS
+   module at runtime and lands after globals.css in the cascade. ─── */
+.hero-cards {
+  padding: 60px 0 80px !important;
+}
+.hero-cards .swiper-wrapper {
+  align-items: center !important;
+}
+.hero-cards .swiper-slide {
+  transition: opacity 0.5s !important;
+}
+.hero-cards .swiper-slide:not(.swiper-slide-active) {
+  opacity: 0.65 !important;
+}
+.hero-cards .swiper-slide-active {
+  opacity: 1 !important;
+}
+
+/* ─── Hero: Gradient overlay ─── */
+.hero-gradient {
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.58) 45%,
+    rgba(0, 0, 0, 0.08) 100%
+  );
+}
+
+/* ─── Hero: Buttons ─── */
+
+/* Shop Now shimmer */
+.btn-shop { position: relative; overflow: hidden; }
+.btn-shimmer { position: absolute; inset: 0; pointer-events: none; }
+.btn-shop:hover .btn-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.25) 50%, transparent 100%);
+  background-size: 200% auto;
+  animation: shimmer 0.7s linear;
+}
+
+/* Learn More fill sweep */
+.btn-learn { position: relative; overflow: hidden; }
+.btn-learn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: white;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(.22, 1, .36, 1);
+  z-index: 0;
+}
+.btn-learn:hover::after { transform: scaleX(1); }
+.btn-learn span { position: relative; z-index: 1; transition: color 0.2s 0.1s; }
+.btn-learn:hover span { color: #1a1a1a; }
