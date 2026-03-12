@@ -215,4 +215,75 @@
 }
 .btn-learn:hover::after { transform: scaleX(1); }
 .btn-learn span { position: relative; z-index: 1; transition: color 0.2s 0.1s; }
+
+/* Swiper custom styles */
+.product-swiper {
+  position: relative;
+  padding: 0 48px;
+}
+
+/* Navigation arrows — outside cards */
+.product-swiper .swiper-button-next,
+.product-swiper .swiper-button-prev {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #050a30;
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(5, 10, 48, 0.25);
+  transition: background 0.3s;
+}
+.product-swiper .swiper-button-prev {
+  left: 0;
+}
+.product-swiper .swiper-button-next {
+  right: 0;
+}
+.product-swiper .swiper-button-next::after,
+.product-swiper .swiper-button-prev::after {
+  font-size: 14px;
+  font-weight: 700;
+}
+.product-swiper .swiper-button-next:hover,
+.product-swiper .swiper-button-prev:hover {
+  background: #785d32;
+}
+
+/* Pagination dots — below cards */
+.product-swiper .swiper-pagination {
+  position: relative;
+  margin-top: 28px;
+}
+.product-swiper .swiper-pagination-bullet {
+  background: #050a30;
+  opacity: 0.25;
+  width: 10px;
+  height: 10px;
+  transition: all 0.3s;
+}
+.product-swiper .swiper-pagination-bullet-active {
+  opacity: 1;
+  background: #785d32;
+  width: 28px;
+  border-radius: 5px;
+}
+
+/* Dark mode overrides */
+:is(.dark) .product-swiper .swiper-button-next,
+:is(.dark) .product-swiper .swiper-button-prev {
+  background: #785d32;
+  color: #fff;
+}
+:is(.dark) .product-swiper .swiper-button-next:hover,
+:is(.dark) .product-swiper .swiper-button-prev:hover {
+  background: #c4a97e;
+}
+:is(.dark) .product-swiper .swiper-pagination-bullet {
+  background: #c4a97e;
+  opacity: 0.3;
+}
+:is(.dark) .product-swiper .swiper-pagination-bullet-active {
+  background: #785d32;
+  opacity: 1;
+}
 .btn-learn:hover span { color: #1a1a1a; }

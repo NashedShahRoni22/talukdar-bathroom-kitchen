@@ -145,7 +145,7 @@ export default function Hero() {
               ref={swiperRef}
               modules={[Autoplay, Pagination]}
               slidesPerView={2.2}
-              centeredSlides={true}
+              // centeredSlides={true}
               spaceBetween={18}
               loop={true}
               slideToClickedSlide={true}

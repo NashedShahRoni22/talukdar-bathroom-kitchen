@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { Menu, X, ShoppingCart, Sun, Moon, Instagram, Facebook, Youtube, Twitter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import logo from '@/public/images/logo.png';
@@ -12,6 +13,9 @@ import { useApp } from '@/components/context/AppContext';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === '/';
+  const isTransparent = isHome && !scrolled;
   const { cartCount, toggleCart, isDark, toggleTheme } = useApp();
 
   useEffect(() => {
@@ -42,9 +46,9 @@ export default function Navbar() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-          scrolled
-            ? 'bg-white dark:bg-[#0a0f2e] border-b border-gray-100 dark:border-[#1c2444] shadow-sm dark:shadow-none'
-            : 'bg-transparent border-b border-transparent shadow-none'
+          isTransparent
+            ? 'bg-transparent border-b border-transparent shadow-none'
+            : 'bg-white dark:bg-[#0a0f2e] border-b border-gray-100 dark:border-[#1c2444] shadow-sm dark:shadow-none'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -52,7 +56,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" className="flex items-center">
               <Image
-                src={!scrolled ? logoWhite : isDark ? logoWhite : logo}
+                src={isTransparent ? logoWhite : isDark ? logoWhite : logo}
                 alt="Talukdar Logo"
                 width={140}
                 height={70}
@@ -61,13 +65,13 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Menu */}
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-9">
               {menuItems.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={`text-sm font-medium transition-colors duration-200 hover:text-brand-gold dark:hover:text-[#c4a97e] ${
-                    scrolled ? 'text-brand-navy dark:text-brand-pale' : 'text-white'
+                  className={`text-base font-medium transition-colors duration-200 hover:text-brand-gold dark:hover:text-[#c4a97e] ${
+                    isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'
                   }`}
                 >
                   {item.label}
@@ -83,7 +87,7 @@ export default function Navbar() {
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleTheme}
                 className={`cursor-pointer p-2.5 rounded-xl transition-colors ${
-                    scrolled ? 'hover:bg-gray-100 dark:hover:bg-[#1a2340]' : 'hover:bg-white/10'
+                    isTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-[#1a2340]'
                   }`}
                 aria-label="Toggle theme"
               >
@@ -108,7 +112,7 @@ export default function Navbar() {
                       transition={{ duration: 0.2 }}
                       className="block"
                     >
-                      <Moon size={19} className={scrolled ? 'text-brand-navy' : 'text-white'} />
+                      <Moon size={19} className={isTransparent ? 'text-white' : 'text-brand-navy'} />
                     </motion.span>
                   )}
                 </AnimatePresence>
@@ -118,11 +122,11 @@ export default function Navbar() {
               <button
                 onClick={toggleCart}
                 className={`cursor-pointer p-2.5 rounded-xl transition-colors relative ${
-                    scrolled ? 'hover:bg-gray-100 dark:hover:bg-[#1a2340]' : 'hover:bg-white/10'
+                    isTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-[#1a2340]'
                   }`}
                 aria-label="Open cart"
               >
-                <ShoppingCart size={19} className={scrolled ? 'text-brand-navy dark:text-brand-pale' : 'text-white'} />
+                <ShoppingCart size={19} className={isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'} />
                 {cartCount > 0 && (
                   <motion.span
                     key={cartCount}
@@ -139,12 +143,12 @@ export default function Navbar() {
               {/* Mobile Menu Button */}
               <button
                 className={`md:hidden cursor-pointer p-2.5 rounded-xl transition-colors ${
-                    scrolled ? 'hover:bg-gray-100 dark:hover:bg-[#1a2340]' : 'hover:bg-white/10'
+                    isTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-[#1a2340]'
                   }`}
                 onClick={() => setIsOpen(true)}
                 aria-label="Open menu"
               >
-                <Menu size={22} className={scrolled ? 'text-brand-navy dark:text-brand-pale' : 'text-white'} />
+                <Menu size={22} className={isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'} />
               </button>
             </div>
           </div>
