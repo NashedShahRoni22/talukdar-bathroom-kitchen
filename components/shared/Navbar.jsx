@@ -25,10 +25,10 @@ export default function Navbar() {
   }, []);
 
   const menuItems = [
-    { label: 'Home', href: '#' },
+    { label: 'Home', href: '/' },
     { label: 'Bathrooms', href: '#bathrooms' },
     { label: 'Kitchens', href: '#kitchens' },
-    { label: 'About', href: '#about' },
+    { label: 'About', href: '/about' },
     { label: 'Contact', href: '#contact' },
   ];
 
@@ -66,17 +66,30 @@ export default function Navbar() {
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-9">
-              {menuItems.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={`text-base font-medium transition-colors duration-200 hover:text-brand-gold dark:hover:text-[#c4a97e] ${
-                    isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {menuItems.map((item) => {
+                const isActive = 
+                  (item.href === '/' && pathname === '/') ||
+                  (item.href.startsWith('/') && pathname === item.href);
+                
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`text-base font-medium transition-all duration-200 relative pb-1 ${
+                      isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'
+                    } ${isActive ? 'text-[#c4a97e]' : 'hover:text-[#c4a97e]'}`}
+                  >
+                    {item.label}
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeIndicator"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#c4a97e]"
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
+                  </Link>
+                );
+              })}
             </div>
 
             {/* Right Actions */}
@@ -198,30 +211,48 @@ export default function Navbar() {
 
             {/* Menu Items */}
             <div className="flex-1 flex flex-col justify-center px-8 overflow-hidden">
-              {menuItems.map((item, i) => (
-                <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.15 + i * 0.08, duration: 0.4, ease: 'easeOut' }}
-                >
-                  <Link
-                    href={item.href}
-                    onClick={() => setIsOpen(false)}
-                    className="group flex items-center justify-between py-4 border-b border-white/10 hover:border-[#785d32]/60 transition-all"
+              {menuItems.map((item, i) => {
+                const isActive = 
+                  (item.href === '/' && pathname === '/') ||
+                  (item.href.startsWith('/') && pathname === item.href);
+                
+                return (
+                  <motion.div
+                    key={item.label}
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.15 + i * 0.08, duration: 0.4, ease: 'easeOut' }}
                   >
-                    <span
-                      className="text-3xl font-bold text-white group-hover:text-[#e8d9c4] transition-colors"
-                      style={{ fontFamily: 'var(--font-playfair)' }}
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`group flex items-center justify-between py-4 border-b transition-all ${
+                        isActive 
+                          ? 'border-[#785d32] text-[#e8d9c4]' 
+                          : 'border-white/10 hover:border-[#785d32]/60'
+                      }`}
                     >
-                      {item.label}
-                    </span>
-                    <span className="text-[#785d32] text-xl opacity-0 group-hover:opacity-100 transition-opacity">
-                      →
-                    </span>
-                  </Link>
-                </motion.div>
-              ))}
+                      <span
+                        className={`text-3xl font-bold transition-colors ${
+                          isActive 
+                            ? 'text-[#e8d9c4]' 
+                            : 'text-white group-hover:text-[#e8d9c4]'
+                        }`}
+                        style={{ fontFamily: 'var(--font-playfair)' }}
+                      >
+                        {item.label}
+                      </span>
+                      <span className={`text-xl transition-opacity ${
+                        isActive 
+                          ? 'text-[#785d32] opacity-100' 
+                          : 'text-[#785d32] opacity-0 group-hover:opacity-100'
+                      }`}>
+                        →
+                      </span>
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
 
             {/* Bottom: Social Links */}

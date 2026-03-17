@@ -82,7 +82,7 @@ export default function ProductCard({ id, name, price, image, category, rating }
         <h3 className="font-semibold text-gray-800 dark:text-[#e8d9c4] text-sm mb-2 line-clamp-2">{name}</h3>
 
         {/* Rating */}
-        <div className="flex items-center gap-1 mb-3">
+        {/* <div className="flex items-center gap-1 mb-3">
           {[...Array(5)].map((_, i) => (
             <span
               key={i}
@@ -92,7 +92,7 @@ export default function ProductCard({ id, name, price, image, category, rating }
             </span>
           ))}
           <span className="text-xs text-gray-600 dark:text-[#9fa8cc] ml-2">({rating})</span>
-        </div>
+        </div> */}
 
         {/* Price */}
         <div className="flex items-center justify-between">

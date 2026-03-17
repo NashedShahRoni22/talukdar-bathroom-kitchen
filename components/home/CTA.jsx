@@ -52,16 +52,8 @@ export default function CTA() {
               className="cursor-pointer px-8 py-4 rounded-lg font-semibold text-white text-lg flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-2xl bg-[#050a30] dark:bg-[#785d32]"
             >
               <Calendar size={20} />
-              Book Consultation
-              <ArrowRight size={20} />
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="cursor-pointer px-8 py-4 rounded-lg font-semibold border-2 border-[#785d32] text-lg transition-all hover:shadow-lg text-[#050a30] dark:text-[#f0ebe3] bg-[#e8d9c4] dark:bg-transparent hover:bg-[#785d32] hover:text-white dark:hover:bg-[#785d32] dark:hover:text-white"
-            >
               View Catalog
+              <ArrowRight size={20} />
             </motion.button>
           </div>
 
