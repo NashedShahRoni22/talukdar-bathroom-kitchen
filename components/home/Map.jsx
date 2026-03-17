@@ -18,7 +18,7 @@ export default function Map() {
   };
 
   return (
-    <section id="contact" className="py-20 bg-white dark:bg-[#0d1333] scroll-mt-20 transition-colors duration-300">
+    <section id="contact" className="py-20 bg-white dark:bg-[#111b2d] scroll-mt-20 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -155,15 +155,6 @@ export default function Map() {
                 </p>
               </div>
             </div>
-
-            {/* CTA */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="cursor-pointer w-full px-8 py-3 rounded-lg font-semibold text-white transition-all bg-[#050a30] dark:bg-[#785d32]"
-            >
-              Schedule a Consultation
-            </motion.button>
           </motion.div>
         </motion.div>
       </div>

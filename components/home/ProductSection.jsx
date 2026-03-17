@@ -11,11 +11,14 @@ import ProductCard from '@/components/products/ProductCard';
 
 export default function ProductSection({ title, subtitle, products, id }) {
   const swiperRef = useRef(null);
+  const surfaceClass = id === 'kitchens'
+    ? 'bg-[#f7f5f2] dark:bg-[#0f1219]'
+    : 'bg-white dark:bg-[#111b2d]';
 
   return (
     <section
       id={id}
-      className="py-12 sm:py-16 lg:py-20 bg-white dark:bg-[#0d1333] scroll-mt-20 transition-colors duration-300"
+      className={`py-12 sm:py-16 lg:py-20 ${surfaceClass} scroll-mt-20 transition-colors duration-300`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 

@@ -29,7 +29,7 @@ export default function Navbar() {
     { label: 'Bathrooms', href: '#bathrooms' },
     { label: 'Kitchens', href: '#kitchens' },
     { label: 'About', href: '/about' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'Contact', href: '/contact' },
   ];
 
   const socialLinks = [

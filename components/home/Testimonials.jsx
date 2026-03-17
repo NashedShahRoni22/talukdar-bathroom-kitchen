@@ -58,7 +58,7 @@ export default function Testimonials() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="relative py-16 md:py-24 bg-white dark:bg-[#0d1333] overflow-hidden transition-colors duration-300">
+    <section className="relative py-16 md:py-24 bg-white dark:bg-[#111b2d] overflow-hidden transition-colors duration-300">
 
       {/* ── Decorative blobs ── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
