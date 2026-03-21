@@ -6,7 +6,7 @@ import Image from 'next/image';
 export default function Mission() {
   return (
     <section className="py-20 md:py-32 bg-white dark:bg-[#111b2d] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Content */}
           <motion.div
@@ -14,6 +14,7 @@ export default function Mission() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
+            className="min-w-0"
           >
             <span className="text-sm font-semibold tracking-widest uppercase text-[#785d32]">
               Who We Are

@@ -38,7 +38,7 @@ const milestones = [
 export default function Journey() {
   return (
     <section className="py-20 md:py-32 bg-white dark:bg-[#111b2d] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -47,10 +47,10 @@ export default function Journey() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="text-sm font-semibold tracking-widest uppercase text-[#785d32]">
+          <span className="text-sm font-semibold tracking-widest uppercase text-brand-gold">
             Our Journey
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold mt-3 mb-4 text-[#050a30] dark:text-[#f0ebe3]" style={{ fontFamily: 'var(--font-playfair)' }}>
+          <h2 className="text-4xl md:text-5xl font-bold mt-3 mb-4 text-brand-navy dark:text-[#f0ebe3]" style={{ fontFamily: 'var(--font-playfair)' }}>
             From Vision to Reality
           </h2>
           <div className="w-16 h-1 rounded-full mx-auto" style={{ backgroundColor: '#785d32' }}></div>
@@ -59,7 +59,7 @@ export default function Journey() {
         {/* Timeline */}
         <div className="grid md:grid-cols-2 gap-8 relative">
           {/* Vertical Timeline Line */}
-          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#785d32] via-[#c4a97e] to-[#785d32]"></div>
+          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-brand-gold via-[#c4a97e] to-brand-gold"></div>
 
           {milestones.map((milestone, index) => (
             <motion.div
@@ -68,19 +68,19 @@ export default function Journey() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className={`md:w-full ${index % 2 === 0 ? 'md:text-right md:pr-16' : 'md:col-start-2 md:pl-16'}`}
+              className={`min-w-0 md:w-full ${index % 2 === 0 ? 'md:text-right md:pr-16' : 'md:col-start-2 md:pl-16'}`}
             >
               {/* Timeline Dot */}
               <div className="hidden md:flex absolute left-1/2 top-4 -translate-x-1/2 items-center justify-center">
-                <div className="w-6 h-6 rounded-full border-4 border-white dark:border-[#111b2d] bg-[#785d32]"></div>
+                <div className="w-6 h-6 rounded-full border-4 border-white dark:border-[#111b2d] bg-brand-gold"></div>
               </div>
 
               {/* Content */}
               <div className="bg-[#f9f9f9] dark:bg-[#162235] p-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 border-l-4" style={{ borderColor: '#785d32' }}>
-                <span className="text-sm font-bold uppercase tracking-wider text-[#785d32]">
+                <span className="text-sm font-bold uppercase tracking-wider text-brand-gold">
                   {milestone.year}
                 </span>
-                <h3 className="text-2xl font-bold mt-2 mb-3 text-[#050a30] dark:text-[#f0ebe3]">
+                <h3 className="text-2xl font-bold mt-2 mb-3 text-brand-navy dark:text-[#f0ebe3]">
                   {milestone.title}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">

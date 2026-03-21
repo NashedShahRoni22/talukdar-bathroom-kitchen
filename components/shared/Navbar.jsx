@@ -26,8 +26,7 @@ export default function Navbar() {
 
   const menuItems = [
     { label: 'Home', href: '/' },
-    { label: 'Bathrooms', href: '#bathrooms' },
-    { label: 'Kitchens', href: '#kitchens' },
+    { label: 'Shop', href: '/shop' },
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
   ];

@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { useApp } from '@/components/context/AppContext';
+import { getOrderTotalsForAustralia, parseAuPostcode } from '@/lib/auShipping';
 
 // ─── Set your API endpoint here (or via NEXT_PUBLIC_ORDERS_API_URL env var) ───
 const ORDERS_API_URL = process.env.NEXT_PUBLIC_ORDERS_API_URL ?? 'https://your-api.com/orders';
@@ -20,18 +22,8 @@ const EMPTY_ADDRESS = {
   city: '',
   state: '',
   zip: '',
-  country: 'United States',
+  country: 'Australia',
 };
-
-const COUNTRIES = [
-  'United States',
-  'United Kingdom',
-  'Canada',
-  'Australia',
-  'Germany',
-  'France',
-  'Other',
-];
 
 function InputField({ label, name, value, onChange, error, type = 'text', span2 = false }) {
   return (
@@ -46,28 +38,10 @@ function InputField({ label, name, value, onChange, error, type = 'text', span2 
         className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none transition-colors bg-white dark:bg-[#111840] dark:text-[#f0ebe3] dark:placeholder-[#6b7498] ${
           error
             ? 'border-red-400 focus:border-red-400'
-            : 'border-gray-200 dark:border-[#2a3460] focus:border-[#050a30] dark:focus:border-[#c4a97e]'
+            : 'border-gray-200 dark:border-[#2a3460] focus:border-brand-navy dark:focus:border-[#c4a97e]'
         }`}
       />
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-    </div>
-  );
-}
-
-function SelectField({ label, name, value, onChange }) {
-  return (
-    <div className="col-span-2">
-      <label className="block text-sm font-medium text-gray-600 dark:text-[#9fa8cc] mb-1.5">{label}</label>
-      <select
-        name={name}
-        value={value}
-        onChange={onChange}
-        className="cursor-pointer w-full px-4 py-3 border border-gray-200 dark:border-[#2a3460] rounded-lg text-sm focus:outline-none focus:border-[#050a30] dark:focus:border-[#c4a97e] transition-colors bg-white dark:bg-[#111840] dark:text-[#f0ebe3]"
-      >
-        {COUNTRIES.map((c) => (
-          <option key={c}>{c}</option>
-        ))}
-      </select>
     </div>
   );
 }
@@ -79,7 +53,7 @@ function Checkbox({ checked, onChange, children }) {
         type="button"
         onClick={onChange}
         className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${
-          checked ? 'border-[#785d32] bg-[#785d32]' : 'border-gray-300 dark:border-[#2a3460] bg-white dark:bg-[#111840] hover:border-[#785d32]'
+          checked ? 'border-brand-gold bg-brand-gold' : 'border-gray-300 dark:border-[#2a3460] bg-white dark:bg-[#111840] hover:border-brand-gold'
         }`}
         aria-checked={checked}
         role="checkbox"
@@ -111,7 +85,7 @@ function AddressForm({ title, prefix, data, onChange, errors }) {
   return (
     <div>
       <h3
-        className="text-base font-bold uppercase tracking-widest mb-5 pb-3 border-b border-gray-100 dark:border-[#1c2444] text-[#050a30] dark:text-[#f0ebe3]"
+        className="text-base font-bold uppercase tracking-widest mb-5 pb-3 border-b border-gray-100 dark:border-[#1c2444] text-brand-navy dark:text-[#f0ebe3]"
       >
         {title}
       </h3>
@@ -123,19 +97,13 @@ function AddressForm({ title, prefix, data, onChange, errors }) {
         {field('address', 'Street Address', { span2: true })}
         {field('city', 'City')}
         {field('state', 'State / Province')}
-        {field('zip', 'ZIP / Postal Code')}
-        <SelectField
-          label="Country"
-          name="country"
-          value={data.country}
-          onChange={onChange}
-        />
+        {field('zip', 'Postcode')}
       </div>
     </div>
   );
 }
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ onShippingMetaChange }) {
   const router = useRouter();
   const { cartItems, cartTotal, clearCart } = useApp();
 
@@ -146,6 +114,13 @@ export default function CheckoutForm() {
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    onShippingMetaChange?.({
+      zip: shipping.zip,
+      country: 'Australia',
+    });
+  }, [shipping.zip, onShippingMetaChange]);
 
   function makeHandler(setter) {
     return (e) => {
@@ -162,10 +137,18 @@ export default function CheckoutForm() {
       if (!shipping[f]?.trim()) errs[`shipping_${f}`] = 'This field is required';
     });
 
+    if (!parseAuPostcode(shipping.zip)) {
+      errs.shipping_zip = 'Enter a valid Australian postcode (e.g. 2000)';
+    }
+
     if (!sameAsShipping) {
       required.forEach((f) => {
         if (!billing[f]?.trim()) errs[`billing_${f}`] = 'This field is required';
       });
+
+      if (!parseAuPostcode(billing.zip)) {
+        errs.billing_zip = 'Enter a valid Australian postcode (e.g. 3000)';
+      }
     }
 
     if (cartItems.length === 0) errs.cart = 'Your cart is empty';
@@ -176,14 +159,14 @@ export default function CheckoutForm() {
   }
 
   function buildPayload() {
-    const shippingCharge = cartTotal > 5000 ? 0 : 250;
-    const taxRate = 0.10;
-    const tax = parseFloat((cartTotal * taxRate).toFixed(2));
-    const total = parseFloat((cartTotal + shippingCharge + tax).toFixed(2));
+    const totals = getOrderTotalsForAustralia({
+      subtotal: cartTotal,
+      destinationPostcode: shipping.zip,
+    });
 
     return {
-      shipping: { ...shipping },
-      billing: sameAsShipping ? { ...shipping } : { ...billing },
+      shipping: { ...shipping, country: 'Australia' },
+      billing: sameAsShipping ? { ...shipping, country: 'Australia' } : { ...billing, country: 'Australia' },
       items: cartItems.map(({ id, name, category, price, image, quantity }) => ({
         id,
         name,
@@ -195,12 +178,14 @@ export default function CheckoutForm() {
       })),
       summary: {
         subtotal: parseFloat(cartTotal.toFixed(2)),
-        shippingCharge,
-        taxRate,
-        tax,
-        total,
+        shippingCharge: totals.shippingCharge,
+        taxRate: totals.gstRate,
+        tax: totals.tax,
+        total: totals.total,
+        shippingZone: totals.shippingMeta.zone,
+        deliveryPricingModel: 'AU_POSTCODE_DISTANCE_BAND',
       },
-    };
+      };
   }
 
   async function handleSubmit(e) {
@@ -291,7 +276,7 @@ export default function CheckoutForm() {
       {/* Terms & Privacy */}
       <div className="space-y-4">
         <h3
-          className="text-base font-bold uppercase tracking-widest text-[#050a30] dark:text-[#f0ebe3]"
+          className="text-base font-bold uppercase tracking-widest text-brand-navy dark:text-[#f0ebe3]"
         >
           Agreements
         </h3>
@@ -299,13 +284,14 @@ export default function CheckoutForm() {
         <div data-error={errors.terms ? true : undefined}>
           <Checkbox checked={agreedTerms} onChange={() => setAgreedTerms((v) => !v)}>
             I have read and agree to the{' '}
-            <button
-              type="button"
-              className="underline font-semibold hover:opacity-75 transition-opacity"
-              style={{ color: '#785d32' }}
+            <Link
+              href="/terms-and-conditions"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-semibold hover:opacity-75 transition-opacity text-brand-gold"
             >
               Terms & Conditions
-            </button>
+            </Link>
           </Checkbox>
           {errors.terms && (
             <p className="text-xs text-red-500 mt-1 ml-8">{errors.terms}</p>
@@ -315,13 +301,14 @@ export default function CheckoutForm() {
         <div data-error={errors.privacy ? true : undefined}>
           <Checkbox checked={agreedPrivacy} onChange={() => setAgreedPrivacy((v) => !v)}>
             I have read and agree to the{' '}
-            <button
-              type="button"
-              className="underline font-semibold hover:opacity-75 transition-opacity"
-              style={{ color: '#785d32' }}
+            <Link
+              href="/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-semibold hover:opacity-75 transition-opacity text-brand-gold"
             >
               Privacy Policy
-            </button>
+            </Link>
           </Checkbox>
           {errors.privacy && (
             <p className="text-xs text-red-500 mt-1 ml-8">{errors.privacy}</p>
@@ -337,7 +324,7 @@ export default function CheckoutForm() {
       {/* Submit */}
       <motion.button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || !agreedTerms || !agreedPrivacy}
         whileHover={isLoading ? {} : { scale: 1.02 }}
         whileTap={isLoading ? {} : { scale: 0.97 }}
         className="w-full py-4 rounded-xl text-white font-semibold text-base flex items-center justify-center gap-2.5 shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed"
@@ -355,6 +342,12 @@ export default function CheckoutForm() {
           </>
         )}
       </motion.button>
+
+      {(!agreedTerms || !agreedPrivacy) && (
+        <p className="text-xs text-center text-gray-500 dark:text-[#9fa8cc]">
+          Please accept Terms & Conditions and Privacy Policy to proceed with payment.
+        </p>
+      )}
     </form>
   );
 }

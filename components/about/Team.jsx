@@ -53,7 +53,7 @@ export default function Team() {
 
   return (
     <section className="py-20 md:py-32 bg-[#f7f5f2] dark:bg-[#0f1219] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -83,7 +83,7 @@ export default function Team() {
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
         >
           {team.map((member, index) => (
-            <motion.div key={index} variants={itemVariants}>
+            <motion.div key={index} variants={itemVariants} className="min-w-0">
               <div className="bg-white dark:bg-[#162235] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group h-full">
                 {/* Image */}
                 <div className="relative h-80 overflow-hidden">

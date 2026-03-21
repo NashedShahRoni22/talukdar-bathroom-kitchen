@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Shield } from 'lucide-react';
@@ -12,6 +12,10 @@ import { useApp } from '@/components/context/AppContext';
 export default function CheckoutPage() {
   const { cartItems } = useApp();
   const router = useRouter();
+  const [shippingMeta, setShippingMeta] = useState({
+    zip: '',
+    country: 'Australia',
+  });
 
   useEffect(() => {
     if (cartItems.length === 0) {
@@ -29,23 +33,25 @@ export default function CheckoutPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="flex items-center gap-4 mb-10"
+          className="mb-8 flex flex-col gap-3 sm:mb-10 sm:flex-row sm:items-center sm:gap-4"
         >
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors"
-          >
-            <ArrowLeft size={15} />
-            Back to store
-          </Link>
-          <div className="h-4 w-px bg-gray-300 dark:bg-[#2a3460]" />
-          <h1
-            className="text-2xl md:text-3xl font-bold text-[#050a30] dark:text-[#f0ebe3]"
-            style={{ fontFamily: 'var(--font-playfair)' }}
-          >
-            Checkout
-          </h1>
-          <div className="ml-auto flex items-center gap-1.5 text-xs text-gray-400">
+          <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:flex-nowrap sm:gap-4">
+            <Link
+              href="/"
+              className="flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-gray-700"
+            >
+              <ArrowLeft size={15} />
+              Back to store
+            </Link>
+            <div className="hidden h-4 w-px bg-gray-300 dark:bg-[#2a3460] sm:block" />
+            <h1
+              className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3] md:text-3xl"
+              style={{ fontFamily: 'var(--font-playfair)' }}
+            >
+              Checkout
+            </h1>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-gray-400 sm:ml-auto">
             <Shield size={14} />
             Secure &amp; Encrypted
           </div>
@@ -60,7 +66,7 @@ export default function CheckoutPage() {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="bg-white dark:bg-[#0d1333] rounded-2xl p-8 shadow-sm"
           >
-            <CheckoutForm />
+            <CheckoutForm onShippingMetaChange={setShippingMeta} />
           </motion.div>
 
           {/* Right — Order Summary */}
@@ -70,7 +76,7 @@ export default function CheckoutPage() {
             transition={{ duration: 0.4, delay: 0.2 }}
           >
               <div className="bg-white dark:bg-[#0d1333] rounded-2xl p-6 shadow-sm">
-              <OrderSummary />
+              <OrderSummary shippingZip={shippingMeta.zip} shippingCountry={shippingMeta.country} />
             </div>
           </motion.div>
         </div>

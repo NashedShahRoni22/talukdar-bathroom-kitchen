@@ -59,7 +59,7 @@ export default function Values() {
 
   return (
     <section className="py-20 md:py-32 bg-[#f7f5f2] dark:bg-[#0f1219] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -68,10 +68,10 @@ export default function Values() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="text-sm font-semibold tracking-widest uppercase text-[#785d32]">
+          <span className="text-sm font-semibold tracking-widest uppercase text-brand-gold">
             Core Values
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold mt-3 mb-4 text-[#050a30] dark:text-[#f0ebe3]" style={{ fontFamily: 'var(--font-playfair)' }}>
+          <h2 className="text-4xl md:text-5xl font-bold mt-3 mb-4 text-brand-navy dark:text-[#f0ebe3]" style={{ fontFamily: 'var(--font-playfair)' }}>
             What Drives Us
           </h2>
           <div className="w-16 h-1 rounded-full mx-auto" style={{ backgroundColor: '#785d32' }}></div>
@@ -94,12 +94,12 @@ export default function Values() {
                 whileHover={{ y: -8 }}
                 className="group"
               >
-                <div className="bg-white dark:bg-[#162235] rounded-lg p-8 h-full shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-[#785d32]">
-                  <div className="h-16 w-16 rounded-lg flex items-center justify-center mb-6 transition-all bg-[#e8d9c4] dark:bg-[#2a3550] group-hover:bg-[#785d32]">
-                    <Icon size={32} className="text-[#050a30] dark:text-[#c4a97e] group-hover:text-white transition-colors" />
+                <div className="bg-white dark:bg-[#162235] rounded-lg p-8 h-full shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-brand-gold">
+                  <div className="h-16 w-16 rounded-lg flex items-center justify-center mb-6 transition-all bg-brand-pale dark:bg-[#2a3550] group-hover:bg-brand-gold">
+                    <Icon size={32} className="text-brand-navy dark:text-[#c4a97e] group-hover:text-white transition-colors" />
                   </div>
 
-                  <h3 className="text-xl font-bold mb-3 text-[#050a30] dark:text-[#f0ebe3]">
+                  <h3 className="text-xl font-bold mb-3 text-brand-navy dark:text-[#f0ebe3]">
                     {value.title}
                   </h3>
 

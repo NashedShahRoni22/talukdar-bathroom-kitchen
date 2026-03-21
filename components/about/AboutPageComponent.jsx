@@ -41,7 +41,7 @@ export default function AboutPageComponent() {
   }, []);
 
   return (
-    <main className="bg-white dark:bg-[#0f1219] transition-colors duration-300">
+    <main className="bg-white dark:bg-[#0f1219] transition-colors duration-300 overflow-x-clip">
       {/* Page Header Meta Info - Hidden but important for SEO */}
       <div className="sr-only">
         <h1>{metadata.title}</h1>

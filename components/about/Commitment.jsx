@@ -34,7 +34,7 @@ export default function Commitment() {
 
   return (
     <section className="py-20 md:py-32 bg-white dark:bg-[#111b2d] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Image */}
           <motion.div
@@ -42,14 +42,14 @@ export default function Commitment() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative h-[500px] rounded-lg overflow-hidden shadow-2xl"
+            className="relative h-125 rounded-lg overflow-hidden shadow-2xl"
           >
             <img
               src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=700&fit=crop"
               alt="Modern Kitchen"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050a30]/30 to-transparent"></div>
+            <div className="absolute inset-0 bg-linear-to-t from-brand-navy/30 to-transparent"></div>
           </motion.div>
 
           {/* Content */}
@@ -58,11 +58,12 @@ export default function Commitment() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
+            className="min-w-0"
           >
-            <span className="text-sm font-semibold tracking-widest uppercase text-[#785d32]">
+            <span className="text-sm font-semibold tracking-widest uppercase text-brand-gold">
               Our Commitment
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-3 mb-6 text-[#050a30] dark:text-[#f0ebe3]" style={{ fontFamily: 'var(--font-playfair)' }}>
+            <h2 className="text-4xl md:text-5xl font-bold mt-3 mb-6 text-brand-navy dark:text-[#f0ebe3]" style={{ fontFamily: 'var(--font-playfair)' }}>
               Excellence You Can Trust
             </h2>
             <div className="w-16 h-1 rounded-full mb-8" style={{ backgroundColor: '#785d32' }}></div>
@@ -85,7 +86,7 @@ export default function Commitment() {
                   variants={itemVariants}
                   className="flex items-start gap-4"
                 >
-                  <CheckCircle size={24} className="text-[#785d32] flex-shrink-0 mt-1" />
+                  <CheckCircle size={24} className="text-brand-gold shrink-0 mt-1" />
                   <p className="text-gray-700 dark:text-gray-300">
                     {commitment}
                   </p>
@@ -101,7 +102,7 @@ export default function Commitment() {
               transition={{ delay: 0.6 }}
               className="mt-10"
             >
-              <button className="px-8 py-3 bg-[#785d32] hover:bg-[#6a5028] text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg">
+              <button className="px-8 py-3 bg-brand-gold hover:bg-[#6a5028] text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg">
                 Start Your Journey With Us
               </button>
             </motion.div>

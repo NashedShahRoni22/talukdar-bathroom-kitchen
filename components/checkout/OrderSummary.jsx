@@ -5,19 +5,26 @@ import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useApp } from '@/components/context/AppContext';
+import { getOrderTotalsForAustralia, parseAuPostcode } from '@/lib/auShipping';
 
-export default function OrderSummary() {
+export default function OrderSummary({ shippingZip, shippingCountry = 'Australia' }) {
   const { cartItems, cartTotal, cartCount, removeFromCart, updateQuantity } = useApp();
 
-  const shipping = cartTotal > 5000 ? 0 : 250;
-  const tax = cartTotal * 0.10;
-  const grandTotal = cartTotal + shipping + tax;
+  const totals = getOrderTotalsForAustralia({
+    subtotal: cartTotal,
+    destinationPostcode: shippingZip,
+  });
+
+  const shipping = totals.shippingCharge;
+  const tax = totals.tax;
+  const grandTotal = totals.total;
+  const hasValidAusPostcode = shippingCountry === 'Australia' && !!parseAuPostcode(shippingZip);
 
   return (
     <div className="sticky top-28">
       {/* Header */}
       <h2
-        className="text-xl font-bold mb-6 text-[#050a30] dark:text-[#f0ebe3]"
+        className="text-xl font-bold mb-6 text-brand-navy dark:text-[#f0ebe3]"
         style={{ fontFamily: 'var(--font-playfair)' }}
       >
         Your Order
@@ -69,7 +76,7 @@ export default function OrderSummary() {
                   <h4 className="text-sm font-semibold text-gray-800 dark:text-[#f0ebe3] leading-tight line-clamp-2 mt-0.5">
                     {item.name}
                   </h4>
-                  <p className="text-sm font-bold mt-1 text-[#050a30] dark:text-[#f0ebe3]">
+                  <p className="text-sm font-bold mt-1 text-brand-navy dark:text-[#f0ebe3]">
                     ${item.price.toFixed(2)}
                   </p>
 
@@ -101,7 +108,7 @@ export default function OrderSummary() {
 
                     {/* Line total + remove */}
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-[#050a30] dark:text-[#f0ebe3]">
+                      <span className="text-sm font-bold text-brand-navy dark:text-[#f0ebe3]">
                         ${(item.price * item.quantity).toFixed(2)}
                       </span>
                       <motion.button
@@ -138,26 +145,26 @@ export default function OrderSummary() {
 
           <div className="flex justify-between text-gray-500 dark:text-[#9fa8cc]">
             <span>Shipping</span>
-            {shipping === 0 ? (
-              <span className="font-semibold text-green-500">Free</span>
+            {!hasValidAusPostcode ? (
+              <span className="font-medium text-amber-600">Enter postcode</span>
             ) : (
               <span className="font-medium text-gray-700 dark:text-[#f0ebe3]">${shipping.toFixed(2)}</span>
             )}
           </div>
 
           <div className="flex justify-between text-gray-500 dark:text-[#9fa8cc]">
-            <span>Tax (10%)</span>
+            <span>GST (10%)</span>
             <span className="font-medium text-gray-700 dark:text-[#f0ebe3]">${tax.toFixed(2)}</span>
           </div>
 
-          {shipping === 0 && (
-            <p className="text-xs text-green-600 font-medium">
-              ✓ You qualify for free shipping on orders over $5,000
+          {hasValidAusPostcode && (
+            <p className="text-xs text-gray-500 dark:text-[#9fa8cc] font-medium">
+              Delivery estimate from NSW 2000 to {shippingZip} ({totals.shippingMeta.zone} zone)
             </p>
           )}
 
           <div
-            className="border-t pt-3 flex justify-between font-bold text-base border-[#e8d9c4] dark:border-[#2a3460] text-[#050a30] dark:text-[#f0ebe3]"
+            className="border-t pt-3 flex justify-between font-bold text-base border-brand-pale dark:border-[#2a3460] text-brand-navy dark:text-[#f0ebe3]"
           >
             <span>Total</span>
             <span>${grandTotal.toFixed(2)}</span>
@@ -165,14 +172,9 @@ export default function OrderSummary() {
         </motion.div>
       )}
 
-      {/* Free shipping nudge */}
-      {cartTotal > 0 && cartTotal < 5000 && (
+      {cartTotal > 0 && !hasValidAusPostcode && (
         <p className="mt-3 text-xs text-gray-400 text-center">
-          Add{' '}
-          <span className="font-semibold" style={{ color: '#785d32' }}>
-            ${(5000 - cartTotal).toFixed(2)}
-          </span>{' '}
-          more for free shipping
+          Enter a valid Australian postcode in shipping details to calculate delivery.
         </p>
       )}
     </div>

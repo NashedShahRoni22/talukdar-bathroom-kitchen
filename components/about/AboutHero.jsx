@@ -29,14 +29,14 @@ export default function AboutHero() {
   const swiperRef = useRef(null);
 
   return (
-    <section className="relative bg-[#f7f5f2] dark:bg-[#0f1219] text-[#050a30] dark:text-white overflow-hidden pt-32">
+    <section className="relative bg-[#f7f5f2] dark:bg-[#0f1219] text-brand-navy dark:text-white overflow-hidden pt-32">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5 dark:opacity-10">
-        <div className="absolute top-20 left-10 w-80 h-80 bg-[#785d32] rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-10 w-80 h-80 bg-brand-gold rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 right-10 w-80 h-80 bg-[#c4a97e] rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-8 md:gap-14 items-center py-12 md:py-16">
           {/* Left Content */}
           <motion.div
@@ -49,7 +49,7 @@ export default function AboutHero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-sm font-semibold tracking-widest uppercase text-[#785d32] flex items-center gap-2 justify-center md:justify-start"
+              className="text-sm font-semibold tracking-widest uppercase text-brand-gold flex items-center gap-2 justify-center md:justify-start"
             >
               <motion.span
                 animate={{ y: [0, -3, 0] }}
@@ -64,7 +64,7 @@ export default function AboutHero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              className="text-5xl md:text-6xl font-bold mt-4 mb-6 text-[#050a30] dark:text-white leading-tight"
+              className="text-4xl sm:text-5xl md:text-6xl font-bold mt-4 mb-6 text-brand-navy dark:text-white leading-tight"
               style={{ fontFamily: 'var(--font-playfair)' }}
             >
               Crafting Luxury, <br /> Creating Sanctuaries
@@ -74,7 +74,7 @@ export default function AboutHero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-lg md:text-xl text-gray-700 dark:text-[#e8d9c4] max-w-2xl mb-8 font-light"
+              className="text-lg md:text-xl text-gray-700 dark:text-brand-pale max-w-2xl mb-8 font-light"
             >
               Discover how Talukdar transforms spaces into works of art with premium bathroom and kitchen fixtures that define luxury living.
             </motion.p>
@@ -88,14 +88,14 @@ export default function AboutHero() {
               <motion.button
                 whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(120, 93, 50, 0.3)' }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 bg-[#785d32] hover:bg-[#6a5028] text-white font-semibold rounded-lg transition-all duration-300"
+                className="px-8 py-3 bg-brand-gold hover:bg-[#6a5028] text-white font-semibold rounded-lg transition-all duration-300"
               >
                 Explore Products
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05, borderColor: '#c4a97e' }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 border-2 border-[#c4a97e] text-[#c4a97e] hover:bg-[#c4a97e] hover:text-[#050a30] font-semibold rounded-lg transition-all duration-300"
+                className="px-8 py-3 border-2 border-[#c4a97e] text-[#c4a97e] hover:bg-[#c4a97e] hover:text-brand-navy font-semibold rounded-lg transition-all duration-300"
               >
                 Contact Us
               </motion.button>
@@ -140,14 +140,14 @@ export default function AboutHero() {
                 {heroImages.map((image, index) => (
                   <SwiperSlide key={index} style={{ width: '450px' }}>
                     <motion.div
-                      className="relative w-full h-[450px] rounded-2xl overflow-hidden shadow-2xl mx-auto"
+                      className="relative w-full h-112.5 rounded-2xl overflow-hidden shadow-2xl mx-auto"
                     >
                       <img
                         src={image.src}
                         alt={image.title}
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#050a30]/60 to-transparent flex items-end p-6">
+                      <div className="absolute inset-0 bg-linear-to-t from-brand-navy/60 to-transparent flex items-end p-6">
                         <h3 className="text-2xl font-bold text-white" style={{ fontFamily: 'var(--font-playfair)' }}>
                           {image.title}
                         </h3>
@@ -162,7 +162,7 @@ export default function AboutHero() {
                 whileHover={{ scale: 1.15 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => swiperRef.current?.slidePrev()}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 z-10 p-3 rounded-full bg-[#785d32] hover:bg-[#6a5028] text-white transition-all duration-300 shadow-lg dark:bg-[#785d32] dark:hover:bg-[#c4a97e]"
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 z-10 p-3 rounded-full bg-brand-gold hover:bg-[#6a5028] text-white transition-all duration-300 shadow-lg dark:bg-brand-gold dark:hover:bg-[#c4a97e]"
                 aria-label="Previous slide"
               >
                 <ChevronLeft size={28} />
@@ -172,7 +172,7 @@ export default function AboutHero() {
                 whileHover={{ scale: 1.15 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => swiperRef.current?.slideNext()}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 z-10 p-3 rounded-full bg-[#785d32] hover:bg-[#6a5028] text-white transition-all duration-300 shadow-lg dark:bg-[#785d32] dark:hover:bg-[#c4a97e]"
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 z-10 p-3 rounded-full bg-brand-gold hover:bg-[#6a5028] text-white transition-all duration-300 shadow-lg dark:bg-brand-gold dark:hover:bg-[#c4a97e]"
                 aria-label="Next slide"
               >
                 <ChevronRight size={28} />
@@ -191,7 +191,7 @@ export default function AboutHero() {
         transition={{ duration: 2, repeat: Infinity }}
         className="absolute bottom-4 left-1/2 -translate-x-1/2"
       >
-        <ArrowDown size={24} className="text-[#785d32] dark:text-[#c4a97e]" />
+        <ArrowDown size={24} className="text-brand-gold dark:text-[#c4a97e]" />
       </motion.div>
 
       {/* Custom Swiper Pagination Styles */}
