@@ -1,9 +1,11 @@
 import Hero from "@/components/home/Hero";
+import CategorySpotlight from "@/components/home/CategorySpotlight";
 import ProductSection from "@/components/home/ProductSection";
 import Features from "@/components/home/Features";
 import Testimonials from "@/components/home/Testimonials";
 import CTA from "@/components/home/CTA";
 import Map from "@/components/home/Map";
+import Marquee from "../components/home/Marquee";
 
 const bathroomProducts = [
   {
@@ -258,6 +260,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <Hero />
+      <CategorySpotlight />
       <ProductSection
         title="Bathroom Collections"
         subtitle="Premium Bathroom"
@@ -271,6 +274,7 @@ export default function Home() {
         id="kitchens"
         products={kitchenProducts}
       />
+      <Marquee/>
       <ProductSection
         title="Accessories & Finishing"
         subtitle="Complete Your Design"
