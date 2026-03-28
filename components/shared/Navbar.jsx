@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ShoppingCart, Sun, Moon, Instagram, Facebook, Youtube, Twitter } from 'lucide-react';
+import { Menu, X, ShoppingCart, Sun, Moon, Instagram, Facebook, Youtube, Twitter, UserRound } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import logo from '@/public/images/logo.png';
 import logoWhite from '@/public/images/logo-white.png';
@@ -16,7 +16,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === '/';
   const isTransparent = isHome && !scrolled;
-  const { cartCount, toggleCart, isDark, toggleTheme } = useApp();
+  const { cartCount, toggleCart, isDark, toggleTheme, isAuthenticated } = useApp();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -29,6 +29,7 @@ export default function Navbar() {
     { label: 'Shop', href: '/shop' },
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
+    { label: 'Account', href: '/profile' },
   ];
 
   const socialLinks = [
@@ -113,7 +114,7 @@ export default function Navbar() {
                       transition={{ duration: 0.2 }}
                       className="block"
                     >
-                      <Sun size={19} className="text-[#e8d9c4]" />
+                      <Sun size={19} className="text-brand-pale" />
                     </motion.span>
                   ) : (
                     <motion.span
@@ -129,6 +130,20 @@ export default function Navbar() {
                   )}
                 </AnimatePresence>
               </motion.button>
+
+              {/* Cart */}
+              <Link
+                href={isAuthenticated ? '/profile' : '/login'}
+                className={`cursor-pointer p-2.5 rounded-xl transition-colors relative ${
+                    isTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-[#1a2340]'
+                  }`}
+                aria-label="Account"
+              >
+                <UserRound size={19} className={isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'} />
+                {isAuthenticated && (
+                  <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand-gold" />
+                )}
+              </Link>
 
               {/* Cart */}
               <button
@@ -175,7 +190,7 @@ export default function Navbar() {
             animate={{ opacity: 1, clipPath: 'circle(170% at calc(100% - 44px) 44px)' }}
             exit={{ opacity: 0, clipPath: 'circle(0% at calc(100% - 44px) 44px)' }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[60] flex flex-col md:hidden overflow-hidden"
+            className="fixed inset-0 z-60 flex flex-col md:hidden overflow-hidden"
             style={{ backgroundColor: '#050a30' }}
           >
             {/* Top Bar */}
@@ -227,15 +242,15 @@ export default function Navbar() {
                       onClick={() => setIsOpen(false)}
                       className={`group flex items-center justify-between py-4 border-b transition-all ${
                         isActive 
-                          ? 'border-[#785d32] text-[#e8d9c4]' 
-                          : 'border-white/10 hover:border-[#785d32]/60'
+                          ? 'border-brand-gold text-brand-pale' 
+                          : 'border-white/10 hover:border-brand-gold/60'
                       }`}
                     >
                       <span
                         className={`text-3xl font-bold transition-colors ${
                           isActive 
-                            ? 'text-[#e8d9c4]' 
-                            : 'text-white group-hover:text-[#e8d9c4]'
+                            ? 'text-brand-pale' 
+                            : 'text-white group-hover:text-brand-pale'
                         }`}
                         style={{ fontFamily: 'var(--font-playfair)' }}
                       >
@@ -243,8 +258,8 @@ export default function Navbar() {
                       </span>
                       <span className={`text-xl transition-opacity ${
                         isActive 
-                          ? 'text-[#785d32] opacity-100' 
-                          : 'text-[#785d32] opacity-0 group-hover:opacity-100'
+                          ? 'text-brand-gold opacity-100' 
+                          : 'text-brand-gold opacity-0 group-hover:opacity-100'
                       }`}>
                         →
                       </span>
@@ -271,7 +286,7 @@ export default function Navbar() {
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.15, y: -3 }}
                     whileTap={{ scale: 0.9 }}
-                    className="cursor-pointer w-11 h-11 rounded-full border border-white/20 flex items-center justify-center hover:border-[#785d32] hover:bg-[#785d32]/20 transition-all"
+                    className="cursor-pointer w-11 h-11 rounded-full border border-white/20 flex items-center justify-center hover:border-brand-gold hover:bg-brand-gold/20 transition-all"
                     aria-label={label}
                   >
                     <Icon size={18} color="white" />

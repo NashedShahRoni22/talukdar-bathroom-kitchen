@@ -9,6 +9,9 @@ export function AppProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [authToken, setAuthToken] = useState(null);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authReady, setAuthReady] = useState(false);
 
   // Hydrate cart from localStorage on first mount
   useEffect(() => {
@@ -34,6 +37,21 @@ export function AppProvider({ children }) {
         setIsDark(true);
       }
     } catch {}
+  }, []);
+
+  // Hydrate auth state on mount
+  useEffect(() => {
+    try {
+      const savedToken = localStorage.getItem('talukdar-auth-token');
+      const savedEmail = localStorage.getItem('talukdar-auth-email');
+      if (savedToken) setAuthToken(savedToken);
+      if (savedEmail) setAuthEmail(savedEmail);
+    } catch {
+      setAuthToken(null);
+      setAuthEmail('');
+    } finally {
+      setAuthReady(true);
+    }
   }, []);
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -89,6 +107,82 @@ export function AppProvider({ children }) {
     setIsCartOpen(false);
   }
 
+  function requestOtp(email) {
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      toast.error('Please enter your email first');
+      return false;
+    }
+
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const expiresAt = String(Date.now() + 5 * 60 * 1000);
+
+    try {
+      localStorage.setItem('talukdar-otp-email', normalizedEmail);
+      localStorage.setItem('talukdar-otp-code', otp);
+      localStorage.setItem('talukdar-otp-expiry', expiresAt);
+      toast.success(`OTP sent. Demo code: ${otp}`);
+      return true;
+    } catch {
+      toast.error('Unable to start OTP login right now');
+      return false;
+    }
+  }
+
+  function verifyOtp(email, otp) {
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedOtp = otp.trim();
+
+    try {
+      const savedEmail = localStorage.getItem('talukdar-otp-email') || '';
+      const savedOtp = localStorage.getItem('talukdar-otp-code') || '';
+      const savedExpiry = Number(localStorage.getItem('talukdar-otp-expiry') || 0);
+
+      if (!savedEmail || !savedOtp || !savedExpiry) {
+        toast.error('No OTP request found. Please request a new OTP.');
+        return false;
+      }
+
+      if (Date.now() > savedExpiry) {
+        toast.error('OTP expired. Please request a new OTP.');
+        return false;
+      }
+
+      if (normalizedEmail !== savedEmail || normalizedOtp !== savedOtp) {
+        toast.error('Invalid OTP or email. Please try again.');
+        return false;
+      }
+
+      const token = `talukdar_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      setAuthToken(token);
+      setAuthEmail(normalizedEmail);
+
+      localStorage.setItem('talukdar-auth-token', token);
+      localStorage.setItem('talukdar-auth-email', normalizedEmail);
+      localStorage.removeItem('talukdar-otp-email');
+      localStorage.removeItem('talukdar-otp-code');
+      localStorage.removeItem('talukdar-otp-expiry');
+
+      toast.success('Login successful');
+      return true;
+    } catch {
+      toast.error('Unable to verify OTP right now');
+      return false;
+    }
+  }
+
+  function logout() {
+    setAuthToken(null);
+    setAuthEmail('');
+    try {
+      localStorage.removeItem('talukdar-auth-token');
+      localStorage.removeItem('talukdar-auth-email');
+    } catch {}
+    toast('Logged out', { icon: '👋' });
+  }
+
+  const isAuthenticated = Boolean(authToken);
+
   return (
     <AppContext.Provider
       value={{
@@ -105,6 +199,13 @@ export function AppProvider({ children }) {
         removeFromCart,
         updateQuantity,
         clearCart,
+        authToken,
+        authEmail,
+        authReady,
+        isAuthenticated,
+        requestOtp,
+        verifyOtp,
+        logout,
       }}
     >
       {children}
