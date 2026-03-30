@@ -3,6 +3,7 @@ import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import { AppProvider } from "@/components/context/AppContext";
 import CartSidebar from "@/components/cart/CartSidebar";
+import Preloader from "@/components/shared/Preloader";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
         className={`${playfair.variable} ${openSans.variable} antialiased bg-white dark:bg-[#060b20] transition-colors duration-300`}
       >
         <AppProvider>
+          <Preloader />
           <Navbar />
           {children}
           <Footer />

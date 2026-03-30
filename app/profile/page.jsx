@@ -1,40 +1,40 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
-import { CalendarDays, Package, ReceiptText, ShieldCheck } from 'lucide-react';
-import PrivateRoute from '@/components/route/PrivateRoute';
-import { useApp } from '@/components/context/AppContext';
+import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { CalendarDays, Headset, Package, Star, Truck } from "lucide-react";
+import PrivateRoute from "@/components/route/PrivateRoute";
+import { useApp } from "@/components/context/AppContext";
 
 const fallbackOrders = [
   {
-    id: 'ORD-10031',
-    date: '2026-03-16',
-    status: 'Processing',
+    id: "ORD-10031",
+    date: "2026-03-16",
+    status: "Processing",
     total: 4200,
-    items: ['Freestanding Bathtub', 'Brass Towel Ring'],
+    items: ["Freestanding Bathtub", "Brass Towel Ring"],
   },
   {
-    id: 'ORD-10012',
-    date: '2026-02-22',
-    status: 'Delivered',
+    id: "ORD-10012",
+    date: "2026-02-22",
+    status: "Delivered",
     total: 1890,
-    items: ['Premium Faucet', 'LED Bathroom Mirror'],
+    items: ["Premium Faucet", "LED Bathroom Mirror"],
   },
 ];
 
 function formatDate(date) {
-  return new Intl.DateTimeFormat('en-AU', {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
+  return new Intl.DateTimeFormat("en-AU", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
   }).format(new Date(date));
 }
 
 function formatCurrency(value) {
-  return new Intl.NumberFormat('en-AU', {
-    style: 'currency',
-    currency: 'AUD',
+  return new Intl.NumberFormat("en-AU", {
+    style: "currency",
+    currency: "AUD",
     maximumFractionDigits: 0,
   }).format(value);
 }
@@ -42,10 +42,10 @@ function formatCurrency(value) {
 export default function ProfilePage() {
   const { authEmail, logout } = useApp();
   const [orders] = useState(() => {
-    if (typeof window === 'undefined') return fallbackOrders;
+    if (typeof window === "undefined") return fallbackOrders;
 
     try {
-      const raw = localStorage.getItem('talukdar-orders');
+      const raw = localStorage.getItem("talukdar-orders");
       if (!raw) return fallbackOrders;
 
       const parsed = JSON.parse(raw);
@@ -54,7 +54,7 @@ export default function ProfilePage() {
       return parsed.map((order, idx) => ({
         id: order.id || `ORD-${10000 + idx}`,
         date: order.date || new Date().toISOString(),
-        status: order.status || 'Placed',
+        status: order.status || "Placed",
         total: Number(order?.summary?.total || order.total || 0),
         items: Array.isArray(order.items)
           ? order.items.map((item) => item.name).filter(Boolean)
@@ -65,15 +65,29 @@ export default function ProfilePage() {
     }
   });
 
-  const totalSpent = useMemo(
-    () => orders.reduce((sum, order) => sum + Number(order.total || 0), 0),
-    [orders]
+  const toReceiveCount = useMemo(
+    () =>
+      orders.filter((order) => {
+        const status = String(order.status || "").toLowerCase();
+        return ["placed", "processing", "confirmed", "shipped", "out for delivery"].includes(status);
+      }).length,
+    [orders],
+  );
+
+  const toReviewCount = useMemo(
+    () =>
+      orders.filter((order) => {
+        const status = String(order.status || "").toLowerCase();
+        return status === "delivered";
+      }).length,
+    [orders],
   );
 
   return (
     <PrivateRoute>
       <main className="min-h-screen pt-28 pb-14 bg-[#f8f5ef] dark:bg-[#060b20] transition-colors duration-300">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header section  */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -81,15 +95,20 @@ export default function ProfilePage() {
             className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
           >
             <div>
-              <p className="text-xs font-semibold tracking-[0.24em] uppercase text-brand-gold">My Account</p>
+              <p className="text-xs font-semibold tracking-[0.24em] uppercase text-brand-gold">
+                My Account
+              </p>
               <h1
                 className="mt-2 text-3xl sm:text-4xl font-semibold text-brand-navy dark:text-[#f0ebe3]"
-                style={{ fontFamily: 'var(--font-playfair)' }}
+                style={{ fontFamily: "var(--font-playfair)" }}
               >
                 Profile & Orders
               </h1>
               <p className="mt-2 text-sm text-gray-600 dark:text-[#9fa8cc]">
-                Signed in as <span className="font-semibold">{authEmail || 'user@example.com'}</span>
+                Signed in as{" "}
+                <span className="font-semibold">
+                  {authEmail || "user@example.com"}
+                </span>
               </p>
             </div>
 
@@ -101,32 +120,86 @@ export default function ProfilePage() {
             </button>
           </motion.div>
 
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* At a glance  */}
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="rounded-xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-pale/60 dark:bg-brand-gold/25">
-                <Package size={18} className="text-brand-navy dark:text-brand-pale" />
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-pale/60 dark:bg-brand-gold/25">
+                    <Package
+                      size={18}
+                      className="text-brand-navy dark:text-brand-pale"
+                    />
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-[#9fa8cc]">
+                    Total Orders
+                  </p>
+                </div>
+                <p className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3]">
+                  {orders.length}
+                </p>
               </div>
-              <p className="mt-3 text-sm text-gray-500 dark:text-[#9fa8cc]">Total Orders</p>
-              <p className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3]">{orders.length}</p>
             </div>
 
             <div className="rounded-xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-pale/60 dark:bg-brand-gold/25">
-                <ReceiptText size={18} className="text-brand-navy dark:text-brand-pale" />
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-pale/60 dark:bg-brand-gold/25">
+                    <Truck
+                      size={18}
+                      className="text-brand-navy dark:text-brand-pale"
+                    />
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-[#9fa8cc]">
+                    To Receive
+                  </p>
+                </div>
+                <p className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3]">
+                  {toReceiveCount}
+                </p>
               </div>
-              <p className="mt-3 text-sm text-gray-500 dark:text-[#9fa8cc]">Total Spent</p>
-              <p className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3]">{formatCurrency(totalSpent)}</p>
             </div>
 
             <div className="rounded-xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5">
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-pale/60 dark:bg-brand-gold/25">
-                <ShieldCheck size={18} className="text-brand-navy dark:text-brand-pale" />
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-pale/60 dark:bg-brand-gold/25">
+                    <Star
+                      size={18}
+                      className="text-brand-navy dark:text-brand-pale"
+                    />
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-[#9fa8cc]">
+                    To Review
+                  </p>
+                </div>
+                <p className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3]">
+                  {toReviewCount}
+                </p>
               </div>
-              <p className="mt-3 text-sm text-gray-500 dark:text-[#9fa8cc]">Account Status</p>
-              <p className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3]">Verified</p>
+            </div>
+
+            <div className="rounded-xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-pale/60 dark:bg-brand-gold/25">
+                    <Headset
+                      size={18}
+                      className="text-brand-navy dark:text-brand-pale"
+                    />
+                  </div>
+                  <p className="text-sm text-gray-500 dark:text-[#9fa8cc]">
+                    Support Options
+                  </p>
+                </div>
+                <p className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3]">
+                  24/7
+                </p>
+              </div>
             </div>
           </div>
 
+          {/* Order history   */}
           <div className="mt-8 space-y-4">
             {orders.map((order, index) => (
               <motion.article
@@ -139,8 +212,12 @@ export default function ProfilePage() {
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-brand-gold">Order ID</p>
-                    <h2 className="text-lg font-bold text-brand-navy dark:text-[#f0ebe3] mt-1">{order.id}</h2>
+                    <p className="text-xs uppercase tracking-[0.2em] text-brand-gold">
+                      Order ID
+                    </p>
+                    <h2 className="text-lg font-bold text-brand-navy dark:text-[#f0ebe3] mt-1">
+                      {order.id}
+                    </h2>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-[#9fa8cc]">
@@ -154,7 +231,9 @@ export default function ProfilePage() {
                     {order.status}
                   </span>
                   <span className="text-sm text-gray-600 dark:text-[#9fa8cc]">
-                    {order.items.length > 0 ? order.items.join(' • ') : 'Items unavailable'}
+                    {order.items.length > 0
+                      ? order.items.join(" • ")
+                      : "Items unavailable"}
                   </span>
                 </div>
 
