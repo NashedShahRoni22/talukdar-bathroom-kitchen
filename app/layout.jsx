@@ -5,6 +5,8 @@ import { AppProvider } from "@/components/context/AppContext";
 import CartSidebar from "@/components/cart/CartSidebar";
 import Preloader from "@/components/shared/Preloader";
 import "./globals.css";
+import ReactQueryProvider from "../components/providers/QueryProvider";
+import ScrollToTop from "../components/scrollToTop/ScrollToTop";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -30,13 +32,16 @@ export default function RootLayout({ children }) {
       <body
         className={`${playfair.variable} ${openSans.variable} antialiased bg-white dark:bg-[#060b20] transition-colors duration-300`}
       >
-        <AppProvider>
-          <Preloader />
-          <Navbar />
-          {children}
-          <Footer />
-          <CartSidebar />
-        </AppProvider>
+        <ReactQueryProvider>
+          <AppProvider>
+            <ScrollToTop />
+            <Preloader />
+            <Navbar />
+            {children}
+            <Footer />
+            <CartSidebar />
+          </AppProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );
