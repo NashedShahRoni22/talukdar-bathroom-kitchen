@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight, KeyRound, Mail } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useApp } from '@/components/context/AppContext';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowRight, KeyRound, Mail } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useApp } from "@/components/context/AppContext";
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/profile';
+  const redirectTo = searchParams.get("redirect") || "/profile";
 
   const { requestOtp, verifyOtp, authReady, isAuthenticated } = useApp();
 
-  const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState('email');
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState("email");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function LoginPage() {
 
     setIsSubmitting(true);
     const ok = requestOtp(normalizedEmail);
-    if (ok) setStep('otp');
+    if (ok) setStep("otp");
     setIsSubmitting(false);
   }
 
@@ -61,10 +61,12 @@ export default function LoginPage() {
           transition={{ duration: 0.5 }}
           className="w-full rounded-3xl border border-white/70 bg-white/85 p-6 shadow-[0_22px_60px_rgba(5,10,48,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-[#0d1435]/80 dark:shadow-[0_24px_60px_rgba(0,0,0,0.45)] sm:p-8"
         >
-          <p className="text-xs font-semibold tracking-[0.24em] uppercase text-brand-gold">Account Access</p>
+          <p className="text-xs font-semibold tracking-[0.24em] uppercase text-brand-gold">
+            Account Access
+          </p>
           <h1
             className="mt-3 text-3xl font-semibold text-brand-navy dark:text-[#f0ebe3]"
-            style={{ fontFamily: 'var(--font-playfair)' }}
+            style={{ fontFamily: "var(--font-playfair)" }}
           >
             Login With OTP
           </h1>
@@ -72,10 +74,12 @@ export default function LoginPage() {
             Enter your email to receive a one-time password.
           </p>
 
-          {step === 'email' ? (
+          {step === "email" ? (
             <form onSubmit={handleSendOtp} className="mt-6 space-y-5">
               <label className="block">
-                <span className="text-sm font-medium text-brand-navy dark:text-[#f0ebe3]">Email Address</span>
+                <span className="text-sm font-medium text-brand-navy dark:text-[#f0ebe3]">
+                  Email Address
+                </span>
                 <div className="mt-2 relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-pale/70 text-brand-navy dark:bg-brand-gold/20 dark:text-brand-pale">
                     <Mail size={15} />
@@ -103,7 +107,9 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleVerifyOtp} className="mt-6 space-y-5">
               <label className="block">
-                <span className="text-sm font-medium text-brand-navy dark:text-[#f0ebe3]">One-Time Password</span>
+                <span className="text-sm font-medium text-brand-navy dark:text-[#f0ebe3]">
+                  One-Time Password
+                </span>
                 <div className="mt-2 relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-pale/70 text-brand-navy dark:bg-brand-gold/20 dark:text-brand-pale">
                     <KeyRound size={15} />
@@ -112,7 +118,9 @@ export default function LoginPage() {
                     type="text"
                     inputMode="numeric"
                     value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onChange={(e) =>
+                      setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                    }
                     placeholder="Enter 6-digit OTP"
                     required
                     className="w-full rounded-2xl border border-[#e6dece] bg-white/95 pl-14 pr-4 py-3.5 text-sm tracking-[0.3em] text-brand-navy placeholder:text-[#8e95a8] shadow-[0_8px_24px_rgba(5,10,48,0.06)] transition-all focus:outline-none focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/15 dark:border-[#2a3460] dark:bg-[#111840]/90 dark:text-[#f0ebe3]"
@@ -131,7 +139,7 @@ export default function LoginPage() {
 
               <button
                 type="button"
-                onClick={() => setStep('email')}
+                onClick={() => setStep("email")}
                 className="w-full text-sm font-medium text-brand-gold hover:opacity-80"
               >
                 Use another email
