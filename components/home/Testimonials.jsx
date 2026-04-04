@@ -18,7 +18,7 @@ const testimonials = [
     company: 'Manhattan',
     content:
       'The quality and elegance of Talukdar products transformed our bathroom into a spa-like sanctuary. The attention to detail is remarkable!',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
+    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=600&fit=crop&q=90',
     rating: 5,
   },
   {
@@ -28,7 +28,7 @@ const testimonials = [
     company: 'Chen Design Studio',
     content:
       'Working with Talukdar has been seamless. Their luxury collection perfectly elevates any modern kitchen design.',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=600&fit=crop&q=90',
     rating: 5,
   },
   {
@@ -38,7 +38,7 @@ const testimonials = [
     company: 'Premium Properties Inc',
     content:
       'Talukdar fixtures are our go-to choice for high-end properties. Clients consistently praise the luxury aesthetic and durability.',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
+    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&h=600&fit=crop&q=90',
     rating: 5,
   },
   {
@@ -48,7 +48,7 @@ const testimonials = [
     company: 'Rivera & Partners',
     content:
       'Unmatched craftsmanship. Every piece integrates flawlessly into our architectural visions. Talukdar is our only recommendation for luxury builds.',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&h=600&fit=crop&q=90',
     rating: 5,
   },
 ];
@@ -179,7 +179,7 @@ export default function Testimonials() {
                     {/* Avatar column */}
                     <div className="flex sm:flex-col items-center sm:items-center gap-4 sm:gap-3 sm:w-32 shrink-0">
                       <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden ring-4 ring-[#785d32]/20">
-                        <Image src={t.image} alt={t.name} fill className="object-cover" />
+                        <Image src={t.image} alt={t.name} fill className="object-cover" quality={90} />
                       </div>
                       <div className="sm:text-center">
                         <p className="font-bold text-sm sm:text-base text-[#050a30] dark:text-[#f0ebe3] leading-tight">

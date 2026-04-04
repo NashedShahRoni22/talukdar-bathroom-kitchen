@@ -89,15 +89,13 @@
   height: 40vh;
   border-radius: 1.5rem;
   overflow: hidden;
-  transition: height 0.5s ease, box-shadow 0.5s ease;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  transition: height 0.5s ease;
   cursor: pointer;
 }
 
 /* Active card: significantly taller */
 .hero-cards .swiper-slide-active.hero-card-slide {
   height: 78vh;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
 }
 
 /* ─── Hero: Keyframe animations ─── */
@@ -155,7 +153,6 @@
 /* ─── Hero: Card hover lift ─── */
 .hero-card-slide:hover {
   transform: translateY(-6px);
-  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55);
 }
 
 /* ─── Hero: Active card float ─── */

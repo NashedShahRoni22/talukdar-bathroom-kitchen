@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
-import { Toaster, toast } from 'react-hot-toast';
+import { createContext, useContext, useState, useEffect } from "react";
+import { Toaster, toast } from "react-hot-toast";
+import { useGetData } from "../helpers/useGetData";
 
 const AppContext = createContext(null);
 
@@ -10,13 +11,16 @@ export function AppProvider({ children }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [authToken, setAuthToken] = useState(null);
-  const [authEmail, setAuthEmail] = useState('');
+  const [authEmail, setAuthEmail] = useState("");
   const [authReady, setAuthReady] = useState(false);
+  // get categories
+  const { data:categoriesData } = useGetData("categories");
+  const categories = categoriesData?.data;
 
   // Hydrate cart from localStorage on first mount
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('talukdar-cart');
+      const stored = localStorage.getItem("talukdar-cart");
       if (stored) setCartItems(JSON.parse(stored));
     } catch {
       setCartItems([]);
@@ -25,15 +29,15 @@ export function AppProvider({ children }) {
 
   // Persist cart to localStorage on every change
   useEffect(() => {
-    localStorage.setItem('talukdar-cart', JSON.stringify(cartItems));
+    localStorage.setItem("talukdar-cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
   // Hydrate theme preference on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('talukdar-theme');
-      if (saved === 'dark') {
-        document.documentElement.classList.add('dark');
+      const saved = localStorage.getItem("talukdar-theme");
+      if (saved === "dark") {
+        document.documentElement.classList.add("dark");
         setIsDark(true);
       }
     } catch {}
@@ -42,25 +46,28 @@ export function AppProvider({ children }) {
   // Hydrate auth state on mount
   useEffect(() => {
     try {
-      const savedToken = localStorage.getItem('talukdar-auth-token');
-      const savedEmail = localStorage.getItem('talukdar-auth-email');
+      const savedToken = localStorage.getItem("talukdar-auth-token");
+      const savedEmail = localStorage.getItem("talukdar-auth-email");
       if (savedToken) setAuthToken(savedToken);
       if (savedEmail) setAuthEmail(savedEmail);
     } catch {
       setAuthToken(null);
-      setAuthEmail('');
+      setAuthEmail("");
     } finally {
       setAuthReady(true);
     }
   }, []);
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const cartTotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
   function addToCart(product) {
     const existing = cartItems.find((item) => item.id === product.id);
     if (existing) {
-      toast('Already in cart', { icon: '🛒' });
+      toast("Already in cart", { icon: "🛒" });
       return;
     }
     toast.success(`${product.name} added to cart!`);
@@ -79,20 +86,20 @@ export function AppProvider({ children }) {
       return;
     }
     setCartItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+      prev.map((item) => (item.id === id ? { ...item, quantity } : item)),
     );
   }
 
   function clearCart() {
     setCartItems([]);
-    toast('Cart cleared', { icon: '🗑️' });
+    toast("Cart cleared", { icon: "🗑️" });
   }
 
   function toggleTheme() {
     const next = !isDark;
     setIsDark(next);
-    document.documentElement.classList.toggle('dark', next);
-    localStorage.setItem('talukdar-theme', next ? 'dark' : 'light');
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("talukdar-theme", next ? "dark" : "light");
   }
 
   function toggleCart() {
@@ -110,7 +117,7 @@ export function AppProvider({ children }) {
   function requestOtp(email) {
     const normalizedEmail = email.trim().toLowerCase();
     if (!normalizedEmail) {
-      toast.error('Please enter your email first');
+      toast.error("Please enter your email first");
       return false;
     }
 
@@ -118,13 +125,13 @@ export function AppProvider({ children }) {
     const expiresAt = String(Date.now() + 5 * 60 * 1000);
 
     try {
-      localStorage.setItem('talukdar-otp-email', normalizedEmail);
-      localStorage.setItem('talukdar-otp-code', otp);
-      localStorage.setItem('talukdar-otp-expiry', expiresAt);
+      localStorage.setItem("talukdar-otp-email", normalizedEmail);
+      localStorage.setItem("talukdar-otp-code", otp);
+      localStorage.setItem("talukdar-otp-expiry", expiresAt);
       toast.success(`OTP sent. Demo code: ${otp}`);
       return true;
     } catch {
-      toast.error('Unable to start OTP login right now');
+      toast.error("Unable to start OTP login right now");
       return false;
     }
   }
@@ -134,22 +141,24 @@ export function AppProvider({ children }) {
     const normalizedOtp = otp.trim();
 
     try {
-      const savedEmail = localStorage.getItem('talukdar-otp-email') || '';
-      const savedOtp = localStorage.getItem('talukdar-otp-code') || '';
-      const savedExpiry = Number(localStorage.getItem('talukdar-otp-expiry') || 0);
+      const savedEmail = localStorage.getItem("talukdar-otp-email") || "";
+      const savedOtp = localStorage.getItem("talukdar-otp-code") || "";
+      const savedExpiry = Number(
+        localStorage.getItem("talukdar-otp-expiry") || 0,
+      );
 
       if (!savedEmail || !savedOtp || !savedExpiry) {
-        toast.error('No OTP request found. Please request a new OTP.');
+        toast.error("No OTP request found. Please request a new OTP.");
         return false;
       }
 
       if (Date.now() > savedExpiry) {
-        toast.error('OTP expired. Please request a new OTP.');
+        toast.error("OTP expired. Please request a new OTP.");
         return false;
       }
 
       if (normalizedEmail !== savedEmail || normalizedOtp !== savedOtp) {
-        toast.error('Invalid OTP or email. Please try again.');
+        toast.error("Invalid OTP or email. Please try again.");
         return false;
       }
 
@@ -157,28 +166,28 @@ export function AppProvider({ children }) {
       setAuthToken(token);
       setAuthEmail(normalizedEmail);
 
-      localStorage.setItem('talukdar-auth-token', token);
-      localStorage.setItem('talukdar-auth-email', normalizedEmail);
-      localStorage.removeItem('talukdar-otp-email');
-      localStorage.removeItem('talukdar-otp-code');
-      localStorage.removeItem('talukdar-otp-expiry');
+      localStorage.setItem("talukdar-auth-token", token);
+      localStorage.setItem("talukdar-auth-email", normalizedEmail);
+      localStorage.removeItem("talukdar-otp-email");
+      localStorage.removeItem("talukdar-otp-code");
+      localStorage.removeItem("talukdar-otp-expiry");
 
-      toast.success('Login successful');
+      toast.success("Login successful");
       return true;
     } catch {
-      toast.error('Unable to verify OTP right now');
+      toast.error("Unable to verify OTP right now");
       return false;
     }
   }
 
   function logout() {
     setAuthToken(null);
-    setAuthEmail('');
+    setAuthEmail("");
     try {
-      localStorage.removeItem('talukdar-auth-token');
-      localStorage.removeItem('talukdar-auth-email');
+      localStorage.removeItem("talukdar-auth-token");
+      localStorage.removeItem("talukdar-auth-email");
     } catch {}
-    toast('Logged out', { icon: '👋' });
+    toast("Logged out", { icon: "👋" });
   }
 
   const isAuthenticated = Boolean(authToken);
@@ -214,17 +223,17 @@ export function AppProvider({ children }) {
         toastOptions={{
           duration: 2500,
           style: {
-            background: '#050a30',
-            color: '#fff',
-            fontSize: '14px',
-            borderRadius: '8px',
-            padding: '12px 16px',
+            background: "#050a30",
+            color: "#fff",
+            fontSize: "14px",
+            borderRadius: "8px",
+            padding: "12px 16px",
           },
           success: {
-            iconTheme: { primary: '#785d32', secondary: '#fff' },
+            iconTheme: { primary: "#785d32", secondary: "#fff" },
           },
           error: {
-            iconTheme: { primary: '#e05252', secondary: '#fff' },
+            iconTheme: { primary: "#e05252", secondary: "#fff" },
           },
         }}
       />
@@ -234,6 +243,6 @@ export function AppProvider({ children }) {
 
 export function useApp() {
   const context = useContext(AppContext);
-  if (!context) throw new Error('useApp must be used inside AppProvider');
+  if (!context) throw new Error("useApp must be used inside AppProvider");
   return context;
 }

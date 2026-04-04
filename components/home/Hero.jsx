@@ -61,6 +61,7 @@ export default function Hero() {
                 className="object-cover"
                 priority={i === 0}
                 sizes="100vw"
+                quality={95}
               />
             </div>
             <div className="absolute inset-0 hero-gradient" />
@@ -117,14 +118,10 @@ export default function Hero() {
             key={`btns-${textKey}`}
             className="hero-btns flex flex-wrap gap-4"
           >
-            {/* <Link href={sliders?.[activeIndex]?.link}> */}
-            <button
+            <Link
+              href={sliders?.[activeIndex]?.link || "#"}
               className="btn-shop px-8 py-3.5 rounded-lg font-semibold text-white flex items-center gap-2 shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-[1.03]"
               style={{ backgroundColor: "#785d32" }}
-              // onClick={() => window.open(sliders?.[activeIndex]?.link, "_self")}
-              onClick={() =>
-                window.open(sliders?.[activeIndex]?.link, "_blank")
-              }
             >
               <span className="btn-shimmer" />
               Shop Now
@@ -132,8 +129,7 @@ export default function Hero() {
                 size={18}
                 className="transition-transform duration-300 group-hover:translate-x-1"
               />
-            </button>
-            {/* </Link> */}
+            </Link>
           </div>
 
           {/* Slide counter */}
@@ -153,23 +149,16 @@ export default function Hero() {
 
         {/* Right: Card slider */}
         <div
-          className={`flex-1 h-full flex items-center overflow-hidden ${mounted ? "mount-cards" : "opacity-0"}`}
+          className={`flex-1 h-full flex flex-col items-center justify-center overflow-hidden relative ${mounted ? "mount-cards" : "opacity-0"}`}
         >
           <Swiper
             ref={swiperRef}
-            modules={[Autoplay, Pagination]}
+            modules={[Autoplay]}
             slidesPerView={2.2}
-            // centeredSlides={true}
             spaceBetween={18}
             loop={true}
             slideToClickedSlide={true}
             autoplay={{ delay: 4500, disableOnInteraction: false }}
-            pagination={{
-              clickable: true,
-              el: ".hero-pagination",
-              bulletClass: "hero-bullet",
-              bulletActiveClass: "hero-bullet-active",
-            }}
             onSlideChange={handleSlideChange}
             className="hero-cards w-full h-[82vh]"
           >
@@ -182,6 +171,7 @@ export default function Hero() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 1280px) 30vw, 26vw"
+                    quality={95}
                   />
                   {/* Card overlay label on active */}
                   <div
@@ -205,11 +195,6 @@ export default function Hero() {
           </Swiper>
         </div>
       </div>
-
-      {/* Desktop pagination — centered bottom */}
-      <div
-        className={`hero-pagination hidden md:flex absolute bottom-7 left-1/2 -translate-x-1/2 z-20 gap-2 items-center ${mounted ? "mount-nav" : "opacity-0"}`}
-      />
 
       {/* ── Mobile / Tablet ── */}
       <div className="md:hidden w-full h-full">
@@ -257,20 +242,14 @@ export default function Hero() {
                   {slide.sub_title}
                 </p>
                 <div className="flex gap-3 flex-wrap justify-center">
-                  {/* <Link href={slide.link}> */}
-                  <button
-                    // onClick={() => window.open(sliders?.link, "_self")}
-                    onClick={() => window.open(sliders?.link, "_blank")}
+                  <Link
+                    href={slide.link || "#"}
                     className="btn-shop px-6 py-3 rounded-lg font-semibold text-white flex items-center gap-2 text-sm"
                     style={{ backgroundColor: "#785d32" }}
                   >
                     <span className="btn-shimmer" />
                     Shop Now <ArrowRight size={16} />
-                  </button>
-                  {/* </Link> */}
-                  {/* <button className="btn-learn px-6 py-3 rounded-lg font-semibold border-2 border-white text-white text-sm">
-                      <span>Learn More</span>
-                    </button> */}
+                  </Link>
                 </div>
               </div>
             </SwiperSlide>

@@ -63,6 +63,7 @@ function CategoryCard({ category, index, className }) {
           fill
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           sizes="(max-width: 1024px) 100vw, 33vw"
+          quality={90}
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-black/10 dark:from-black/85 dark:via-black/35" />
         <div className="absolute inset-0 bg-linear-to-br from-brand-navy/45 via-transparent to-brand-gold/20 dark:from-brand-navy/55" />
