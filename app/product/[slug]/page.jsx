@@ -16,7 +16,7 @@ export default function ProductPage() {
 
   // Fetch product by slug only when slug is available
   const { data: productData, isLoading, error } = useGetData(
-    slug ? `products/${slug}` : 'products/placeholder',
+    slug ? `product/${slug}` : 'product/placeholder',
     {},
     {
       enabled: !!slug,
@@ -28,22 +28,11 @@ export default function ProductPage() {
 
   const product = productData?.data;
 
+  console.log(product);
+
   useEffect(() => {
     console.log('Current Slug:', slug);
   }, [slug]);
-
-  // Log product data to console
-  useEffect(() => {
-    if (product) {
-      console.log('Product Data:', product);
-      console.log('Product ID:', product?.id);
-      console.log('Product Name:', product?.name);
-      console.log('Product Slug:', product?.slug);
-      console.log('Product Price:', product?.base_price);
-      console.log('Product Description:', product?.description);
-    }
-  }, [product]);
-
   if (!slug || isLoading) return <Loader />;
 
   if (error || !product) {

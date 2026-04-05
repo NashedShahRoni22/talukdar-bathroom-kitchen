@@ -261,25 +261,25 @@ export default function Home() {
     <main className="min-h-screen">
       <Hero />
       <CategorySpotlight />
-      <ProductSection
+      {/* <ProductSection
         title="Bathroom Collections"
         subtitle="Premium Bathroom"
         id="bathrooms"
         products={bathroomProducts}
-      />
+      /> */}
       <Features />
-      <ProductSection
+      {/* <ProductSection
         title="Kitchen Collections"
         subtitle="Luxury Kitchens"
         id="kitchens"
         products={kitchenProducts}
-      />
+      /> */}
       <Marquee/>
-      <ProductSection
+      {/* <ProductSection
         title="Accessories & Finishing"
         subtitle="Complete Your Design"
         products={accessoryProducts}
-      />
+      /> */}
       <Testimonials />
       <CTA />
       <Map />
