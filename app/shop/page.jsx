@@ -158,7 +158,6 @@ export default function ShopPage() {
   // get products
   const { data: productsData, isLoading } = useGetData("products");
   const products = productsData?.data;
-  console.log("products:", products);
 
   const [filters, setFilters] = useState({
     Type: "All",

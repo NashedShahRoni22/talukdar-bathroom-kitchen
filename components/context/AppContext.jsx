@@ -3,35 +3,30 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { useGetData } from "../helpers/useGetData";
+import { usePostData } from "../helpers/usePostData";
+import { useDeleteDataWithToken } from "../helpers/useDeleteData";
+import { useQueryClient } from "@tanstack/react-query";
 
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
-  const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [authToken, setAuthToken] = useState(null);
   const [authEmail, setAuthEmail] = useState("");
   const [authReady, setAuthReady] = useState(false);
-  // get categories
-  const { data:categoriesData } = useGetData("categories");
-  const categories = categoriesData?.data;
+  const [guestToken, setGuestToken] = useState(null);
+  const queryClient = useQueryClient();
 
-  // Hydrate cart from localStorage on first mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("talukdar-cart");
-      if (stored) setCartItems(JSON.parse(stored));
-    } catch {
-      setCartItems([]);
+  // Generate or retrieve guest token
+  const generateGuestToken = () => {
+    let storedGuestToken = localStorage.getItem("guest_token");
+    if (!storedGuestToken) {
+      storedGuestToken = crypto.randomUUID();
+      localStorage.setItem("guest_token", storedGuestToken);
     }
-  }, []);
-
-  // Persist cart to localStorage on every change
-  useEffect(() => {
-    localStorage.setItem("talukdar-cart", JSON.stringify(cartItems));
-  }, [cartItems]);
-
+    return storedGuestToken;
+  };
   // Hydrate theme preference on mount
   useEffect(() => {
     try {
@@ -47,9 +42,11 @@ export function AppProvider({ children }) {
   useEffect(() => {
     try {
       const savedToken = localStorage.getItem("talukdar-auth-token");
-      const savedEmail = localStorage.getItem("talukdar-auth-email");
       if (savedToken) setAuthToken(savedToken);
+      const savedEmail = localStorage.getItem("talukdar-auth-email");
       if (savedEmail) setAuthEmail(savedEmail);
+      const generatedGuestToken = generateGuestToken();
+      setGuestToken(generatedGuestToken);
     } catch {
       setAuthToken(null);
       setAuthEmail("");
@@ -57,43 +54,6 @@ export function AppProvider({ children }) {
       setAuthReady(true);
     }
   }, []);
-
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-
-  function addToCart(product) {
-    const existing = cartItems.find((item) => item.id === product.id);
-    if (existing) {
-      toast("Already in cart", { icon: "🛒" });
-      return;
-    }
-    toast.success(`${product.name} added to cart!`);
-    setCartItems((prev) => [...prev, { ...product, quantity: 1 }]);
-  }
-
-  function removeFromCart(id) {
-    const item = cartItems.find((i) => i.id === id);
-    if (item) toast.error(`${item.name} removed from cart`);
-    setCartItems((prev) => prev.filter((i) => i.id !== id));
-  }
-
-  function updateQuantity(id, quantity) {
-    if (quantity < 1) {
-      removeFromCart(id);
-      return;
-    }
-    setCartItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item)),
-    );
-  }
-
-  function clearCart() {
-    setCartItems([]);
-    toast("Cart cleared", { icon: "🗑️" });
-  }
 
   function toggleTheme() {
     const next = !isDark;
@@ -192,22 +152,134 @@ export function AppProvider({ children }) {
 
   const isAuthenticated = Boolean(authToken);
 
+  // Cart API: guest
+  const postCartGuest = usePostData("add-to-cart-guest");
+  const deleteItem = useDeleteDataWithToken();
+  const guestCartQueryKey = [`guest-cart?guest_token=${guestToken}`];
+
+  const addToCartDBGuest = async (
+    productVariantId,
+    quantity = 1,
+    type = "increment",
+  ) => {
+    if (!guestToken) {
+      toast.error("Cart session not ready yet. Please try again.");
+      return false;
+    }
+
+    if (!productVariantId) {
+      toast.error("This product is currently unavailable.");
+      return false;
+    }
+
+    const formData = new FormData();
+    formData.append("guest_token", guestToken);
+    formData.append("product_variant_id", String(productVariantId));
+    formData.append("quantity", String(quantity));
+    formData.append("type", type);
+
+    try {
+      await toast.promise(postCartGuest.mutateAsync(formData), {
+        loading: "Updating cart...",
+        success: "Cart Updated!",
+        error: (err) => err.message || "Failed to add product to cart",
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: guestCartQueryKey,
+      });
+
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const removeFromCartDBGuest = async (cartId, options = {}) => {
+    const { silent = false } = options;
+
+    try {
+      if (silent) {
+        await deleteItem.mutateAsync({
+          endpoint: `guest-cart/${cartId}`,
+          guestToken,
+        });
+      } else {
+        await toast.promise(
+          deleteItem.mutateAsync({
+            endpoint: `guest-cart/${cartId}`,
+            guestToken,
+          }),
+          {
+            loading: "Removing item from cart...",
+            success: "Item removed from cart!",
+            error: (err) => err.message || "Failed to remove item",
+          },
+        );
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: [`guest-cart?guest_token=${guestToken}`],
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // get cart data Guest
+  const { data: cartDataGuest, isLoading: isCartLoading } = useGetData(
+    `guest-cart?guest_token=${guestToken}`,
+    {},
+    { enabled: !!guestToken },
+  );
+  const cartDBGuest = Array.isArray(cartDataGuest?.data)
+    ? cartDataGuest.data
+    : [];
+
+  const totalDBGuest = Number(cartDataGuest?.meta?.sub_total || 0);
+  const cartDBCountGuest = cartDBGuest.length;
+  const cartReady = Boolean(guestToken) && !isCartLoading;
+
+  const updateQuantityDBGuest = async (item, quantity) => {
+    if (!item) return;
+
+    const productVariantId = item.product_variant_id;
+    const currentQuantity = Number(item.quantity);
+    if (!productVariantId || !Number.isFinite(currentQuantity)) return;
+
+    if (quantity < 1) {
+      const cartId = item.cart_id;
+      if (!cartId) return;
+      await removeFromCartDBGuest(cartId);
+      return;
+    }
+
+    const delta = quantity - currentQuantity;
+    if (delta === 0) return;
+
+    await addToCartDBGuest(
+      productVariantId,
+      Math.abs(delta),
+      delta > 0 ? "increment" : "decrement",
+    );
+  };
+
   return (
     <AppContext.Provider
       value={{
-        cartItems,
-        cartCount,
-        cartTotal,
+        cartReady,
         isCartOpen,
         isDark,
         toggleCart,
         toggleTheme,
         openCart,
         closeCart,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
+        cartDBGuest,
+        totalDBGuest,
+        cartDBCountGuest,
+        removeFromCartDBGuest,
+        updateQuantityDBGuest,
         authToken,
         authEmail,
         authReady,
@@ -215,11 +287,12 @@ export function AppProvider({ children }) {
         requestOtp,
         verifyOtp,
         logout,
+        addToCartDBGuest,
       }}
     >
       {children}
       <Toaster
-        position="top-right"
+        position="top-center"
         toastOptions={{
           duration: 2500,
           style: {

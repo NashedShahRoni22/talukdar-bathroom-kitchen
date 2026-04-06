@@ -105,7 +105,18 @@ function AddressForm({ title, prefix, data, onChange, errors }) {
 
 export default function CheckoutForm({ onShippingMetaChange }) {
   const router = useRouter();
-  const { cartItems, cartTotal, clearCart } = useApp();
+  const { cartDBGuest, totalDBGuest } = useApp();
+
+  const normalizedCartItems = cartDBGuest.map((item) => ({
+    id: item.cart_id,
+    name: item.name,
+    category: item.slug,
+    image: item.thumbnail_image,
+    quantity: Number(item.quantity),
+    price: Number(item.price),
+  }));
+
+  const cartSubtotal = Number(totalDBGuest);
 
   const [shipping, setShipping] = useState(EMPTY_ADDRESS);
   const [billing, setBilling] = useState(EMPTY_ADDRESS);
@@ -151,7 +162,7 @@ export default function CheckoutForm({ onShippingMetaChange }) {
       }
     }
 
-    if (cartItems.length === 0) errs.cart = 'Your cart is empty';
+    if (normalizedCartItems.length === 0) errs.cart = 'Your cart is empty';
     if (!agreedTerms) errs.terms = 'You must accept the Terms & Conditions';
     if (!agreedPrivacy) errs.privacy = 'You must accept the Privacy Policy';
 
@@ -160,14 +171,14 @@ export default function CheckoutForm({ onShippingMetaChange }) {
 
   function buildPayload() {
     const totals = getOrderTotalsForAustralia({
-      subtotal: cartTotal,
+      subtotal: cartSubtotal,
       destinationPostcode: shipping.zip,
     });
 
     return {
       shipping: { ...shipping, country: 'Australia' },
       billing: sameAsShipping ? { ...shipping, country: 'Australia' } : { ...billing, country: 'Australia' },
-      items: cartItems.map(({ id, name, category, price, image, quantity }) => ({
+      items: normalizedCartItems.map(({ id, name, category, price, image, quantity }) => ({
         id,
         name,
         category,
@@ -177,7 +188,7 @@ export default function CheckoutForm({ onShippingMetaChange }) {
         lineTotal: parseFloat((price * quantity).toFixed(2)),
       })),
       summary: {
-        subtotal: parseFloat(cartTotal.toFixed(2)),
+        subtotal: parseFloat(cartSubtotal.toFixed(2)),
         shippingCharge: totals.shippingCharge,
         taxRate: totals.gstRate,
         tax: totals.tax,
@@ -216,9 +227,6 @@ export default function CheckoutForm({ onShippingMetaChange }) {
       }
 
       const data = await res.json();
-
-      // Clear cart after successful order creation
-      clearCart();
 
       // Redirect to payment URL returned by the API
       if (data?.paymentUrl) {

@@ -10,18 +10,10 @@ import { useApp } from "@/components/context/AppContext";
 export default function ProductCard({ p }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const { addToCart } = useApp();
-  console.log(p);
+  const { addToCartDBGuest } = useApp();
 
   function handleAddToCart() {
-    addToCart({
-      id: p?.id,
-      name: p?.name,
-      price: p?.price,
-      image: p?.thumbnail_image,
-      category: p?.category,
-      rating: p?.rating,
-    });
+    addToCartDBGuest(p?.variants?.[0]?.product_variant_id, 1, "increment");
   }
 
   return (
@@ -71,7 +63,7 @@ export default function ProductCard({ p }) {
                 <Eye size={20} />
               </motion.button>
             </Link>
-            
+
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}

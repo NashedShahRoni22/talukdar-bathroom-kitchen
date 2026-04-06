@@ -10,7 +10,7 @@ import OrderSummary from '@/components/checkout/OrderSummary';
 import { useApp } from '@/components/context/AppContext';
 
 export default function CheckoutPage() {
-  const { cartItems } = useApp();
+  const { cartDBGuest, cartReady } = useApp();
   const router = useRouter();
   const [shippingMeta, setShippingMeta] = useState({
     zip: '',
@@ -18,12 +18,13 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
-    if (cartItems.length === 0) {
+    if (cartReady && cartDBGuest.length === 0) {
       router.replace('/');
     }
-  }, [cartItems, router]);
+  }, [cartDBGuest, cartReady, router]);
 
-  if (cartItems.length === 0) return null;
+  if (!cartReady) return null;
+  if (cartDBGuest.length === 0) return null;
 
   return (
     <main className="min-h-screen pt-28 pb-20 bg-[#faf8f5] dark:bg-[#060b20] transition-colors duration-300">

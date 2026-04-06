@@ -6,17 +6,10 @@ import { motion } from "framer-motion";
 import { useApp } from "@/components/context/AppContext";
 
 export default function ProductListCard({ p }) {
-  const { addToCart } = useApp();
+  const { addToCartDBGuest } = useApp();
 
   function handleAddToCart() {
-    addToCart({
-      id: p?.id,
-      name: p?.name,
-      price: p?.price,
-      image: p?.image,
-      category: p?.category,
-      rating: p?.rating,
-    });
+    addToCartDBGuest(p?.variants?.[0]?.product_variant_id, 1, "increment");
   }
 
   return (

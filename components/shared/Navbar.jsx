@@ -16,7 +16,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === '/';
   const isTransparent = isHome && !scrolled;
-  const { cartCount, toggleCart, isDark, toggleTheme, isAuthenticated } = useApp();
+  const { cartDBCountGuest, toggleCart, isDark, toggleTheme, isAuthenticated } = useApp();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -154,15 +154,15 @@ export default function Navbar() {
                 aria-label="Open cart"
               >
                 <ShoppingCart size={19} className={isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'} />
-                {cartCount > 0 && (
+                {cartDBCountGuest > 0 && (
                   <motion.span
-                    key={cartCount}
+                    key={cartDBCountGuest}
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-white text-xs font-bold flex items-center justify-center"
                     style={{ backgroundColor: '#785d32' }}
                   >
-                    {cartCount > 99 ? '99+' : cartCount}
+                    {cartDBCountGuest > 99 ? '99+' : cartDBCountGuest}
                   </motion.span>
                 )}
               </button>

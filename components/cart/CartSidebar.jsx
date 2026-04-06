@@ -1,14 +1,16 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, ShoppingBag, ArrowRight, Trash2 } from 'lucide-react';
+import { X, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/components/context/AppContext';
 import CartItem from './CartItem';
 
 export default function CartSidebar() {
-  const { isCartOpen, closeCart, cartItems, cartCount, cartTotal, clearCart } = useApp();
+  const { isCartOpen, closeCart, cartDBGuest, cartDBCountGuest, totalDBGuest } = useApp();
   const router = useRouter();
+
+  const subtotal = Number.isFinite(Number(totalDBGuest)) ? Number(totalDBGuest) : 0;
 
   function goToCheckout() {
     closeCart();
@@ -49,26 +51,17 @@ export default function CartSidebar() {
                 >
                   Your Cart
                 </h2>
-                {cartCount > 0 && (
+                {cartDBCountGuest > 0 && (
                   <span
                     className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center"
                     style={{ backgroundColor: '#785d32' }}
                   >
-                    {cartCount}
+                    {cartDBCountGuest}
                   </span>
                 )}
               </div>
 
               <div className="flex items-center gap-2">
-                {cartItems.length > 0 && (
-                  <button
-                    onClick={clearCart}
-                    className="cursor-pointer flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-500 transition-colors px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
-                  >
-                    <Trash2 size={12} />
-                    Clear all
-                  </button>
-                )}
                 <button
                   onClick={closeCart}
                   className="cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-[#1a2340] rounded-lg transition-colors"
@@ -81,7 +74,7 @@ export default function CartSidebar() {
 
             {/* Cart Items — Scrollable */}
             <div className="flex-1 overflow-y-auto px-6">
-              {cartItems.length === 0 ? (
+              {cartDBGuest.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center py-12">
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
@@ -108,15 +101,18 @@ export default function CartSidebar() {
                 </div>
               ) : (
                 <AnimatePresence mode="popLayout">
-                  {cartItems.map((item) => (
-                    <CartItem key={item.id} item={item} />
+                  {cartDBGuest.map((item, index) => (
+                    <CartItem
+                      key={item?.id ?? item?.guest_cart_id ?? item?.cart_id ?? index}
+                      item={item}
+                    />
                   ))}
                 </AnimatePresence>
               )}
             </div>
 
             {/* Footer — Subtotal & Actions */}
-            {cartItems.length > 0 && (
+            {cartDBGuest.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -125,10 +121,10 @@ export default function CartSidebar() {
                 {/* Subtotal */}
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm text-gray-500 dark:text-[#9fa8cc]">
-                    Subtotal ({cartCount} {cartCount === 1 ? 'item' : 'items'})
+                    Subtotal ({cartDBCountGuest} {cartDBCountGuest === 1 ? 'item' : 'items'})
                   </span>
                   <span className="text-2xl font-bold text-[#050a30] dark:text-[#e8d9c4]">
-                    ${cartTotal.toFixed(2)}
+                    ${subtotal.toFixed(2)}
                   </span>
                 </div>
                 <p className="text-xs text-gray-400 dark:text-[#6b7498] mb-5">
