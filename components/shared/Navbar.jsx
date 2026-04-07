@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ShoppingCart, Sun, Moon, Instagram, Facebook, Youtube, Twitter, UserRound } from 'lucide-react';
+import { Menu, X, ShoppingCart, Heart, Sun, Moon, Instagram, Facebook, Youtube, Twitter, UserRound } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import logo from '@/public/images/logo.png';
 import logoWhite from '@/public/images/logo-white.png';
@@ -16,7 +16,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const isHome = pathname === '/';
   const isTransparent = isHome && !scrolled;
-  const { cartDBCountGuest, toggleCart, isDark, toggleTheme, isAuthenticated } = useApp();
+  const { cartDBCountGuest, wishlistItems, toggleCart, isDark, toggleTheme, isAuthenticated } = useApp();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -144,6 +144,29 @@ export default function Navbar() {
                   <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand-gold" />
                 )}
               </Link>
+
+              {/* Wishlist */}
+              {isAuthenticated && (
+                <Link
+                  href="/wishlist"
+                  className={`cursor-pointer p-2.5 rounded-xl transition-colors relative ${
+                      isTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-[#1a2340]'
+                    }`}
+                  aria-label="Wishlist"
+                >
+                  <Heart size={19} className={isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'} />
+                  {wishlistItems?.length > 0 && (
+                    <motion.span
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-white text-xs font-bold flex items-center justify-center"
+                      style={{ backgroundColor: '#ef4444' }}
+                    >
+                      {wishlistItems?.length > 99 ? '99+' : wishlistItems?.length}
+                    </motion.span>
+                  )}
+                </Link>
+              )}
 
               {/* Cart */}
               <button

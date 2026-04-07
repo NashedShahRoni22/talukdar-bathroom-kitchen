@@ -1,17 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, KeyRound, Mail } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useApp } from "@/components/context/AppContext";
+import { usePostData } from "@/components/helpers/usePostData";
+import toast from "react-hot-toast";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/profile";
 
-  const { requestOtp, verifyOtp, authReady, isAuthenticated } = useApp();
+  const { authReady, isAuthenticated, setAuthToken, setAuthEmail, mergeGuestCartToMain } = useApp();
+  
+  const postLoginRequest = usePostData("login/request");
+  const postLoginVerify = usePostData("login/verify");
 
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -24,7 +29,7 @@ export default function LoginPage() {
     }
   }, [authReady, isAuthenticated, redirectTo, router]);
 
-  function handleSendOtp(e) {
+  async function handleSendOtp(e) {
     e.preventDefault();
 
     const normalizedEmail = email.trim().toLowerCase();
@@ -33,20 +38,62 @@ export default function LoginPage() {
     if (!isEmail) return;
 
     setIsSubmitting(true);
-    const ok = requestOtp(normalizedEmail);
-    if (ok) setStep("otp");
-    setIsSubmitting(false);
+    const formData = new FormData();
+    formData.append("email", normalizedEmail);
+
+    try {
+      const response = await postLoginRequest.mutateAsync(formData);
+      if (response?.status === "success") {
+        toast.success(response?.message || "A verification code has been sent to your email.");
+        setStep("otp");
+      } else {
+        toast.error(response?.message || "Failed to request OTP.");
+      }
+    } catch (err) {
+      toast.error(err?.message || "Unable to start OTP login right now.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
-  function handleVerifyOtp(e) {
+  async function handleVerifyOtp(e) {
     e.preventDefault();
 
     if (otp.trim().length !== 6) return;
 
     setIsSubmitting(true);
-    const ok = verifyOtp(email, otp);
-    if (ok) router.push(redirectTo);
-    setIsSubmitting(false);
+    const formData = new FormData();
+    formData.append("email", email.trim().toLowerCase());
+    formData.append("code", otp.trim());
+
+    try {
+      const response = await postLoginVerify.mutateAsync(formData);
+      if (response?.status === "success" && response?.data?.token) {
+        const token = response.data.token;
+        const userDetails = response.data.details;
+
+        setAuthToken(token);
+        setAuthEmail(email.trim().toLowerCase());
+
+        localStorage.setItem("talukdar-auth-token", token);
+        localStorage.setItem("talukdar-auth-email", email.trim().toLowerCase());
+        
+        if (userDetails) {
+          localStorage.setItem("talukdar-user-details", JSON.stringify(userDetails));
+        }
+
+        await mergeGuestCartToMain(token);
+
+        toast.success(response?.message || "Login successful.");
+        router.push(redirectTo);
+      } else {
+        toast.error(response?.message || "Invalid OTP or email. Please try again.");
+      }
+    } catch (err) {
+      toast.error(err?.message || "Unable to verify OTP right now.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -149,5 +196,13 @@ export default function LoginPage() {
         </motion.div>
       </section>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

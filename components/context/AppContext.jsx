@@ -5,6 +5,8 @@ import { Toaster, toast } from "react-hot-toast";
 import { useGetData } from "../helpers/useGetData";
 import { usePostData } from "../helpers/usePostData";
 import { useDeleteDataWithToken } from "../helpers/useDeleteData";
+import { usePostDataWithToken } from "../helpers/usePostDataWithToken";
+import { useGetDataWithToken } from "../helpers/useGetDataWithToken";
 import { useQueryClient } from "@tanstack/react-query";
 
 const AppContext = createContext(null);
@@ -74,78 +76,13 @@ export function AppProvider({ children }) {
     setIsCartOpen(false);
   }
 
-  function requestOtp(email) {
-    const normalizedEmail = email.trim().toLowerCase();
-    if (!normalizedEmail) {
-      toast.error("Please enter your email first");
-      return false;
-    }
-
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
-    const expiresAt = String(Date.now() + 5 * 60 * 1000);
-
-    try {
-      localStorage.setItem("talukdar-otp-email", normalizedEmail);
-      localStorage.setItem("talukdar-otp-code", otp);
-      localStorage.setItem("talukdar-otp-expiry", expiresAt);
-      toast.success(`OTP sent. Demo code: ${otp}`);
-      return true;
-    } catch {
-      toast.error("Unable to start OTP login right now");
-      return false;
-    }
-  }
-
-  function verifyOtp(email, otp) {
-    const normalizedEmail = email.trim().toLowerCase();
-    const normalizedOtp = otp.trim();
-
-    try {
-      const savedEmail = localStorage.getItem("talukdar-otp-email") || "";
-      const savedOtp = localStorage.getItem("talukdar-otp-code") || "";
-      const savedExpiry = Number(
-        localStorage.getItem("talukdar-otp-expiry") || 0,
-      );
-
-      if (!savedEmail || !savedOtp || !savedExpiry) {
-        toast.error("No OTP request found. Please request a new OTP.");
-        return false;
-      }
-
-      if (Date.now() > savedExpiry) {
-        toast.error("OTP expired. Please request a new OTP.");
-        return false;
-      }
-
-      if (normalizedEmail !== savedEmail || normalizedOtp !== savedOtp) {
-        toast.error("Invalid OTP or email. Please try again.");
-        return false;
-      }
-
-      const token = `talukdar_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-      setAuthToken(token);
-      setAuthEmail(normalizedEmail);
-
-      localStorage.setItem("talukdar-auth-token", token);
-      localStorage.setItem("talukdar-auth-email", normalizedEmail);
-      localStorage.removeItem("talukdar-otp-email");
-      localStorage.removeItem("talukdar-otp-code");
-      localStorage.removeItem("talukdar-otp-expiry");
-
-      toast.success("Login successful");
-      return true;
-    } catch {
-      toast.error("Unable to verify OTP right now");
-      return false;
-    }
-  }
-
   function logout() {
     setAuthToken(null);
     setAuthEmail("");
     try {
       localStorage.removeItem("talukdar-auth-token");
       localStorage.removeItem("talukdar-auth-email");
+      localStorage.removeItem("talukdar-user-details");
     } catch {}
     toast("Logged out", { icon: "👋" });
   }
@@ -154,21 +91,46 @@ export function AppProvider({ children }) {
 
   // Cart API: guest
   const postCartGuest = usePostData("add-to-cart-guest");
+  const postCartAuth = usePostDataWithToken("add-to-cart");
+  const postMergeGuestCart = usePostDataWithToken("add-to-cart-from-guest");
   const deleteItem = useDeleteDataWithToken();
   const guestCartQueryKey = [`guest-cart?guest_token=${guestToken}`];
+  const authCartQueryKey = ["cart", authToken];
 
   const addToCartDBGuest = async (
     productVariantId,
     quantity = 1,
     type = "increment",
   ) => {
-    if (!guestToken) {
-      toast.error("Cart session not ready yet. Please try again.");
+    if (!productVariantId) {
+      toast.error("This product is currently unavailable.");
       return false;
     }
 
-    if (!productVariantId) {
-      toast.error("This product is currently unavailable.");
+    if (isAuthenticated && authToken) {
+      const formData = new FormData();
+      formData.append("product_variant_id", String(productVariantId));
+      formData.append("quantity", String(quantity));
+      if (type === "decrement") {
+        formData.append("type", "decrement");
+      }
+
+      try {
+        await toast.promise(postCartAuth.mutateAsync({ formData, token: authToken }), {
+          loading: "Updating cart...",
+          success: "Cart Updated!",
+          error: (err) => err.message || "Failed to add product to cart",
+        });
+
+        await queryClient.invalidateQueries({ queryKey: authCartQueryKey });
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    if (!guestToken) {
+      toast.error("Cart session not ready yet. Please try again.");
       return false;
     }
 
@@ -198,18 +160,21 @@ export function AppProvider({ children }) {
   const removeFromCartDBGuest = async (cartId, options = {}) => {
     const { silent = false } = options;
 
+    if (!cartId) return false;
+
+    const endpoint = isAuthenticated && authToken
+      ? `cart/${cartId}`
+      : `guest-cart/${cartId}`;
+    const mutationPayload = isAuthenticated && authToken
+      ? { endpoint, token: authToken }
+      : { endpoint, guestToken };
+
     try {
       if (silent) {
-        await deleteItem.mutateAsync({
-          endpoint: `guest-cart/${cartId}`,
-          guestToken,
-        });
+        await deleteItem.mutateAsync(mutationPayload);
       } else {
         await toast.promise(
-          deleteItem.mutateAsync({
-            endpoint: `guest-cart/${cartId}`,
-            guestToken,
-          }),
+          deleteItem.mutateAsync(mutationPayload),
           {
             loading: "Removing item from cart...",
             success: "Item removed from cart!",
@@ -218,28 +183,55 @@ export function AppProvider({ children }) {
         );
       }
 
-      queryClient.invalidateQueries({
-        queryKey: [`guest-cart?guest_token=${guestToken}`],
-      });
+      if (isAuthenticated && authToken) {
+        await queryClient.invalidateQueries({ queryKey: authCartQueryKey });
+      } else {
+        await queryClient.invalidateQueries({ queryKey: guestCartQueryKey });
+      }
       return true;
     } catch {
       return false;
     }
   };
-
-  // get cart data Guest
-  const { data: cartDataGuest, isLoading: isCartLoading } = useGetData(
+  
+  const { data: cartDataGuest, isLoading: isGuestCartLoading } = useGetData(
     `guest-cart?guest_token=${guestToken}`,
     {},
-    { enabled: !!guestToken },
+    { enabled: !!guestToken && !isAuthenticated },
   );
-  const cartDBGuest = Array.isArray(cartDataGuest?.data)
-    ? cartDataGuest.data
+  const { data: cartDataAuth, isLoading: isAuthCartLoading } = useGetDataWithToken(
+    "cart",
+    authToken,
+    isAuthenticated,
+  );
+
+  const activeCartData = isAuthenticated ? cartDataAuth : cartDataGuest;
+  const cartDBGuest = Array.isArray(activeCartData?.data)
+    ? activeCartData.data
     : [];
 
-  const totalDBGuest = Number(cartDataGuest?.meta?.sub_total || 0);
+  const totalDBGuest = Number(activeCartData?.meta?.sub_total || 0);
   const cartDBCountGuest = cartDBGuest.length;
-  const cartReady = Boolean(guestToken) && !isCartLoading;
+  const cartReady = isAuthenticated
+    ? !isAuthCartLoading
+    : Boolean(guestToken) && !isGuestCartLoading;
+
+  const mergeGuestCartToMain = async (tokenOverride) => {
+    const activeToken = tokenOverride || authToken;
+    if (!activeToken || !guestToken) return true;
+
+    const formData = new FormData();
+    formData.append("guest_token", guestToken);
+
+    try {
+      await postMergeGuestCart.mutateAsync({ formData, token: activeToken });
+      await queryClient.invalidateQueries({ queryKey: ["cart", activeToken] });
+      await queryClient.invalidateQueries({ queryKey: guestCartQueryKey });
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   const updateQuantityDBGuest = async (item, quantity) => {
     if (!item) return;
@@ -265,6 +257,45 @@ export function AppProvider({ children }) {
     );
   };
 
+  //Wishlist API: auth
+  const { data: wishlistData, isLoading: isWishlistLoading } = useGetDataWithToken("wishlist", authToken, isAuthenticated);
+  const postWishlist = usePostDataWithToken("wishlist");
+
+  const addToWishlist = async (product_variant_id) => {
+    if (!isAuthenticated) {
+      toast.error("Please login to manage wishlist");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("product_variant_id", product_variant_id);
+
+    try {
+      const res = await postWishlist.mutateAsync({ formData, token: authToken });
+      if (res?.status === "success") {
+        toast.success(res?.message || "Added to wishlist!");
+        queryClient.invalidateQueries(["wishlist", authToken]);
+      }
+    } catch (e) {
+      toast.error(e.message || "Failed to add to wishlist");
+    }
+  };
+
+  const removeFromWishlist = async (wishlist_id) => {
+    if (!isAuthenticated) {
+      toast.error("Please login to manage wishlist");
+      return;
+    }
+    try {
+      const res = await deleteItem.mutateAsync({ endpoint: `wishlist/${wishlist_id}`, token: authToken });
+      if (res?.status === "success") {
+        toast.success(res?.message || "Removed from wishlist!");
+        queryClient.invalidateQueries(["wishlist", authToken]);
+      }
+    } catch (e) {
+      toast.error(e.message || "Failed to remove from wishlist");
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -284,10 +315,15 @@ export function AppProvider({ children }) {
         authEmail,
         authReady,
         isAuthenticated,
-        requestOtp,
-        verifyOtp,
+        setAuthToken,
+        setAuthEmail,
+        wishlistItems: wishlistData?.data || [],
+        isWishlistLoading,
+        addToWishlist,
+        removeFromWishlist,
         logout,
         addToCartDBGuest,
+        mergeGuestCartToMain,
       }}
     >
       {children}

@@ -233,7 +233,7 @@ export default function ShopPage() {
       </header>
 
       <main className="mx-auto w-full max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-        <section className="sticky top-20 z-40 mb-5 rounded-2xl border border-gray-200 bg-white/95 p-4 shadow-md backdrop-blur-sm sm:p-5 dark:border-[#1c2444] dark:bg-[#0a0f2e]/95">
+        {/* <section className="sticky top-20 z-40 mb-5 rounded-2xl border border-gray-200 bg-white/95 p-4 shadow-md backdrop-blur-sm sm:p-5 dark:border-[#1c2444] dark:bg-[#0a0f2e]/95">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-brand-gold">
               <SlidersHorizontal size={16} />
@@ -322,7 +322,7 @@ export default function ShopPage() {
               </button>
             </div>
           )}
-        </section>
+        </section> */}
 
         <section>
           <div className="mb-3 flex flex-wrap items-center justify-between">
