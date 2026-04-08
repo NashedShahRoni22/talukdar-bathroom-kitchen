@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, Clock3, HelpCircle, XCircle } from 'lucide-react';
-import toast from 'react-hot-toast';
+// import toast from 'react-hot-toast';
 
 const BASE_URL = process.env.NEXT_PUBLIC_TALUKDAR_API_BASE_URL;
 
@@ -51,12 +51,9 @@ function getStatusCopy(status) {
 
 function PaymentPageContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const status = searchParams.get('status') || 'processing';
   const message = searchParams.get('message') || '';
-  const paymentIntent = searchParams.get('payment_intent') || searchParams.get('paymentIntent') || '';
-  const paymentIntentClientSecret =
-    searchParams.get('payment_intent_client_secret') || searchParams.get('paymentIntentClientSecret') || '';
+  const paymentIntent = searchParams.get('payment_intent');
   const redirectStatus = searchParams.get('redirect_status') || '';
 
   const [isVerifying, setIsVerifying] = useState(false);
@@ -99,8 +96,8 @@ function PaymentPageContent() {
             throw new Error(errorData?.message || `Server error: ${res.status}`);
           }
 
-          const data = await res.json();
-          toast.success(data?.message || 'Payment verified successfully!');
+        //   const data = await res.json();
+        //   toast.success(data?.message || 'Payment verified successfully!');
         } else if (['cancelled', 'failed'].includes(redirectStatus)) {
           setIsVerifying(true);
 
@@ -132,11 +129,11 @@ function PaymentPageContent() {
           }
 
           const data = await res.json();
-          toast.info(data?.message || 'Payment cancelled.');
+        //   toast.info(data?.message || 'Payment cancelled.');
         }
       } catch (err) {
         console.error('Payment status handling error:', err);
-        toast.error(err?.message || 'An error occurred while processing your payment.');
+        // toast.error(err?.message || 'An error occurred while processing your payment.');
       } finally {
         setIsVerifying(false);
       }
@@ -174,7 +171,7 @@ function PaymentPageContent() {
           className="overflow-hidden rounded-3xl border border-white/70 bg-white shadow-[0_30px_70px_rgba(5,10,48,0.08)] dark:border-[#1c2444] dark:bg-[#0d1333]"
         >
           <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="p-8 sm:p-10">
+            <div className="flex h-full flex-col items-center justify-center p-8 text-center sm:p-10">
               <div
                 className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
                   statusCopy.tone === 'succeeded'
@@ -186,21 +183,18 @@ function PaymentPageContent() {
                         : 'bg-brand-gold/10 text-brand-navy dark:text-[#f0ebe3]'
                 }`}
               >
-                <StatusIcon size={16} />
+                <StatusIcon 
+                  size={18} 
+                  className={statusCopy.tone === 'processing' ? 'animate-spin' : ''} 
+                />
                 {statusCopy.title}
               </div>
 
-              <h1
-                className="mt-6 text-3xl font-bold text-brand-navy dark:text-[#f0ebe3] md:text-5xl"
-                style={{ fontFamily: 'var(--font-playfair)' }}
-              >
-              </h1>
-
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-gray-600 dark:text-[#9fa8cc] sm:text-base">
+              <p className="mt-6 max-w-lg text-sm leading-6 text-gray-600 dark:text-[#9fa8cc] sm:text-base">
                 {message || statusCopy.description}
               </p>
 
-              <div className="mt-10 flex flex-wrap gap-3">
+              <div className="mt-8 flex flex-wrap justify-center gap-3">
                 <Link
                   href="/shop"
                   className="rounded-xl border border-gray-200 bg-transparent px-6 py-3.5 text-sm font-bold text-brand-navy transition-all hover:bg-gray-50 focus:ring-2 focus:ring-brand-gold/50 dark:border-[#2a3460] dark:text-[#f0ebe3] dark:hover:bg-[#111840]"

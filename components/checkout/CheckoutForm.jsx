@@ -1,31 +1,41 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Lock, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
-import { useApp } from '@/components/context/AppContext';
-import { getCouponAdjustedTotal } from '@/lib/coupon';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Lock, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
+import { useApp } from "@/components/context/AppContext";
+import { getCouponAdjustedTotal } from "@/lib/coupon";
 
 const BASE_URL = process.env.NEXT_PUBLIC_TALUKDAR_API_BASE_URL;
 
 const EMPTY_ADDRESS = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
-  address: '',
-  city: '',
-  state: '',
-  zip: '',
-  country: 'Australia',
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  address: "",
+  city: "",
+  state: "",
+  zip: "",
+  country: "Australia",
 };
 
-function InputField({ label, name, value, onChange, error, type = 'text', span2 = false }) {
+function InputField({
+  label,
+  name,
+  value,
+  onChange,
+  error,
+  type = "text",
+  span2 = false,
+}) {
   return (
-    <div className={span2 ? 'col-span-2' : 'col-span-1'}>
-      <label className="block text-sm font-medium text-gray-600 dark:text-[#9fa8cc] mb-1.5">{label}</label>
+    <div className={span2 ? "col-span-2" : "col-span-1"}>
+      <label className="block text-sm font-medium text-gray-600 dark:text-[#9fa8cc] mb-1.5">
+        {label}
+      </label>
       <input
         type={type}
         name={name}
@@ -34,8 +44,8 @@ function InputField({ label, name, value, onChange, error, type = 'text', span2 
         placeholder={label}
         className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none transition-colors bg-white dark:bg-[#111840] dark:text-[#f0ebe3] dark:placeholder-[#6b7498] ${
           error
-            ? 'border-red-400 focus:border-red-400'
-            : 'border-gray-200 dark:border-[#2a3460] focus:border-brand-navy dark:focus:border-[#c4a97e]'
+            ? "border-red-400 focus:border-red-400"
+            : "border-gray-200 dark:border-[#2a3460] focus:border-brand-navy dark:focus:border-[#c4a97e]"
         }`}
       />
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
@@ -50,18 +60,28 @@ function Checkbox({ checked, onChange, children }) {
         type="button"
         onClick={onChange}
         className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${
-          checked ? 'border-brand-gold bg-brand-gold' : 'border-gray-300 dark:border-[#2a3460] bg-white dark:bg-[#111840] hover:border-brand-gold'
+          checked
+            ? "border-brand-gold bg-brand-gold"
+            : "border-gray-300 dark:border-[#2a3460] bg-white dark:bg-[#111840] hover:border-brand-gold"
         }`}
         aria-checked={checked}
         role="checkbox"
       >
         {checked && (
           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-            <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M1 4L3.5 6.5L9 1"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         )}
       </button>
-      <span className="text-sm text-gray-600 dark:text-[#9fa8cc] leading-relaxed">{children}</span>
+      <span className="text-sm text-gray-600 dark:text-[#9fa8cc] leading-relaxed">
+        {children}
+      </span>
     </label>
   );
 }
@@ -81,32 +101,31 @@ function AddressForm({ title, prefix, data, onChange, errors }) {
 
   return (
     <div>
-      <h3
-        className="text-base font-bold uppercase tracking-widest mb-5 pb-3 border-b border-gray-100 dark:border-[#1c2444] text-brand-navy dark:text-[#f0ebe3]"
-      >
+      <h3 className="text-base font-bold uppercase tracking-widest mb-5 pb-3 border-b border-gray-100 dark:border-[#1c2444] text-brand-navy dark:text-[#f0ebe3]">
         {title}
       </h3>
       <div className="grid grid-cols-2 gap-4">
-        {field('firstName', 'First Name')}
-        {field('lastName', 'Last Name')}
-        {field('email', 'Email Address', { type: 'email', span2: true })}
-        {field('phone', 'Phone Number', { type: 'tel', span2: true })}
-        {field('address', 'Street Address', { span2: true })}
-        {field('city', 'City')}
-        {field('state', 'State / Province')}
-        {field('zip', 'Postcode')}
+        {field("firstName", "First Name")}
+        {field("lastName", "Last Name")}
+        {field("email", "Email Address", { type: "email", span2: true })}
+        {field("phone", "Phone Number", { type: "tel", span2: true })}
+        {field("address", "Street Address", { span2: true })}
+        {field("city", "City")}
+        {field("state", "State / Province")}
+        {field("zip", "Postcode")}
       </div>
     </div>
   );
 }
 
-export default function CheckoutForm({ 
-  onShippingMetaChange, 
+export default function CheckoutForm({
+  onShippingMetaChange,
   couponMeta = null,
   shippingCost = null,
   onSubmit = null,
 }) {
-  const { cartDBGuest, totalDBGuest, authToken, isAuthenticated, guestToken } = useApp();
+  const { cartDBGuest, totalDBGuest, authToken, isAuthenticated, guestToken } =
+    useApp();
 
   const normalizedCartItems = cartDBGuest.map((item) => ({
     id: item.cart_id,
@@ -131,43 +150,57 @@ export default function CheckoutForm({
   useEffect(() => {
     onShippingMetaChange?.({
       zip: shipping.zip,
-      country: 'Australia',
+      country: "Australia",
     });
   }, [shipping.zip, onShippingMetaChange]);
 
   function makeHandler(setter) {
     return (e) => {
-      const { name, value } = e.target;
+      let { name, value } = e.target;
+      if (name === 'zip') {
+        value = value.replace(/\D/g, '').slice(0, 4);
+      }
       setter((prev) => ({ ...prev, [name]: value }));
     };
   }
 
   function validate() {
     const errs = {};
-    const required = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'zip'];
+    const required = [
+      "firstName",
+      "lastName",
+      "email",
+      "phone",
+      "address",
+      "city",
+      "state",
+      "zip",
+    ];
     const simpleZipRegex = /^\d{4}$/; // Basic 4-digit postcode check
 
     required.forEach((f) => {
-      if (!shipping[f]?.trim()) errs[`shipping_${f}`] = 'This field is required';
+      if (!shipping[f]?.trim())
+        errs[`shipping_${f}`] = "This field is required";
     });
 
     if (!simpleZipRegex.test(shipping.zip)) {
-      errs.shipping_zip = 'Enter a valid postcode (4 digits)';
+      errs.shipping_zip = "Enter a valid postcode (4 digits)";
     }
 
     if (!sameAsShipping) {
       required.forEach((f) => {
-        if (!billing[f]?.trim()) errs[`billing_${f}`] = 'This field is required';
+        if (!billing[f]?.trim())
+          errs[`billing_${f}`] = "This field is required";
       });
 
       if (!simpleZipRegex.test(billing.zip)) {
-        errs.billing_zip = 'Enter a valid postcode (4 digits)';
+        errs.billing_zip = "Enter a valid postcode (4 digits)";
       }
     }
 
-    if (normalizedCartItems.length === 0) errs.cart = 'Your cart is empty';
-    if (!agreedTerms) errs.terms = 'You must accept the Terms & Conditions';
-    if (!agreedPrivacy) errs.privacy = 'You must accept the Privacy Policy';
+    if (normalizedCartItems.length === 0) errs.cart = "Your cart is empty";
+    if (!agreedTerms) errs.terms = "You must accept the Terms & Conditions";
+    if (!agreedPrivacy) errs.privacy = "You must accept the Privacy Policy";
 
     return errs;
   }
@@ -175,44 +208,47 @@ export default function CheckoutForm({
   function buildOrderFormData() {
     const discounted = getCouponAdjustedTotal(
       cartSubtotal + (shippingCost || 0),
-      couponMeta
+      couponMeta,
     );
 
     const billingData = sameAsShipping ? shipping : billing;
 
     const formData = new FormData();
-    formData.append('first_name', shipping.firstName.trim());
-    formData.append('last_name', shipping.lastName.trim());
-    formData.append('phone', shipping.phone.trim());
-    formData.append('email', shipping.email.trim());
-    formData.append('street', shipping.address.trim());
-    formData.append('city', shipping.city.trim());
-    formData.append('state', shipping.state.trim());
-    formData.append('post_code', shipping.zip.trim());
-    formData.append('additional_info', '');
+    formData.append("first_name", shipping.firstName.trim());
+    formData.append("last_name", shipping.lastName.trim());
+    formData.append("phone", shipping.phone.trim());
+    formData.append("email", shipping.email.trim());
+    formData.append("street", shipping.address.trim());
+    formData.append("city", shipping.city.trim());
+    formData.append("state", shipping.state.trim());
+    formData.append("post_code", shipping.zip.trim());
+    formData.append("additional_info", "");
 
-    formData.append('is_billing_same', sameAsShipping ? '1' : '0');
-    formData.append('billing_first_name', billingData.firstName.trim());
-    formData.append('billing_last_name', billingData.lastName.trim());
-    formData.append('billing_phone', billingData.phone.trim());
-    formData.append('billing_email', billingData.email.trim());
-    formData.append('billing_street', billingData.address.trim());
-    formData.append('billing_city', billingData.city.trim());
-    formData.append('billing_state', billingData.state.trim());
-    formData.append('billing_post_code', billingData.zip.trim());
-    formData.append('billing_additional_info', '');
-    formData.append('payment_method', 'online_payment');
+    formData.append("is_billing_same", sameAsShipping ? "1" : "0");
+    formData.append("billing_first_name", billingData.firstName.trim());
+    formData.append("billing_last_name", billingData.lastName.trim());
+    formData.append("billing_phone", billingData.phone.trim());
+    formData.append("billing_email", billingData.email.trim());
+    formData.append("billing_street", billingData.address.trim());
+    formData.append("billing_city", billingData.city.trim());
+    formData.append("billing_state", billingData.state.trim());
+    formData.append("billing_post_code", billingData.zip.trim());
+    formData.append("billing_additional_info", "");
+    formData.append("payment_method", "online_payment");
 
     normalizedCartItems.forEach((item) => {
-      formData.append('product_variant_id[]', String(item.productVariantId ?? item.id));
-      formData.append('product_variant_price[]', String(item.price));
-      formData.append('product_variant_quantity[]', String(item.quantity));
+      formData.append(
+        "product_variant_id[]",
+        String(item.productVariantId ?? item.id),
+      );
+      formData.append("product_variant_price[]", String(item.price));
+      formData.append("product_variant_quantity[]", String(item.quantity));
     });
 
-    formData.append('shipping_cost', String(shippingCost || 0));
-    formData.append('total', String(discounted.totalAfterDiscount));
-    formData.append('agree_terms', String(agreedTerms));
-    formData.append('agree_privacy', String(agreedPrivacy));
+    formData.append("shipping_cost", String(shippingCost || 0));
+    formData.append("total", String(discounted.totalAfterDiscount));
+    formData.append("agree_terms", String(agreedTerms));
+    formData.append("agree_privacy", String(agreedPrivacy));
 
     return formData;
   }
@@ -223,7 +259,9 @@ export default function CheckoutForm({
     const errs = validate();
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
-      document.querySelector('[data-error]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document
+        .querySelector("[data-error]")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -232,18 +270,22 @@ export default function CheckoutForm({
 
     try {
       if (!BASE_URL) {
-        throw new Error('Missing NEXT_PUBLIC_TALUKDAR_API_BASE_URL environment variable.');
+        throw new Error(
+          "Missing NEXT_PUBLIC_TALUKDAR_API_BASE_URL environment variable.",
+        );
       }
 
-      const normalizedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
-      
+      const normalizedBaseUrl = BASE_URL.endsWith("/")
+        ? BASE_URL
+        : `${BASE_URL}/`;
+
       const formData = buildOrderFormData();
       let res;
 
       if (isAuthenticated && authToken) {
         const orderUrl = `${normalizedBaseUrl}order`;
         res = await fetch(orderUrl, {
-          method: 'POST',
+          method: "POST",
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
@@ -252,10 +294,10 @@ export default function CheckoutForm({
       } else {
         const guestOrderUrl = `${normalizedBaseUrl}guest-order`;
         if (guestToken) {
-          formData.append('guest_token', guestToken);
+          formData.append("guest_token", guestToken);
         }
         res = await fetch(guestOrderUrl, {
-          method: 'POST',
+          method: "POST",
           body: formData,
         });
       }
@@ -266,41 +308,31 @@ export default function CheckoutForm({
       }
 
       const data = await res.json();
-
-      const secret =
-        data?.data?.clientSecret ||
-        data?.data?.client_secret ||
-        data?.clientSecret ||
-        data?.client_secret ||
-        '';
-
-      const orderId =
-        data?.data?.order_id ||
-        data?.data?.id ||
-        data?.order_id ||
-        data?.id ||
-        '';
+      const secret = data?.data?.clientSecret;
+      const orderId = data?.data?.order_id;
 
       if (!secret) {
-        throw new Error('Order created, but Stripe client secret was not returned by the server.');
+        throw new Error(
+          "Order created, but Stripe client secret was not returned by the server.",
+        );
       }
 
       // Store order_id in sessionStorage for payment verify/cancel
       if (orderId) {
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('talukdar-order-id', String(orderId));
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("talukdar-order-id", String(orderId));
         }
       }
 
       // Store payment snapshot
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const discounted = getCouponAdjustedTotal(
           cartSubtotal + (shippingCost || 0),
-          couponMeta
+          couponMeta,
         );
 
         const paymentSnapshot = {
-          status: 'processing',
+          status: "processing",
           createdAt: new Date().toISOString(),
           order: {
             total: discounted.totalAfterDiscount,
@@ -314,13 +346,16 @@ export default function CheckoutForm({
           response: data,
         };
 
-        sessionStorage.setItem('talukdar-payment-snapshot', JSON.stringify(paymentSnapshot));
+        sessionStorage.setItem(
+          "talukdar-payment-snapshot",
+          JSON.stringify(paymentSnapshot),
+        );
       }
 
-      toast.success('Order created. Complete payment to finish checkout.');
+      toast.success("Order created. Complete payment to finish checkout.");
       onSubmit?.(secret);
     } catch (err) {
-      toast.error(err.message ?? 'Something went wrong. Please try again.');
+      toast.error(err.message ?? "Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -338,8 +373,13 @@ export default function CheckoutForm({
       />
 
       {/* Billing same toggle */}
-      <Checkbox checked={sameAsShipping} onChange={() => setSameAsShipping((v) => !v)}>
-        <span className="font-medium text-gray-700 dark:text-[#f0ebe3]">Billing address same as shipping</span>
+      <Checkbox
+        checked={sameAsShipping}
+        onChange={() => setSameAsShipping((v) => !v)}
+      >
+        <span className="font-medium text-gray-700 dark:text-[#f0ebe3]">
+          Billing address same as shipping
+        </span>
       </Checkbox>
 
       {/* Billing (conditional) */}
@@ -347,7 +387,7 @@ export default function CheckoutForm({
         {!sameAsShipping && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
@@ -372,8 +412,11 @@ export default function CheckoutForm({
         </h3>
 
         <div data-error={errors.terms ? true : undefined}>
-          <Checkbox checked={agreedTerms} onChange={() => setAgreedTerms((v) => !v)}>
-            I have read and agree to the{' '}
+          <Checkbox
+            checked={agreedTerms}
+            onChange={() => setAgreedTerms((v) => !v)}
+          >
+            I have read and agree to the{" "}
             <Link
               href="/terms-and-conditions"
               target="_blank"
@@ -383,12 +426,17 @@ export default function CheckoutForm({
               Terms & Conditions
             </Link>
           </Checkbox>
-          {errors.terms && <p className="text-xs text-red-500 mt-1 ml-8">{errors.terms}</p>}
+          {errors.terms && (
+            <p className="text-xs text-red-500 mt-1 ml-8">{errors.terms}</p>
+          )}
         </div>
 
         <div data-error={errors.privacy ? true : undefined}>
-          <Checkbox checked={agreedPrivacy} onChange={() => setAgreedPrivacy((v) => !v)}>
-            I have read and agree to the{' '}
+          <Checkbox
+            checked={agreedPrivacy}
+            onChange={() => setAgreedPrivacy((v) => !v)}
+          >
+            I have read and agree to the{" "}
             <Link
               href="/privacy-policy"
               target="_blank"
@@ -398,12 +446,16 @@ export default function CheckoutForm({
               Privacy Policy
             </Link>
           </Checkbox>
-          {errors.privacy && <p className="text-xs text-red-500 mt-1 ml-8">{errors.privacy}</p>}
+          {errors.privacy && (
+            <p className="text-xs text-red-500 mt-1 ml-8">{errors.privacy}</p>
+          )}
         </div>
       </div>
 
       {/* Cart empty error */}
-      {errors.cart && <p className="text-sm text-red-500 text-center">{errors.cart}</p>}
+      {errors.cart && (
+        <p className="text-sm text-red-500 text-center">{errors.cart}</p>
+      )}
 
       {/* Submit */}
       <motion.button
@@ -412,7 +464,7 @@ export default function CheckoutForm({
         whileHover={isLoading ? {} : { scale: 1.02 }}
         whileTap={isLoading ? {} : { scale: 0.97 }}
         className="w-full py-4 rounded-xl text-white font-semibold text-base flex items-center justify-center gap-2.5 shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-        style={{ backgroundColor: '#050a30' }}
+        style={{ backgroundColor: "#050a30" }}
       >
         {isLoading ? (
           <>
@@ -429,7 +481,8 @@ export default function CheckoutForm({
 
       {(!agreedTerms || !agreedPrivacy) && (
         <p className="text-xs text-center text-gray-500 dark:text-[#9fa8cc]">
-          Please accept Terms & Conditions and Privacy Policy to proceed with payment.
+          Please accept Terms & Conditions and Privacy Policy to proceed with
+          payment.
         </p>
       )}
     </form>

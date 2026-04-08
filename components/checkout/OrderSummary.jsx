@@ -70,7 +70,7 @@ export default function OrderSummary({
   }, [guestToken, onCouponMetaChange]);
 
   const subtotal = Number(totalDBGuest);
-  const shipping = shippingCost !== null ? Number(shippingCost) : 0;
+  const shipping = shippingCost !== null && !isNaN(Number(shippingCost)) ? Number(shippingCost) : 0;
   
   // Calculate tax (10% GST)
   const tax = (subtotal + shipping) * 0.1;
@@ -82,6 +82,7 @@ export default function OrderSummary({
   const couponDiscount = discountedTotals.discountAmount;
   
   const hasValidZip = shippingCountry === 'Australia' && /^\d{4}$/.test(shippingZip);
+  const showPendingShipping = !hasValidZip || shippingCost === null;
 
   const handleApplyCoupon = async () => {
     const trimmedCode = couponCode.trim();
@@ -279,7 +280,7 @@ export default function OrderSummary({
           <div className="flex justify-between text-gray-500 dark:text-[#9fa8cc]">
             <span>Shipping</span>
             {!hasValidZip ? (
-              <span className="font-medium text-amber-600">Enter postcode</span>
+              <span className="font-medium text-amber-600">Enter valid postcode</span>
             ) : shippingCost === null ? (
               <span className="font-medium text-gray-500">Calculating...</span>
             ) : (
@@ -289,14 +290,22 @@ export default function OrderSummary({
 
           <div className="flex justify-between text-gray-500 dark:text-[#9fa8cc]">
             <span>GST (10%)</span>
-            <span className="font-medium text-gray-700 dark:text-[#f0ebe3]">${tax.toFixed(2)}</span>
+            {showPendingShipping ? (
+               <span className="font-medium text-gray-400">—</span>
+            ) : (
+               <span className="font-medium text-gray-700 dark:text-[#f0ebe3]">${tax.toFixed(2)}</span>
+            )}
           </div>
 
           <div
             className="border-t pt-3 flex justify-between font-bold text-base border-brand-pale dark:border-[#2a3460] text-brand-navy dark:text-[#f0ebe3]"
           >
             <span>Total</span>
-            <span>${grandTotal.toFixed(2)}</span>
+            {showPendingShipping ? (
+               <span className="text-gray-400 font-medium">Pending shipping</span>
+            ) : (
+               <span>${grandTotal.toFixed(2)}</span>
+            )}
           </div>
         </motion.div>
       )}

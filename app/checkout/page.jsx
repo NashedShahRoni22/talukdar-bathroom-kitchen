@@ -33,10 +33,11 @@ export default function CheckoutPage() {
     initStripe();
   }, []);
 
-  // Fetch shipping cost when zip changes
+  // Fetch shipping cost when zip changes with a debounce
   useEffect(() => {
     const fetchShippingCost = async () => {
-      if (!shippingMeta.zip) {
+      // Only fetch if exactly 4 digits
+      if (!shippingMeta.zip || shippingMeta.zip.length !== 4) {
         setShippingCost(null);
         return;
       }
@@ -49,21 +50,31 @@ export default function CheckoutPage() {
         const url = `${normalizedUrl}get-shipping-cost?post_code=${encodeURIComponent(shippingMeta.zip)}`;
 
         const res = await fetch(url);
-        if (!res.ok) return;
+        if (!res.ok) {
+           setShippingCost(null);
+           return;
+        }
 
         const data = await res.json();
         // Fallbacks for common API response structures
         const price = data?.data?.shipping_charge;
 
-        if (price !== null) {
+        if (price != null && !isNaN(Number(price))) {
           setShippingCost(Number(price));
+        } else {
+          setShippingCost(null);
         }
       } catch (err) {
         console.error('Failed to fetch shipping cost:', err);
+        setShippingCost(null);
       }
     };
 
-    fetchShippingCost();
+    const debounceTimer = setTimeout(() => {
+      fetchShippingCost();
+    }, 600);
+
+    return () => clearTimeout(debounceTimer);
   }, [shippingMeta.zip]);
 
   useEffect(() => {
