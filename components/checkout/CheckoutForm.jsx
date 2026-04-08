@@ -1,17 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Lock, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useApp } from '@/components/context/AppContext';
-import { getOrderTotalsForAustralia, parseAuPostcode } from '@/lib/auShipping';
+import { getCouponAdjustedTotal } from '@/lib/coupon';
 
-// ─── Set your API endpoint here (or via NEXT_PUBLIC_ORDERS_API_URL env var) ───
-const ORDERS_API_URL = process.env.NEXT_PUBLIC_ORDERS_API_URL ?? 'https://your-api.com/orders';
-// ─────────────────────────────────────────────────────────────────────────────
+const BASE_URL = process.env.NEXT_PUBLIC_TALUKDAR_API_BASE_URL;
 
 const EMPTY_ADDRESS = {
   firstName: '',
@@ -103,12 +100,17 @@ function AddressForm({ title, prefix, data, onChange, errors }) {
   );
 }
 
-export default function CheckoutForm({ onShippingMetaChange }) {
-  const router = useRouter();
-  const { cartDBGuest, totalDBGuest } = useApp();
+export default function CheckoutForm({ 
+  onShippingMetaChange, 
+  couponMeta = null,
+  shippingCost = null,
+  onSubmit = null,
+}) {
+  const { cartDBGuest, totalDBGuest, authToken, isAuthenticated, guestToken } = useApp();
 
   const normalizedCartItems = cartDBGuest.map((item) => ({
     id: item.cart_id,
+    productVariantId: item.product_variant_id,
     name: item.name,
     category: item.slug,
     image: item.thumbnail_image,
@@ -143,13 +145,14 @@ export default function CheckoutForm({ onShippingMetaChange }) {
   function validate() {
     const errs = {};
     const required = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'zip'];
+    const simpleZipRegex = /^\d{4}$/; // Basic 4-digit postcode check
 
     required.forEach((f) => {
       if (!shipping[f]?.trim()) errs[`shipping_${f}`] = 'This field is required';
     });
 
-    if (!parseAuPostcode(shipping.zip)) {
-      errs.shipping_zip = 'Enter a valid Australian postcode (e.g. 2000)';
+    if (!simpleZipRegex.test(shipping.zip)) {
+      errs.shipping_zip = 'Enter a valid postcode (4 digits)';
     }
 
     if (!sameAsShipping) {
@@ -157,8 +160,8 @@ export default function CheckoutForm({ onShippingMetaChange }) {
         if (!billing[f]?.trim()) errs[`billing_${f}`] = 'This field is required';
       });
 
-      if (!parseAuPostcode(billing.zip)) {
-        errs.billing_zip = 'Enter a valid Australian postcode (e.g. 3000)';
+      if (!simpleZipRegex.test(billing.zip)) {
+        errs.billing_zip = 'Enter a valid postcode (4 digits)';
       }
     }
 
@@ -169,34 +172,49 @@ export default function CheckoutForm({ onShippingMetaChange }) {
     return errs;
   }
 
-  function buildPayload() {
-    const totals = getOrderTotalsForAustralia({
-      subtotal: cartSubtotal,
-      destinationPostcode: shipping.zip,
+  function buildOrderFormData() {
+    const discounted = getCouponAdjustedTotal(
+      cartSubtotal + (shippingCost || 0),
+      couponMeta
+    );
+
+    const billingData = sameAsShipping ? shipping : billing;
+
+    const formData = new FormData();
+    formData.append('first_name', shipping.firstName.trim());
+    formData.append('last_name', shipping.lastName.trim());
+    formData.append('phone', shipping.phone.trim());
+    formData.append('email', shipping.email.trim());
+    formData.append('street', shipping.address.trim());
+    formData.append('city', shipping.city.trim());
+    formData.append('state', shipping.state.trim());
+    formData.append('post_code', shipping.zip.trim());
+    formData.append('additional_info', '');
+
+    formData.append('is_billing_same', sameAsShipping ? '1' : '0');
+    formData.append('billing_first_name', billingData.firstName.trim());
+    formData.append('billing_last_name', billingData.lastName.trim());
+    formData.append('billing_phone', billingData.phone.trim());
+    formData.append('billing_email', billingData.email.trim());
+    formData.append('billing_street', billingData.address.trim());
+    formData.append('billing_city', billingData.city.trim());
+    formData.append('billing_state', billingData.state.trim());
+    formData.append('billing_post_code', billingData.zip.trim());
+    formData.append('billing_additional_info', '');
+    formData.append('payment_method', 'online_payment');
+
+    normalizedCartItems.forEach((item) => {
+      formData.append('product_variant_id[]', String(item.productVariantId ?? item.id));
+      formData.append('product_variant_price[]', String(item.price));
+      formData.append('product_variant_quantity[]', String(item.quantity));
     });
 
-    return {
-      shipping: { ...shipping, country: 'Australia' },
-      billing: sameAsShipping ? { ...shipping, country: 'Australia' } : { ...billing, country: 'Australia' },
-      items: normalizedCartItems.map(({ id, name, category, price, image, quantity }) => ({
-        id,
-        name,
-        category,
-        price,
-        image,
-        quantity,
-        lineTotal: parseFloat((price * quantity).toFixed(2)),
-      })),
-      summary: {
-        subtotal: parseFloat(cartSubtotal.toFixed(2)),
-        shippingCharge: totals.shippingCharge,
-        taxRate: totals.gstRate,
-        tax: totals.tax,
-        total: totals.total,
-        shippingZone: totals.shippingMeta.zone,
-        deliveryPricingModel: 'AU_POSTCODE_DISTANCE_BAND',
-      },
-      };
+    formData.append('shipping_cost', String(shippingCost || 0));
+    formData.append('total', String(discounted.totalAfterDiscount));
+    formData.append('agree_terms', String(agreedTerms));
+    formData.append('agree_privacy', String(agreedPrivacy));
+
+    return formData;
   }
 
   async function handleSubmit(e) {
@@ -213,13 +231,34 @@ export default function CheckoutForm({ onShippingMetaChange }) {
     setIsLoading(true);
 
     try {
-      const payload = buildPayload();
+      if (!BASE_URL) {
+        throw new Error('Missing NEXT_PUBLIC_TALUKDAR_API_BASE_URL environment variable.');
+      }
 
-      const res = await fetch(ORDERS_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      const normalizedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
+      
+      const formData = buildOrderFormData();
+      let res;
+
+      if (isAuthenticated && authToken) {
+        const orderUrl = `${normalizedBaseUrl}order`;
+        res = await fetch(orderUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: formData,
+        });
+      } else {
+        const guestOrderUrl = `${normalizedBaseUrl}guest-order`;
+        if (guestToken) {
+          formData.append('guest_token', guestToken);
+        }
+        res = await fetch(guestOrderUrl, {
+          method: 'POST',
+          body: formData,
+        });
+      }
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -228,12 +267,58 @@ export default function CheckoutForm({ onShippingMetaChange }) {
 
       const data = await res.json();
 
-      // Redirect to payment URL returned by the API
-      if (data?.paymentUrl) {
-        router.push(data.paymentUrl);
-      } else {
-        toast.success('Order placed! Redirecting to payment…');
+      const secret =
+        data?.data?.clientSecret ||
+        data?.data?.client_secret ||
+        data?.clientSecret ||
+        data?.client_secret ||
+        '';
+
+      const orderId =
+        data?.data?.order_id ||
+        data?.data?.id ||
+        data?.order_id ||
+        data?.id ||
+        '';
+
+      if (!secret) {
+        throw new Error('Order created, but Stripe client secret was not returned by the server.');
       }
+
+      // Store order_id in sessionStorage for payment verify/cancel
+      if (orderId) {
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('talukdar-order-id', String(orderId));
+        }
+      }
+
+      // Store payment snapshot
+      if (typeof window !== 'undefined') {
+        const discounted = getCouponAdjustedTotal(
+          cartSubtotal + (shippingCost || 0),
+          couponMeta
+        );
+
+        const paymentSnapshot = {
+          status: 'processing',
+          createdAt: new Date().toISOString(),
+          order: {
+            total: discounted.totalAfterDiscount,
+            discount: discounted.discountAmount,
+            coupon_code: couponMeta?.coupon_code || null,
+            shippingZip: shipping.zip,
+            customerName: `${shipping.firstName} ${shipping.lastName}`.trim(),
+            customerEmail: shipping.email,
+            order_id: orderId,
+          },
+          response: data,
+        };
+
+        sessionStorage.setItem('talukdar-payment-snapshot', JSON.stringify(paymentSnapshot));
+      }
+
+      toast.success('Order created. Complete payment to finish checkout.');
+      onSubmit?.(secret);
     } catch (err) {
       toast.error(err.message ?? 'Something went wrong. Please try again.');
     } finally {
@@ -254,7 +339,7 @@ export default function CheckoutForm({ onShippingMetaChange }) {
 
       {/* Billing same toggle */}
       <Checkbox checked={sameAsShipping} onChange={() => setSameAsShipping((v) => !v)}>
-          <span className="font-medium text-gray-700 dark:text-[#f0ebe3]">Billing address same as shipping</span>
+        <span className="font-medium text-gray-700 dark:text-[#f0ebe3]">Billing address same as shipping</span>
       </Checkbox>
 
       {/* Billing (conditional) */}
@@ -278,14 +363,11 @@ export default function CheckoutForm({ onShippingMetaChange }) {
         )}
       </AnimatePresence>
 
-      {/* Divider */}
       <div className="border-t border-gray-100 dark:border-[#1c2444]" />
 
       {/* Terms & Privacy */}
       <div className="space-y-4">
-        <h3
-          className="text-base font-bold uppercase tracking-widest text-brand-navy dark:text-[#f0ebe3]"
-        >
+        <h3 className="text-base font-bold uppercase tracking-widest text-brand-navy dark:text-[#f0ebe3]">
           Agreements
         </h3>
 
@@ -301,9 +383,7 @@ export default function CheckoutForm({ onShippingMetaChange }) {
               Terms & Conditions
             </Link>
           </Checkbox>
-          {errors.terms && (
-            <p className="text-xs text-red-500 mt-1 ml-8">{errors.terms}</p>
-          )}
+          {errors.terms && <p className="text-xs text-red-500 mt-1 ml-8">{errors.terms}</p>}
         </div>
 
         <div data-error={errors.privacy ? true : undefined}>
@@ -318,16 +398,12 @@ export default function CheckoutForm({ onShippingMetaChange }) {
               Privacy Policy
             </Link>
           </Checkbox>
-          {errors.privacy && (
-            <p className="text-xs text-red-500 mt-1 ml-8">{errors.privacy}</p>
-          )}
+          {errors.privacy && <p className="text-xs text-red-500 mt-1 ml-8">{errors.privacy}</p>}
         </div>
       </div>
 
       {/* Cart empty error */}
-      {errors.cart && (
-        <p className="text-sm text-red-500 text-center">{errors.cart}</p>
-      )}
+      {errors.cart && <p className="text-sm text-red-500 text-center">{errors.cart}</p>}
 
       {/* Submit */}
       <motion.button

@@ -1,86 +1,66 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { CalendarDays, Headset, Package, Star, Truck } from "lucide-react";
+import { Package } from "lucide-react";
 import PrivateRoute from "@/components/route/PrivateRoute";
 import { useApp } from "@/components/context/AppContext";
+import { useGetDataWithToken } from "@/components/helpers/useGetDataWithToken";
+import OrderCard from "@/components/order/OrderCard";
+import OrderCardSkeleton from "@/components/order/OrderCardSkeleton";
 
-const fallbackOrders = [
-  {
-    id: "ORD-10031",
-    date: "2026-03-16",
-    status: "Processing",
-    total: 4200,
-    items: ["Freestanding Bathtub", "Brass Towel Ring"],
-  },
-  {
-    id: "ORD-10012",
-    date: "2026-02-22",
-    status: "Delivered",
-    total: 1890,
-    items: ["Premium Faucet", "LED Bathroom Mirror"],
-  },
-];
-
-function formatDate(date) {
-  return new Intl.DateTimeFormat("en-AU", {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-  }).format(new Date(date));
-}
-
-function formatCurrency(value) {
-  return new Intl.NumberFormat("en-AU", {
-    style: "currency",
-    currency: "AUD",
-    maximumFractionDigits: 0,
-  }).format(value);
+function getOrderList(response) {
+  const source = response?.data ?? response;
+  if (Array.isArray(source)) return source;
+  if (Array.isArray(source?.orders)) return source.orders;
+  if (Array.isArray(source?.data)) return source.data;
+  if (source && typeof source === "object") return [source];
+  return [];
 }
 
 export default function ProfilePage() {
-  const { authEmail, logout } = useApp();
-  const [orders] = useState(() => {
-    if (typeof window === "undefined") return fallbackOrders;
+  const { authEmail, authToken, authReady, logout } = useApp();
 
-    try {
-      const raw = localStorage.getItem("talukdar-orders");
-      if (!raw) return fallbackOrders;
-
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed) || parsed.length === 0) return fallbackOrders;
-
-      return parsed.map((order, idx) => ({
-        id: order.id || `ORD-${10000 + idx}`,
-        date: order.date || new Date().toISOString(),
-        status: order.status || "Placed",
-        total: Number(order?.summary?.total || order.total || 0),
-        items: Array.isArray(order.items)
-          ? order.items.map((item) => item.name).filter(Boolean)
-          : [],
-      }));
-    } catch {
-      return fallbackOrders;
-    }
-  });
-
-  const toReceiveCount = useMemo(
-    () =>
-      orders.filter((order) => {
-        const status = String(order.status || "").toLowerCase();
-        return ["placed", "processing", "confirmed", "shipped", "out for delivery"].includes(status);
-      }).length,
-    [orders],
+  const { data: ordersResponse, isLoading } = useGetDataWithToken(
+    "orders",
+    authToken,
+    authReady && Boolean(authToken),
   );
 
-  const toReviewCount = useMemo(
-    () =>
-      orders.filter((order) => {
-        const status = String(order.status || "").toLowerCase();
-        return status === "delivered";
-      }).length,
-    [orders],
+  useEffect(() => {
+    if (ordersResponse) {
+      console.log("Orders response:", ordersResponse);
+    }
+  }, [ordersResponse]);
+
+  const orders = useMemo(() => {
+    return getOrderList(ordersResponse).map((order, index) => ({
+      order_id: order.order_id || order.id || `ORD-${10000 + index}`,
+      status: order.status || "Order Pending",
+      ordered_at: order.ordered_at || order.created_at || order.date || null,
+      order_details: Array.isArray(order.order_details)
+        ? order.order_details
+        : Array.isArray(order.items)
+          ? order.items.map((item) => ({
+              product_name: item.product_name || item.name || "Item",
+              product_variant: item.product_variant || item.variant || null,
+              quantity: Number(item.quantity || 1),
+              price: Number(item.price || 0),
+              is_combo: Boolean(item.is_combo),
+            }))
+          : [],
+      amount_payable: Number(order.amount_payable ?? order.total ?? 0),
+      shipping_cost: Number(order.shipping_cost ?? order.summary?.shippingCharge ?? 0),
+      coupon_discount: order.coupon_discount ?? null,
+      shipping_address: order.shipping_address || order.shippingAddress || null,
+      billing_address: order.billing_address || order.billingAddress || null,
+      additional_info: order.additional_info ?? null,
+    }));
+  }, [ordersResponse]);
+
+  const skeletonOrders = useMemo(
+    () => Array.from({ length: 3 }, (_, index) => index),
+    [],
   );
 
   return (
@@ -120,128 +100,29 @@ export default function ProfilePage() {
             </button>
           </motion.div>
 
-          {/* At a glance  */}
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-pale/60 dark:bg-brand-gold/25">
-                    <Package
-                      size={18}
-                      className="text-brand-navy dark:text-brand-pale"
-                    />
-                  </div>
-                  <p className="text-sm text-gray-500 dark:text-[#9fa8cc]">
-                    Total Orders
-                  </p>
-                </div>
-                <p className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3]">
-                  {orders.length}
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-pale/60 dark:bg-brand-gold/25">
-                    <Truck
-                      size={18}
-                      className="text-brand-navy dark:text-brand-pale"
-                    />
-                  </div>
-                  <p className="text-sm text-gray-500 dark:text-[#9fa8cc]">
-                    To Receive
-                  </p>
-                </div>
-                <p className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3]">
-                  {toReceiveCount}
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-pale/60 dark:bg-brand-gold/25">
-                    <Star
-                      size={18}
-                      className="text-brand-navy dark:text-brand-pale"
-                    />
-                  </div>
-                  <p className="text-sm text-gray-500 dark:text-[#9fa8cc]">
-                    To Review
-                  </p>
-                </div>
-                <p className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3]">
-                  {toReviewCount}
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-brand-pale/60 dark:bg-brand-gold/25">
-                    <Headset
-                      size={18}
-                      className="text-brand-navy dark:text-brand-pale"
-                    />
-                  </div>
-                  <p className="text-sm text-gray-500 dark:text-[#9fa8cc]">
-                    Support Options
-                  </p>
-                </div>
-                <p className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3]">
-                  24/7
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* Order history   */}
           <div className="mt-8 space-y-4">
-            {orders.map((order, index) => (
-              <motion.article
-                key={order.id}
-                initial={{ opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.06 }}
-                className="rounded-2xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5 sm:p-6"
+            {isLoading ? (
+              skeletonOrders.map((index) => (
+                <OrderCardSkeleton key={`profile-skeleton-${index}`} index={index} />
+              ))
+            ) : orders.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-8 text-center"
               >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-brand-gold">
-                      Order ID
-                    </p>
-                    <h2 className="text-lg font-bold text-brand-navy dark:text-[#f0ebe3] mt-1">
-                      {order.id}
-                    </h2>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-[#9fa8cc]">
-                    <CalendarDays size={15} />
-                    {formatDate(order.date)}
-                  </div>
-                </div>
-
-                <div className="mt-4 flex flex-wrap items-center gap-3">
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-brand-pale/70 text-brand-navy dark:bg-brand-gold/25 dark:text-brand-pale">
-                    {order.status}
-                  </span>
-                  <span className="text-sm text-gray-600 dark:text-[#9fa8cc]">
-                    {order.items.length > 0
-                      ? order.items.join(" • ")
-                      : "Items unavailable"}
-                  </span>
-                </div>
-
-                <p className="mt-4 text-xl font-bold text-brand-navy dark:text-[#f0ebe3]">
-                  {formatCurrency(order.total)}
+                <Package size={38} className="mx-auto text-brand-gold" />
+                <h2 className="mt-4 text-lg font-bold text-brand-navy dark:text-[#f0ebe3]">No orders yet</h2>
+                <p className="mt-2 text-sm text-gray-600 dark:text-[#9fa8cc]">
+                  Your orders will appear here once the API returns data.
                 </p>
-              </motion.article>
-            ))}
+              </motion.div>
+            ) : (
+              orders.map((order, index) => (
+                <OrderCard key={order.order_id} order={order} index={index} />
+              ))
+            )}
           </div>
         </section>
       </main>

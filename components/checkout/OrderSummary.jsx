@@ -1,32 +1,137 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { useApp } from '@/components/context/AppContext';
-import { getOrderTotalsForAustralia, parseAuPostcode } from '@/lib/auShipping';
+import { getCouponAdjustedTotal } from '@/lib/coupon';
 
-export default function OrderSummary({ shippingZip, shippingCountry = 'Australia' }) {
+const BASE_URL = process.env.NEXT_PUBLIC_TALUKDAR_API_BASE_URL;
+
+export default function OrderSummary({
+  shippingZip,
+  shippingCountry = 'Australia',
+  couponMeta = null,
+  onCouponMetaChange,
+  shippingCost = null,
+}) {
   const {
     cartDBGuest,
     totalDBGuest,
     cartDBCountGuest,
-    removeFromCartDBGuest,
-    updateQuantityDBGuest,
+    guestToken,
   } = useApp();
 
+  const [couponCode, setCouponCode] = useState(couponMeta?.coupon_code || '');
+  const [isCouponApplied, setIsCouponApplied] = useState(Boolean(couponMeta?.coupon_code));
+  const [isCheckingCoupon, setIsCheckingCoupon] = useState(false);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
+  useEffect(() => {
+    setCouponCode(couponMeta?.coupon_code || '');
+    setIsCouponApplied(Boolean(couponMeta?.coupon_code));
+  }, [couponMeta]);
+
+  useEffect(() => {
+    const checkCouponApplied = async () => {
+      if (!guestToken || !BASE_URL) return;
+
+      setIsCheckingCoupon(true);
+      try {
+        const normalizedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
+        const checkCouponUrl = `${normalizedBaseUrl}check-if-coupon-applied`;
+        const formData = new FormData();
+        formData.append('guest_token', guestToken);
+
+        const res = await fetch(checkCouponUrl, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+        if (data?.status === 'success' && data?.data?.coupon_code) {
+          onCouponMetaChange?.(data.data);
+          setCouponCode(data.data.coupon_code);
+          setIsCouponApplied(true);
+        }
+      } catch {
+        // Do not block checkout for coupon pre-check failures.
+      } finally {
+        setIsCheckingCoupon(false);
+      }
+    };
+
+    checkCouponApplied();
+  }, [guestToken, onCouponMetaChange]);
+
   const subtotal = Number(totalDBGuest);
+  const shipping = shippingCost !== null ? Number(shippingCost) : 0;
+  
+  // Calculate tax (10% GST)
+  const tax = (subtotal + shipping) * 0.1;
+  
+  // Calculate totals
+  const total = subtotal + shipping + tax;
+  const discountedTotals = getCouponAdjustedTotal(total, couponMeta);
+  const grandTotal = discountedTotals.totalAfterDiscount;
+  const couponDiscount = discountedTotals.discountAmount;
+  
+  const hasValidZip = shippingCountry === 'Australia' && /^\d{4}$/.test(shippingZip);
 
-  const totals = getOrderTotalsForAustralia({
-    subtotal,
-    destinationPostcode: shippingZip,
-  });
+  const handleApplyCoupon = async () => {
+    const trimmedCode = couponCode.trim();
 
-  const shipping = totals.shippingCharge;
-  const tax = totals.tax;
-  const grandTotal = totals.total;
-  const hasValidAusPostcode = shippingCountry === 'Australia' && !!parseAuPostcode(shippingZip);
+    if (!trimmedCode) {
+      toast.error('Enter a coupon code first.');
+      return;
+    }
+
+    if (!guestToken) {
+      toast.error('Guest session not ready. Please wait a moment.');
+      return;
+    }
+
+    if (!BASE_URL) {
+      toast.error('Missing API base URL configuration.');
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+
+    try {
+      const normalizedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
+      const applyCouponUrl = `${normalizedBaseUrl}apply-coupon`;
+
+      const formData = new FormData();
+      formData.append('coupon_code', trimmedCode);
+      formData.append('guest_token', guestToken);
+
+      const res = await fetch(applyCouponUrl, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || data?.status !== 'success') {
+        throw new Error(data?.message || 'Failed to apply coupon.');
+      }
+
+      onCouponMetaChange?.(data.data || null);
+      setCouponCode(data?.data?.coupon_code || trimmedCode);
+      setIsCouponApplied(true);
+      toast.success(data?.message || 'Coupon applied successfully!');
+    } catch (err) {
+      toast.error(err?.message || 'Could not apply coupon.');
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
 
   return (
     <div className="sticky top-28">
@@ -62,79 +167,100 @@ export default function OrderSummary({ shippingZip, shippingCountry = 'Australia
               const cartId = item.cart_id;
               const quantity = Number(item.quantity);
               const price = Number(item.price);
+              const lineTotal = Number.isFinite(price * quantity) ? price * quantity : 0;
 
               return (
-              <motion.div
-                key={cartId ?? index}
-                layout
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-                className="flex gap-3 p-4 bg-white dark:bg-[#111840] rounded-xl border border-gray-100 dark:border-[#1c2444] shadow-sm dark:shadow-none"
-              >
-                {/* Image */}
-                <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-gray-100">
-                  <Image src={item.thumbnail_image} alt={item.name} fill className="object-cover" />
-                </div>
+                <motion.div
+                  key={cartId ?? index}
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex gap-3 p-4 bg-white dark:bg-[#111840] rounded-xl border border-gray-100 dark:border-[#1c2444] shadow-sm dark:shadow-none"
+                >
+                  {/* Image */}
+                  <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-gray-100">
+                    <Image src={item.thumbnail_image} alt={item.name} fill className="object-cover" />
+                  </div>
 
-                {/* Details */}
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-semibold text-gray-800 dark:text-[#f0ebe3] leading-tight line-clamp-2 mt-0.5">
-                    {item.name}
-                  </h4>
-                  <p className="text-sm font-bold mt-1 text-brand-navy dark:text-[#f0ebe3]">
-                    ${price.toFixed(2)}
-                  </p>
+                  {/* Details */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-semibold text-gray-800 dark:text-[#f0ebe3] leading-tight line-clamp-2 mt-0.5">
+                      {item.name}
+                    </h4>
+                    <p className="text-sm font-bold mt-1 text-brand-navy dark:text-[#f0ebe3]">
+                      Unit: ${price.toFixed(2)}
+                    </p>
 
-                  {/* Controls row */}
-                  <div className="flex items-center justify-between mt-2">
-                    {/* Qty */}
-                    <div
-                      className="flex items-center rounded-lg overflow-hidden border"
-                      style={{ borderColor: '#e8d9c4' }}
-                    >
-                      <button
-                        onClick={() => updateQuantityDBGuest(item, quantity - 1)}
-                        className="cursor-pointer w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-[#1a2340] transition-colors"
-                        aria-label="Decrease quantity"
-                      >
-                        <Minus size={11} />
-                      </button>
-                      <span className="w-7 text-center text-sm font-semibold text-gray-700 dark:text-[#f0ebe3]">
-                        {quantity}
+                    <div className="mt-2 flex items-center justify-between text-sm">
+                      <span className="font-medium text-gray-500 dark:text-[#9fa8cc]">
+                        Qty: {quantity}
                       </span>
-                      <button
-                        onClick={() => updateQuantityDBGuest(item, quantity + 1)}
-                        className="cursor-pointer w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-[#1a2340] transition-colors"
-                        aria-label="Increase quantity"
-                      >
-                        <Plus size={11} />
-                      </button>
-                    </div>
-
-                    {/* Line total + remove */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-brand-navy dark:text-[#f0ebe3]">
-                        ${Number(item.sub_total).toFixed(2)}
+                      <span className="font-bold text-brand-navy dark:text-[#f0ebe3]">
+                        Total: ${lineTotal.toFixed(2)}
                       </span>
-                      <motion.button
-                        whileHover={{ scale: 1.15 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => removeFromCartDBGuest(cartId)}
-                        className="p-1.5 rounded-full hover:bg-red-50 text-gray-300 hover:text-red-500 transition-colors"
-                        aria-label="Remove item"
-                      >
-                        <Trash2 size={13} />
-                      </motion.button>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            )})
+                </motion.div>
+              );
+            })
           )}
         </AnimatePresence>
       </div>
+
+      {cartDBGuest.length > 0 && (
+        <div className="mb-4 space-y-3 rounded-xl border border-gray-200 p-4 dark:border-[#2a3460]">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-brand-navy dark:text-[#f0ebe3]">
+            Coupon
+          </h3>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <input
+              type="text"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+              placeholder="Enter coupon code"
+              disabled={isCouponApplied || isCheckingCoupon || isApplyingCoupon}
+              className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 transition-colors focus:border-brand-navy focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 dark:border-[#2a3460] dark:bg-[#111840] dark:text-[#f0ebe3]"
+            />
+
+            <button
+              type="button"
+              onClick={handleApplyCoupon}
+              disabled={isCouponApplied || isCheckingCoupon || isApplyingCoupon}
+              className="rounded-lg bg-brand-navy px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isCheckingCoupon ? 'Checking...' : isApplyingCoupon ? 'Applying...' : isCouponApplied ? 'Applied' : 'Apply'}
+            </button>
+          </div>
+
+          {isCouponApplied && couponMeta ? (
+            <p className="text-sm font-medium text-emerald-600 dark:text-emerald-300">
+              Coupon applied: {couponMeta.coupon_code} ({couponMeta.discount}
+              {String(couponMeta.discount_type || '').toLowerCase() === 'percentage' ? '%' : ' off'})
+            </p>
+          ) : null}
+        </div>
+      )}
+
+      {cartDBGuest.length > 0 && couponDiscount > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-500/30 dark:bg-emerald-500/10"
+        >
+          <div className="flex items-center justify-between text-emerald-700 dark:text-emerald-300">
+            <span>
+              Coupon ({couponMeta?.coupon_code || 'Applied'})
+            </span>
+            <span className="font-semibold">- ${couponDiscount.toFixed(2)}</span>
+          </div>
+          <p className="mt-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+            Coupon applied successfully.
+          </p>
+        </motion.div>
+      )}
 
       {/* Pricing Breakdown */}
       {cartDBGuest.length > 0 && (
@@ -152,8 +278,10 @@ export default function OrderSummary({ shippingZip, shippingCountry = 'Australia
 
           <div className="flex justify-between text-gray-500 dark:text-[#9fa8cc]">
             <span>Shipping</span>
-            {!hasValidAusPostcode ? (
+            {!hasValidZip ? (
               <span className="font-medium text-amber-600">Enter postcode</span>
+            ) : shippingCost === null ? (
+              <span className="font-medium text-gray-500">Calculating...</span>
             ) : (
               <span className="font-medium text-gray-700 dark:text-[#f0ebe3]">${shipping.toFixed(2)}</span>
             )}
@@ -164,12 +292,6 @@ export default function OrderSummary({ shippingZip, shippingCountry = 'Australia
             <span className="font-medium text-gray-700 dark:text-[#f0ebe3]">${tax.toFixed(2)}</span>
           </div>
 
-          {hasValidAusPostcode && (
-            <p className="text-xs text-gray-500 dark:text-[#9fa8cc] font-medium">
-              Delivery estimate from NSW 2000 to {shippingZip} ({totals.shippingMeta.zone} zone)
-            </p>
-          )}
-
           <div
             className="border-t pt-3 flex justify-between font-bold text-base border-brand-pale dark:border-[#2a3460] text-brand-navy dark:text-[#f0ebe3]"
           >
@@ -179,7 +301,7 @@ export default function OrderSummary({ shippingZip, shippingCountry = 'Australia
         </motion.div>
       )}
 
-      {subtotal > 0 && !hasValidAusPostcode && (
+      {subtotal > 0 && !hasValidZip && (
         <p className="mt-3 text-xs text-gray-400 text-center">
           Enter a valid Australian postcode in shipping details to calculate delivery.
         </p>

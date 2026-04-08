@@ -312,6 +312,7 @@ export function AppProvider({ children }) {
         removeFromCartDBGuest,
         updateQuantityDBGuest,
         authToken,
+        guestToken,
         authEmail,
         authReady,
         isAuthenticated,
