@@ -11,6 +11,9 @@ import logoWhite from '@/public/images/logo-white.png';
 import { useApp } from '@/components/context/AppContext';
 
 export default function Navbar() {
+  const {categories} = useApp();
+  console.log("navbar", categories);
+  
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();

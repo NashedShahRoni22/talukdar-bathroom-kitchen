@@ -206,8 +206,12 @@ export default function CheckoutForm({
   }
 
   function buildOrderFormData() {
+    const shippingAmount = shippingCost || 0;
+    const tax = (cartSubtotal + shippingAmount) * 0.1;
+    const grandTotal = cartSubtotal + shippingAmount + tax;
+
     const discounted = getCouponAdjustedTotal(
-      cartSubtotal + (shippingCost || 0),
+      grandTotal,
       couponMeta,
     );
 
@@ -326,8 +330,11 @@ export default function CheckoutForm({
 
       // Store payment snapshot
       if (typeof window !== "undefined") {
+        const shippingAmount = shippingCost || 0;
+        const tax = (cartSubtotal + shippingAmount) * 0.1;
+        const grandTotal = cartSubtotal + shippingAmount + tax;
         const discounted = getCouponAdjustedTotal(
-          cartSubtotal + (shippingCost || 0),
+          grandTotal,
           couponMeta,
         );
 

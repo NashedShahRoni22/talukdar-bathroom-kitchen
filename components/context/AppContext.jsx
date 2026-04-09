@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, use } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { useGetData } from "../helpers/useGetData";
 import { usePostData } from "../helpers/usePostData";
@@ -12,13 +12,16 @@ import { useQueryClient } from "@tanstack/react-query";
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
+  const queryClient = useQueryClient();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [authToken, setAuthToken] = useState(null);
   const [authEmail, setAuthEmail] = useState("");
   const [authReady, setAuthReady] = useState(false);
   const [guestToken, setGuestToken] = useState(null);
-  const queryClient = useQueryClient();
+
+  const { data:categoriesData } = useGetData("categories");
+  const categories = categoriesData?.data || [];
 
   // Generate or retrieve guest token
   const generateGuestToken = () => {
@@ -89,7 +92,7 @@ export function AppProvider({ children }) {
 
   const isAuthenticated = Boolean(authToken);
 
-  // Cart API: guest
+  // Cart API: guest & authenticated
   const postCartGuest = usePostData("add-to-cart-guest");
   const postCartAuth = usePostDataWithToken("add-to-cart");
   const postMergeGuestCart = usePostDataWithToken("add-to-cart-from-guest");
@@ -116,11 +119,14 @@ export function AppProvider({ children }) {
       }
 
       try {
-        await toast.promise(postCartAuth.mutateAsync({ formData, token: authToken }), {
-          loading: "Updating cart...",
-          success: "Cart Updated!",
-          error: (err) => err.message || "Failed to add product to cart",
-        });
+        await toast.promise(
+          postCartAuth.mutateAsync({ formData, token: authToken }),
+          {
+            loading: "Updating cart...",
+            success: "Cart Updated!",
+            error: (err) => err.message || "Failed to add product to cart",
+          },
+        );
 
         await queryClient.invalidateQueries({ queryKey: authCartQueryKey });
         return true;
@@ -162,25 +168,22 @@ export function AppProvider({ children }) {
 
     if (!cartId) return false;
 
-    const endpoint = isAuthenticated && authToken
-      ? `cart/${cartId}`
-      : `guest-cart/${cartId}`;
-    const mutationPayload = isAuthenticated && authToken
-      ? { endpoint, token: authToken }
-      : { endpoint, guestToken };
+    const endpoint =
+      isAuthenticated && authToken ? `cart/${cartId}` : `guest-cart/${cartId}`;
+    const mutationPayload =
+      isAuthenticated && authToken
+        ? { endpoint, token: authToken }
+        : { endpoint, guestToken };
 
     try {
       if (silent) {
         await deleteItem.mutateAsync(mutationPayload);
       } else {
-        await toast.promise(
-          deleteItem.mutateAsync(mutationPayload),
-          {
-            loading: "Removing item from cart...",
-            success: "Item removed from cart!",
-            error: (err) => err.message || "Failed to remove item",
-          },
-        );
+        await toast.promise(deleteItem.mutateAsync(mutationPayload), {
+          loading: "Removing item from cart...",
+          success: "Item removed from cart!",
+          error: (err) => err.message || "Failed to remove item",
+        });
       }
 
       if (isAuthenticated && authToken) {
@@ -193,17 +196,14 @@ export function AppProvider({ children }) {
       return false;
     }
   };
-  
+
   const { data: cartDataGuest, isLoading: isGuestCartLoading } = useGetData(
     `guest-cart?guest_token=${guestToken}`,
     {},
     { enabled: !!guestToken && !isAuthenticated },
   );
-  const { data: cartDataAuth, isLoading: isAuthCartLoading } = useGetDataWithToken(
-    "cart",
-    authToken,
-    isAuthenticated,
-  );
+  const { data: cartDataAuth, isLoading: isAuthCartLoading } =
+    useGetDataWithToken("cart", authToken, isAuthenticated);
 
   const activeCartData = isAuthenticated ? cartDataAuth : cartDataGuest;
   const cartDBGuest = Array.isArray(activeCartData?.data)
@@ -258,7 +258,8 @@ export function AppProvider({ children }) {
   };
 
   //Wishlist API: auth
-  const { data: wishlistData, isLoading: isWishlistLoading } = useGetDataWithToken("wishlist", authToken, isAuthenticated);
+  const { data: wishlistData, isLoading: isWishlistLoading } =
+    useGetDataWithToken("wishlist", authToken, isAuthenticated);
   const postWishlist = usePostDataWithToken("wishlist");
 
   const addToWishlist = async (product_variant_id) => {
@@ -270,7 +271,10 @@ export function AppProvider({ children }) {
     formData.append("product_variant_id", product_variant_id);
 
     try {
-      const res = await postWishlist.mutateAsync({ formData, token: authToken });
+      const res = await postWishlist.mutateAsync({
+        formData,
+        token: authToken,
+      });
       if (res?.status === "success") {
         toast.success(res?.message || "Added to wishlist!");
         queryClient.invalidateQueries(["wishlist", authToken]);
@@ -286,7 +290,10 @@ export function AppProvider({ children }) {
       return;
     }
     try {
-      const res = await deleteItem.mutateAsync({ endpoint: `wishlist/${wishlist_id}`, token: authToken });
+      const res = await deleteItem.mutateAsync({
+        endpoint: `wishlist/${wishlist_id}`,
+        token: authToken,
+      });
       if (res?.status === "success") {
         toast.success(res?.message || "Removed from wishlist!");
         queryClient.invalidateQueries(["wishlist", authToken]);
@@ -325,6 +332,7 @@ export function AppProvider({ children }) {
         logout,
         addToCartDBGuest,
         mergeGuestCartToMain,
+        categories,
       }}
     >
       {children}
