@@ -12,8 +12,6 @@ import { useApp } from '@/components/context/AppContext';
 
 export default function Navbar() {
   const {categories} = useApp();
-  console.log("navbar", categories);
-  
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
@@ -29,7 +27,7 @@ export default function Navbar() {
 
   const menuItems = [
     { label: 'Home', href: '/' },
-    { label: 'Shop', href: '/shop' },
+    { label: 'Shop', href: '/shop', child: categories || [] },
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
     { label: 'Account', href: '/profile' },
@@ -75,22 +73,52 @@ export default function Navbar() {
                   (item.href.startsWith('/') && pathname === item.href);
                 
                 return (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className={`text-base font-medium transition-all duration-200 relative pb-1 ${
-                      isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'
-                    } ${isActive ? 'text-[#c4a97e]' : 'hover:text-[#c4a97e]'}`}
-                  >
-                    {item.label}
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeIndicator"
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#c4a97e]"
-                        transition={{ duration: 0.3 }}
-                      />
+                  <div key={item.label} className="relative group">
+                    <Link
+                      href={item.href}
+                      className={`flex items-center gap-1 text-base font-medium transition-all duration-200 relative py-6 -my-6 ${
+                        isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'
+                      } ${isActive ? 'text-[#c4a97e]' : 'hover:text-[#c4a97e]'}`}
+                    >
+                      {item.label}
+                      {isActive && (
+                        <motion.div
+                          layoutId="activeIndicator"
+                          className="absolute bottom-4 left-0 right-0 h-0.5 bg-[#c4a97e]"
+                          transition={{ duration: 0.3 }}
+                        />
+                      )}
+                    </Link>
+
+                    {item.child && item.child.length > 0 && (
+                      <div className="absolute top-10 left-0 w-64 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                        <div className="bg-white dark:bg-[#0a0f2e] border border-gray-100 dark:border-[#1c2444] rounded-xl shadow-lg overflow-hidden py-2">
+                          {item.child.map((child) => (
+                            <Link
+                              key={child.id}
+                              href={`/shop/${child.slug}`}
+                              className="group/item flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#1a2340] transition-colors"
+                            >
+                              {child.icon && (
+                                <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#131b36] flex items-center justify-center p-2 shrink-0">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img src={child.icon} alt={child.name} className="w-full h-full object-contain" />
+                                </div>
+                              )}
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium text-brand-navy dark:text-brand-pale transition-colors group-hover/item:text-[#c4a97e]">
+                                  {child.name}
+                                </span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                  {child.total_products} {child.total_products === 1 ? 'Product' : 'Products'}
+                                </span>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
                     )}
-                  </Link>
+                  </div>
                 );
               })}
             </div>

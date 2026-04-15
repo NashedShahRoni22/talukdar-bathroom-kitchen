@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, use } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { useGetData } from "../helpers/useGetData";
 import { usePostData } from "../helpers/usePostData";
@@ -20,8 +20,13 @@ export function AppProvider({ children }) {
   const [authReady, setAuthReady] = useState(false);
   const [guestToken, setGuestToken] = useState(null);
 
+  // get categories here 
   const { data:categoriesData } = useGetData("categories");
   const categories = categoriesData?.data || [];
+
+  // get brands here 
+  const { data: brandsData } = useGetData("brands");
+  const brands = brandsData?.data;
 
   // Generate or retrieve guest token
   const generateGuestToken = () => {
@@ -333,6 +338,7 @@ export function AppProvider({ children }) {
         addToCartDBGuest,
         mergeGuestCartToMain,
         categories,
+        brands
       }}
     >
       {children}
