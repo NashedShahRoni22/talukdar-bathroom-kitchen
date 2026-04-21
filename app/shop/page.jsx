@@ -30,7 +30,7 @@ export default function ShopPage() {
   const meta = productsData?.meta;
 
   return (
-    <div className="min-h-screen bg-stone-50 font-[Raleway] pt-20 dark:bg-brand-navy">
+    <div className="min-h-screen font-[Raleway] pt-20 dark:bg-brand-navy">
       <header className="relative h-55 overflow-hidden sm:h-65">
         <Image
           src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1400&q=90"

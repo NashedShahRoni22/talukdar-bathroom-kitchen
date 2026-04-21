@@ -1,19 +1,21 @@
-'use client';
+"use client";
 
-import { useRef } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import ProductCard from '@/components/products/ProductCard';
+import { useRef } from "react";
+import { motion } from "framer-motion";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import ProductCard from "@/components/products/ProductCard";
+import Link from "next/link";
 
 export default function ProductSection({ title, subtitle, products, id }) {
   const swiperRef = useRef(null);
-  const surfaceClass = id === 'kitchens'
-    ? 'bg-[#f7f5f2] dark:bg-[#0f1219]'
-    : 'bg-white dark:bg-[#111b2d]';
+  const surfaceClass =
+    id === "kitchens"
+      ? "bg-[#f7f5f2] dark:bg-[#0f1219]"
+      : "bg-white dark:bg-[#111b2d]";
 
   return (
     <section
@@ -21,7 +23,6 @@ export default function ProductSection({ title, subtitle, products, id }) {
       className={`py-12 sm:py-16 lg:py-20 ${surfaceClass} scroll-mt-20 transition-colors duration-300`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
         {/* ── Header row ── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -33,11 +34,11 @@ export default function ProductSection({ title, subtitle, products, id }) {
           {/* Left: title */}
           <div>
             <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#785d32] dark:text-[#c4a97e]">
-              {subtitle || 'Premium Collection'}
+              {subtitle || "Premium Collection"}
             </span>
             <h2
               className="text-3xl sm:text-4xl md:text-5xl font-bold mt-2 text-[#050a30] dark:text-[#f0ebe3]"
-              style={{ fontFamily: 'var(--font-playfair)' }}
+              style={{ fontFamily: "var(--font-playfair)" }}
             >
               {title}
             </h2>
@@ -63,7 +64,11 @@ export default function ProductSection({ title, subtitle, products, id }) {
               "
             >
               <ChevronLeft size={16} strokeWidth={2.5} className="sm:hidden" />
-              <ChevronLeft size={18} strokeWidth={2.5} className="hidden sm:block" />
+              <ChevronLeft
+                size={18}
+                strokeWidth={2.5}
+                className="hidden sm:block"
+              />
             </button>
 
             {/* Next */}
@@ -83,14 +88,19 @@ export default function ProductSection({ title, subtitle, products, id }) {
               "
             >
               <ChevronRight size={16} strokeWidth={2.5} className="sm:hidden" />
-              <ChevronRight size={18} strokeWidth={2.5} className="hidden sm:block" />
+              <ChevronRight
+                size={18}
+                strokeWidth={2.5}
+                className="hidden sm:block"
+              />
             </button>
 
             {/* View All */}
-            <motion.button
-              whileHover={{ x: 4 }}
-              whileTap={{ scale: 0.96 }}
-              className="
+            <Link href="/shop">
+              <motion.button
+                whileHover={{ x: 4 }}
+                whileTap={{ scale: 0.96 }}
+                className="
                 cursor-pointer
                 px-4 py-2 sm:px-7 sm:py-2.5
                 rounded-lg font-semibold text-sm sm:text-base text-white
@@ -99,43 +109,48 @@ export default function ProductSection({ title, subtitle, products, id }) {
                 hover:bg-[#785d32] dark:hover:bg-[#a07840]
                 transition-colors duration-200
               "
-            >
-              <span className="hidden xs:inline">View All</span>
-              <span className="xs:hidden">All</span>
-              <ArrowRight size={16} className="sm:hidden" />
-              <ArrowRight size={18} className="hidden sm:block" />
-            </motion.button>
+              >
+                <span className="hidden xs:inline">View All</span>
+                <span className="xs:hidden">All</span>
+                <ArrowRight size={16} className="sm:hidden" />
+                <ArrowRight size={18} className="hidden sm:block" />
+              </motion.button>
+            </Link>
           </div>
         </motion.div>
 
         {/* ── Slider ── */}
         <Swiper
-          onSwiper={(swiper) => { swiperRef.current = swiper; }}
+          onSwiper={(swiper) => {
+            swiperRef.current = swiper;
+          }}
           modules={[Autoplay, Pagination]}
           spaceBetween={12}
           slidesPerView={1.2}
           centeredSlides={false}
-          pagination={{ clickable: true, el: '#product-pagination' }}
+          pagination={{ clickable: true, el: "#product-pagination" }}
           autoplay={{ delay: 3500, disableOnInteraction: false }}
           loop
           breakpoints={{
-            480:  { slidesPerView: 2,   spaceBetween: 16 },
-            640:  { slidesPerView: 2.5, spaceBetween: 20 },
-            768:  { slidesPerView: 3,   spaceBetween: 20 },
-            1024: { slidesPerView: 3,   spaceBetween: 24 },
-            1280: { slidesPerView: 4,   spaceBetween: 24 },
+            480: { slidesPerView: 2, spaceBetween: 16 },
+            640: { slidesPerView: 2.5, spaceBetween: 20 },
+            768: { slidesPerView: 3, spaceBetween: 20 },
+            1024: { slidesPerView: 3, spaceBetween: 24 },
+            1280: { slidesPerView: 4, spaceBetween: 24 },
           }}
         >
-          {products.map((product, index) => (
-            <SwiperSlide key={`${product.id}-${index}`} className='pb-2'>
-              <ProductCard {...product} />
+          {products.map((p, index) => (
+            <SwiperSlide key={`${p.id}-${index}`} className="pb-2">
+              <ProductCard p={p} />
             </SwiperSlide>
           ))}
         </Swiper>
 
         {/* Pagination dots */}
-        <div id="product-pagination" className="flex justify-center gap-1.5 mt-5 sm:mt-6" />
-
+        <div
+          id="product-pagination"
+          className="flex justify-center gap-1.5 mt-5 sm:mt-6"
+        />
       </div>
     </section>
   );

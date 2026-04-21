@@ -33,7 +33,7 @@ export default function ProductListCard({ p }) {
     }
   }
 
-  const basePrice = defaultVariant.price || p?.base_price;
+  const basePrice = defaultVariant?.price || p?.base_price;
   const discountPrice = defaultVariant?.discount?.discount_price;
   const discountAmount = defaultVariant?.discount?.discount_amount;
   const hasMultipleVariants = p?.variants?.length > 1;
@@ -44,10 +44,10 @@ export default function ProductListCard({ p }) {
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 dark:border-[#1c2444] dark:bg-[#0a0f2e] min-h-48 cursor-pointer h-full"
+        className="group overflow-hidden rounded dark:border-[#1c2444] dark:bg-[#0a0f2e] min-h-48 cursor-pointer h-full"
       >
         <div className="flex flex-col sm:flex-row items-stretch h-full">
-          <div className="relative flex w-full sm:w-48 md:w-64 shrink-0 min-h-[220px] sm:min-h-full overflow-hidden bg-gray-50 dark:bg-brand-navy/50">
+          <div className="relative flex w-full sm:w-48 shrink-0 min-h-[220px] sm:min-h-full overflow-hidden bg-gray-50 dark:bg-brand-navy/50">
             <Image
               src={p?.thumbnail_image}
               alt={p?.name}

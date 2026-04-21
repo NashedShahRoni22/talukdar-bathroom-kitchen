@@ -70,7 +70,7 @@ export default function WishlistPage() {
               {wishlistItems.map((item, i) => {
                 const p = item.product || item;
                 const defaultVariant = p?.variants?.[0] || p;
-                const basePrice = defaultVariant.price || p?.base_price;
+                const basePrice = defaultVariant?.price || p?.base_price;
                 const discountPrice = defaultVariant?.discount?.discount_price;
                 
                 return (

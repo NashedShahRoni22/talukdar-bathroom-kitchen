@@ -39,7 +39,7 @@ export default function ProductCard({ p }) {
     }
   }
 
-  const basePrice = defaultVariant.price || p?.base_price;
+  const basePrice = defaultVariant?.price || p?.base_price;
   const discountPrice = defaultVariant?.discount?.discount_price;
   const discountAmount = defaultVariant?.discount?.discount_amount;
   // const hasMultipleVariants = p?.variants?.length > 1;
@@ -53,7 +53,7 @@ export default function ProductCard({ p }) {
         transition={{ duration: 0.5 }}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
-        className="group flex flex-col bg-white dark:bg-[#0a0f2e] rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full cursor-pointer dark:border-[#1c2444]"
+        className="group flex flex-col bg-white dark:bg-[#0a0f2e] rounded overflow-hidden h-full cursor-pointer dark:border-[#1c2444]"
       >
         {/* Image Container */}
         <div className="relative h-64 w-full overflow-hidden bg-gray-50 dark:bg-brand-navy/50">

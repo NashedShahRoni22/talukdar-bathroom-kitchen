@@ -105,7 +105,7 @@ export default function CategoryShopPage() {
             <ChevronRight size={13} />
             <span>Shop</span>
             <ChevronRight size={13} />
-            <span className="text-brand-gold">{categoryName || "Category"}</span>
+            <span>{categoryName || "Category"}</span>
           </motion.div>
         </div>
       </header>
