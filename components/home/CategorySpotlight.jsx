@@ -1,47 +1,10 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
-
-const categories = [
-  {
-    title: 'Luxury Bathrooms',
-    description: 'Statement bathtubs, spa showers, and designer fittings.',
-    itemCount: '120+ products',
-    href: '/shop',
-    image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1600&h=1100&fit=crop&q=80&auto=format',
-  },
-  {
-    title: 'Modern Kitchens',
-    description: 'Clean lines, smart storage, and elevated utility zones.',
-    itemCount: '95+ products',
-    href: '/shop',
-    image: 'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1400&h=1000&fit=crop&q=80&auto=format',
-  },
-  {
-    title: 'Faucets & Mixers',
-    description: 'Brushed brass, matte black, and timeless chrome finishes.',
-    itemCount: '70+ products',
-    href: '/shop',
-    image: 'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=1200&h=1000&fit=crop&q=80&auto=format',
-  },
-  {
-    title: 'Vanities & Basins',
-    description: 'Double vanity systems and sculptural basin collections.',
-    itemCount: '85+ products',
-    href: '/shop',
-    image: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1200&h=1000&fit=crop&q=80&auto=format',
-  },
-  {
-    title: 'Tiles & Surfaces',
-    description: 'Textured stone, polished porcelain, and feature walls.',
-    itemCount: '110+ products',
-    href: '/shop',
-    image: 'https://images.unsplash.com/photo-1618220179428-22790b461013?w=1500&h=1000&fit=crop&q=80&auto=format',
-  },
-];
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
+import { useApp } from "../context/AppContext";
 
 function CategoryCard({ category, index, className }) {
   return (
@@ -50,16 +13,15 @@ function CategoryCard({ category, index, className }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.55, delay: index * 0.1 }}
-      whileHover={{ y: -6 }}
       className={className}
     >
       <Link
-        href={category.href}
-        className="group relative isolate block h-full overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_10px_35px_rgba(5,10,48,0.09)] transition-transform duration-300 dark:border-white/10 dark:bg-white/5 dark:shadow-[0_14px_40px_rgba(0,0,0,0.35)]"
+        href={"/shop"}
+        className="group relative isolate block h-full overflow-hidden rounded border border-black/10 bg-white shadow-[0_10px_35px_rgba(5,10,48,0.09)] transition-transform duration-300 dark:border-white/10 dark:bg-white/5 dark:shadow-[0_14px_40px_rgba(0,0,0,0.35)]"
       >
         <Image
-          src={category.image}
-          alt={category.title}
+          src={category?.icon}
+          alt={category?.name}
           fill
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           sizes="(max-width: 1024px) 100vw, 33vw"
@@ -70,20 +32,20 @@ function CategoryCard({ category, index, className }) {
 
         <div className="absolute inset-x-0 top-0 z-10 p-4 sm:p-5">
           <span className="inline-flex rounded-full border border-white/45 bg-black/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-sm">
-            {category.itemCount}
+            {category?.total_products} Products
           </span>
         </div>
 
         <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-          <div className="rounded-xl border border-white/25 bg-black/35 p-4 backdrop-blur-sm transition-colors duration-300 group-hover:bg-black/45 dark:border-white/20">
+          <div className="rounded border border-white/25 bg-black/35 p-4 backdrop-blur-sm transition-colors duration-300 group-hover:bg-black/45 dark:border-white/20">
             <h3
               className="text-xl font-semibold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] sm:text-2xl"
-              style={{ fontFamily: 'var(--font-playfair)' }}
+              style={{ fontFamily: "var(--font-playfair)" }}
             >
-              {category.title}
+              {category?.name}
             </h3>
             <p className="mt-2 max-w-[42ch] text-sm leading-relaxed text-white/90 sm:text-[15px]">
-              {category.description}
+              {category?.meta_title}
             </p>
             <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#f2e5d4] transition-transform duration-300 group-hover:translate-x-1">
               Explore Category
@@ -97,17 +59,18 @@ function CategoryCard({ category, index, className }) {
 }
 
 export default function CategorySpotlight() {
+  const { categories } = useApp();
   const desktopClasses = [
     // Card 1 — Luxury Bathrooms: left tall, rows 1–2
-    'min-h-[20rem] md:col-span-2 lg:col-span-3 lg:row-start-1 lg:row-span-2 lg:min-h-[28rem]',
+    "min-h-[20rem] md:col-span-2 lg:col-span-3 lg:row-start-1 lg:row-span-2 lg:min-h-[28rem]",
     // Card 2 — Modern Kitchens: top center wide, row 1
-    'min-h-[14rem] md:col-span-2 lg:col-span-6 lg:col-start-4 lg:row-start-1 lg:row-span-1 lg:min-h-[13.5rem]',
+    "min-h-[14rem] md:col-span-2 lg:col-span-6 lg:col-start-4 lg:row-start-1 lg:row-span-1 lg:min-h-[13.5rem]",
     // Card 3 — Faucets & Mixers: bottom center-left, row 2
-    'min-h-[14rem] md:col-span-1 lg:col-span-3 lg:col-start-4 lg:row-start-2 lg:row-span-1 lg:min-h-[13.5rem]',
+    "min-h-[14rem] md:col-span-1 lg:col-span-3 lg:col-start-4 lg:row-start-2 lg:row-span-1 lg:min-h-[13.5rem]",
     // Card 4 — Vanities & Basins: bottom center-right, row 2
-    'min-h-[14rem] md:col-span-1 lg:col-span-3 lg:col-start-7 lg:row-start-2 lg:row-span-1 lg:min-h-[13.5rem]',
+    "min-h-[14rem] md:col-span-1 lg:col-span-3 lg:col-start-7 lg:row-start-2 lg:row-span-1 lg:min-h-[13.5rem]",
     // Card 5 — Tiles & Surfaces: right tall, rows 1–2 ✅ row-start-1 anchors it correctly
-    'min-h-[20rem] md:col-span-2 lg:col-span-3 lg:col-start-10 lg:row-start-1 lg:row-span-2 lg:min-h-[28rem]',
+    "min-h-[20rem] md:col-span-2 lg:col-span-3 lg:col-start-10 lg:row-start-1 lg:row-span-2 lg:min-h-[28rem]",
   ];
 
   return (
@@ -129,13 +92,14 @@ export default function CategorySpotlight() {
             </span>
             <h2
               className="mt-3 text-3xl font-semibold leading-tight text-[#0a133f] sm:text-4xl lg:text-5xl dark:text-white"
-              style={{ fontFamily: 'var(--font-playfair)' }}
+              style={{ fontFamily: "var(--font-playfair)" }}
             >
               Build Spaces With Character
             </h2>
           </div>
           <p className="max-w-xl text-sm leading-relaxed text-[#3b4466] sm:text-base dark:text-white/80">
-            Discover handpicked product families crafted for bold transformations in bathrooms and kitchens.
+            Discover handpicked product families crafted for bold
+            transformations in bathrooms and kitchens.
           </p>
         </motion.div>
 
@@ -148,7 +112,7 @@ export default function CategorySpotlight() {
         >
           {categories.map((category, index) => (
             <CategoryCard
-              key={category.title}
+              key={index}
               category={category}
               index={index}
               className={desktopClasses[index]}

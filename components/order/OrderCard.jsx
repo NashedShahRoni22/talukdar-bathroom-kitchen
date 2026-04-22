@@ -120,7 +120,7 @@ export default function OrderCard({ order, index = 0 }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: index * 0.06 }}
-      className="rounded-2xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5 sm:p-6"
+      className="rounded border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5 sm:p-6"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -147,7 +147,7 @@ export default function OrderCard({ order, index = 0 }) {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-2xl border border-[#eee4d4] bg-[#faf8f5] p-4 dark:border-[#1c2444] dark:bg-[#09102a]">
+        <div className="rounded border border-[#eee4d4] bg-[#faf8f5] p-4 dark:border-[#1c2444] dark:bg-[#09102a]">
           <div className="flex items-center gap-2 text-sm font-semibold text-brand-navy dark:text-[#f0ebe3]">
             <Package size={15} />
             Order Items
@@ -156,7 +156,7 @@ export default function OrderCard({ order, index = 0 }) {
             {order.order_details.map((item, itemIndex) => (
               <div
                 key={`${order.order_id}-${item.product_name}-${itemIndex}`}
-                className="rounded-xl bg-white p-4 shadow-sm dark:bg-[#0e1430]"
+                className="rounded bg-white p-4 dark:bg-[#0e1430]"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -184,7 +184,7 @@ export default function OrderCard({ order, index = 0 }) {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-2xl border border-[#eee4d4] bg-[#faf8f5] p-4 dark:border-[#1c2444] dark:bg-[#09102a]">
+          <div className="rounded border border-[#eee4d4] bg-[#faf8f5] p-4 dark:border-[#1c2444] dark:bg-[#09102a]">
             <div className="flex items-center gap-2 text-sm font-semibold text-brand-navy dark:text-[#f0ebe3]">
               <MapPin size={15} />
               Shipping Address
@@ -196,7 +196,7 @@ export default function OrderCard({ order, index = 0 }) {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[#eee4d4] bg-[#faf8f5] p-4 dark:border-[#1c2444] dark:bg-[#09102a]">
+          <div className="rounded border border-[#eee4d4] bg-[#faf8f5] p-4 dark:border-[#1c2444] dark:bg-[#09102a]">
             <div className="flex items-center gap-2 text-sm font-semibold text-brand-navy dark:text-[#f0ebe3]">
               <Truck size={15} />
               Charges & Summary

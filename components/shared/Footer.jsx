@@ -1,13 +1,23 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
-import { motion } from 'framer-motion';
+import Link from "next/link";
+import Image from "next/image";
+import {
+  Facebook,
+  Instagram,
+  Twitter,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
+import { motion } from "framer-motion";
 import logo from "@/public/images/logo-white.png";
+import { menuItems, socialLinks } from "./MenuItems";
+import { useApp } from "../context/AppContext";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { categories } = useApp();
 
   const footerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -24,7 +34,7 @@ export default function Footer() {
   };
 
   return (
-    <footer style={{ backgroundColor: '#050a30' }}>
+    <footer style={{ backgroundColor: "#050a30" }}>
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -32,7 +42,7 @@ export default function Footer() {
         variants={footerVariants}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
       >
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
+        <div className="grid md:grid-cols-5 gap-8 mb-8">
           {/* Brand */}
           <div>
             <Image
@@ -43,7 +53,8 @@ export default function Footer() {
               className="object-contain mb-4"
             />
             <p className="text-gray-300 text-sm">
-              Transform your spaces with premium bathrooms and kitchens. Luxury design meets craftsmanship.
+              Transform your spaces with premium bathrooms and kitchens. Luxury
+              design meets craftsmanship.
             </p>
           </div>
 
@@ -51,24 +62,47 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
-              {['Home', 'Bathrooms', 'Kitchens', 'About', 'Contact'].map((link) => (
+              {menuItems.map((link) => (
                 <li key={link}>
-                  <Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">
-                    {link}
+                  <Link
+                    href={link.href}
+                    className="text-gray-300 hover:text-white transition-colors text-sm"
+                  >
+                    {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Products */}
+          {/* Categories */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Products</h4>
+            <h4 className="text-white font-semibold mb-4">Categories</h4>
             <ul className="space-y-2">
-              {['Vanities', 'Faucets', 'Cabinets', 'Fixtures', 'Accessories'].map((product) => (
-                <li key={product}>
-                  <Link href="#" className="text-gray-300 hover:text-white transition-colors text-sm">
-                    {product}
+              {categories.slice(0, 5).map((category) => (
+                <li key={category.id}>
+                  <Link
+                    href={`/shop?category=${category.slug}`}
+                    className="text-gray-300 hover:text-white transition-colors text-sm"
+                  >
+                    {category.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Follow us */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">Follow us</h4>
+            <ul className="space-y-2">
+              {socialLinks.map((link) => (
+                <li key={link}>
+                  <Link
+                    href={link.href}
+                    className="text-gray-300 hover:text-white transition-colors text-sm"
+                  >
+                    {link.label}
                   </Link>
                 </li>
               ))}
@@ -80,25 +114,27 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Contact Us</h4>
             <div className="space-y-3 mb-4">
               <div className="flex items-center gap-3">
-                <Phone size={16} style={{ color: '#785d32' }} />
+                <Phone size={16} style={{ color: "#785d32" }} />
                 <span className="text-gray-300 text-sm">+1 (555) 123-4567</span>
               </div>
               <div className="flex items-center gap-3">
-                <Mail size={16} style={{ color: '#785d32' }} />
+                <Mail size={16} style={{ color: "#785d32" }} />
                 <span className="text-gray-300 text-sm">info@talukdar.com</span>
               </div>
               <div className="flex items-center gap-3">
-                <MapPin size={16} style={{ color: '#785d32' }} />
-                <span className="text-gray-300 text-sm">123 Design St., NYC</span>
+                <MapPin size={16} style={{ color: "#785d32" }} />
+                <span className="text-gray-300 text-sm">
+                  123 Design St., NYC
+                </span>
               </div>
             </div>
 
             {/* Social Links */}
             <div className="flex gap-4">
               {[
-                { icon: Facebook, label: 'Facebook' },
-                { icon: Instagram, label: 'Instagram' },
-                { icon: Twitter, label: 'Twitter' },
+                { icon: Facebook, label: "Facebook" },
+                { icon: Instagram, label: "Instagram" },
+                { icon: Twitter, label: "Twitter" },
               ].map(({ icon: Icon, label }) => (
                 <motion.a
                   key={label}
@@ -106,7 +142,7 @@ export default function Footer() {
                   variants={iconVariants}
                   whileHover={{ scale: 1.2 }}
                   className="p-2 rounded-lg transition-colors"
-                  style={{ backgroundColor: '#785d32' }}
+                  style={{ backgroundColor: "#785d32" }}
                   title={label}
                 >
                   <Icon size={18} className="text-white" />
@@ -123,13 +159,22 @@ export default function Footer() {
               © {currentYear} Talukdar. All rights reserved.
             </p>
             <div className="flex gap-6 mt-4 md:mt-0">
-              <Link href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
+              <Link
+                href="#"
+                className="text-gray-300 hover:text-white text-sm transition-colors"
+              >
                 Privacy Policy
               </Link>
-              <Link href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
+              <Link
+                href="#"
+                className="text-gray-300 hover:text-white text-sm transition-colors"
+              >
                 Terms of Service
               </Link>
-              <Link href="#" className="text-gray-300 hover:text-white text-sm transition-colors">
+              <Link
+                href="#"
+                className="text-gray-300 hover:text-white text-sm transition-colors"
+              >
                 Sitemap
               </Link>
             </div>

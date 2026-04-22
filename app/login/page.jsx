@@ -106,7 +106,7 @@ function LoginContent() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full rounded-3xl border border-white/70 bg-white/85 p-6 shadow-[0_22px_60px_rgba(5,10,48,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-[#0d1435]/80 dark:shadow-[0_24px_60px_rgba(0,0,0,0.45)] sm:p-8"
+          className="w-full rounded border border-white/70 bg-white p-6 backdrop-blur-xl dark:border-white/10 dark:bg-[#0d1435]/80 sm:p-8"
         >
           <p className="text-xs font-semibold tracking-[0.24em] uppercase text-brand-gold">
             Account Access
@@ -137,7 +137,7 @@ function LoginContent() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     required
-                    className="w-full rounded-2xl border border-[#e6dece] bg-white/95 pl-14 pr-4 py-3.5 text-sm text-brand-navy placeholder:text-[#8e95a8] shadow-[0_8px_24px_rgba(5,10,48,0.06)] transition-all focus:outline-none focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/15 dark:border-[#2a3460] dark:bg-[#111840]/90 dark:text-[#f0ebe3]"
+                    className="w-full rounded border border-[#e6dece] bg-white/95 pl-14 pr-4 py-3.5 text-sm text-brand-navy placeholder:text-[#8e95a8] transition-all focus:outline-none focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/15 dark:border-[#2a3460] dark:bg-[#111840]/90 dark:text-[#f0ebe3]"
                   />
                 </div>
               </label>
@@ -145,7 +145,7 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-navy py-3.5 font-semibold text-white shadow-[0_14px_28px_rgba(5,10,48,0.28)] transition-all hover:-translate-y-0.5 hover:bg-brand-gold hover:shadow-[0_16px_30px_rgba(120,93,50,0.35)] disabled:opacity-70"
+                className="w-full inline-flex items-center justify-center gap-2 rounded bg-brand-navy py-3.5 font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-brand-gold disabled:opacity-70"
               >
                 Send OTP
                 <ArrowRight size={16} />
@@ -170,7 +170,7 @@ function LoginContent() {
                     }
                     placeholder="Enter 6-digit OTP"
                     required
-                    className="w-full rounded-2xl border border-[#e6dece] bg-white/95 pl-14 pr-4 py-3.5 text-sm tracking-[0.3em] text-brand-navy placeholder:text-[#8e95a8] shadow-[0_8px_24px_rgba(5,10,48,0.06)] transition-all focus:outline-none focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/15 dark:border-[#2a3460] dark:bg-[#111840]/90 dark:text-[#f0ebe3]"
+                    className="w-full rounded border border-[#e6dece] bg-white/95 pl-14 pr-4 py-3.5 text-sm tracking-[0.3em] text-brand-navy placeholder:text-[#8e95a8] transition-all focus:outline-none focus:border-brand-gold focus:ring-4 focus:ring-brand-gold/15 dark:border-[#2a3460] dark:bg-[#111840]/90 dark:text-[#f0ebe3]"
                   />
                 </div>
               </label>
@@ -178,7 +178,7 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-brand-navy py-3.5 font-semibold text-white shadow-[0_14px_28px_rgba(5,10,48,0.28)] transition-all hover:-translate-y-0.5 hover:bg-brand-gold hover:shadow-[0_16px_30px_rgba(120,93,50,0.35)] disabled:opacity-70"
+                className="w-full inline-flex items-center justify-center gap-2 rounded bg-brand-navy py-3.5 font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-brand-gold disabled:opacity-70"
               >
                 Verify & Login
                 <ArrowRight size={16} />

@@ -2,7 +2,7 @@
 
 export default function ContactForm() {
   return (
-    <div className="bg-[#f7f5f2] dark:bg-[#162235] rounded-2xl p-6 sm:p-8 md:p-10 border border-[#e8dcc9] dark:border-[#26344f] shadow-sm">
+    <div className="bg-[#f7f5f2] dark:bg-[#162235] rounded p-6 sm:p-8 md:p-10 border border-[#e8dcc9] dark:border-[#26344f]">
       <h2
         className="text-3xl md:text-4xl font-bold text-[#050a30] dark:text-[#f0ebe3]"
         style={{ fontFamily: 'var(--font-playfair)' }}
@@ -24,7 +24,7 @@ export default function ContactForm() {
               name="firstName"
               type="text"
               required
-              className="w-full rounded-lg border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
+              className="w-full rounded border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
               placeholder="John"
             />
           </div>
@@ -37,7 +37,7 @@ export default function ContactForm() {
               name="lastName"
               type="text"
               required
-              className="w-full rounded-lg border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
+              className="w-full rounded border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
               placeholder="Doe"
             />
           </div>
@@ -53,7 +53,7 @@ export default function ContactForm() {
               name="email"
               type="email"
               required
-              className="w-full rounded-lg border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
+              className="w-full rounded border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
               placeholder="you@example.com"
             />
           </div>
@@ -65,7 +65,7 @@ export default function ContactForm() {
               id="phone"
               name="phone"
               type="tel"
-              className="w-full rounded-lg border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
+              className="w-full rounded border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
               placeholder="+1 (555) 123-4567"
             />
           </div>
@@ -78,7 +78,7 @@ export default function ContactForm() {
           <select
             id="projectType"
             name="projectType"
-            className="w-full rounded-lg border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
+            className="w-full rounded border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
             defaultValue=""
           >
             <option value="" disabled>
@@ -100,14 +100,14 @@ export default function ContactForm() {
             name="message"
             rows={5}
             required
-            className="w-full rounded-lg border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
+            className="w-full rounded border border-[#d7cab7] dark:border-[#2d3d5b] bg-white dark:bg-[#0f1219] px-4 py-3 text-[#050a30] dark:text-[#f0ebe3] outline-none focus:ring-2 focus:ring-[#785d32]/50"
             placeholder="Tell us about your space, style, and budget goals."
           />
         </div>
 
         <button
           type="submit"
-          className="w-full sm:w-auto px-8 py-3 rounded-lg font-semibold text-white bg-[#785d32] hover:bg-[#6a5028] transition-colors duration-300"
+          className="w-full sm:w-auto px-8 py-3 rounded font-semibold text-white bg-[#785d32] hover:bg-[#6a5028] transition-colors duration-300"
         >
           Submit Request
         </button>

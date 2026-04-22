@@ -65,7 +65,7 @@ export default function ProfilePage() {
 
   return (
     <PrivateRoute>
-      <main className="min-h-screen pt-28 pb-14 bg-[#f8f5ef] dark:bg-[#060b20] transition-colors duration-300">
+      <main className="min-h-screen pt-28 pb-14 bg-white dark:bg-[#060b20] transition-colors duration-300">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header section  */}
           <motion.div
@@ -94,7 +94,7 @@ export default function ProfilePage() {
 
             <button
               onClick={logout}
-              className="self-start md:self-auto px-4 py-2 rounded-lg bg-brand-navy text-white text-sm font-semibold hover:bg-brand-gold transition-colors"
+              className="self-start md:self-auto px-4 py-2 rounded bg-brand-navy text-white text-sm font-semibold hover:bg-brand-gold transition-colors"
             >
               Logout
             </button>
@@ -110,7 +110,7 @@ export default function ProfilePage() {
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-8 text-center"
+                className="rounded border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-8 text-center"
               >
                 <Package size={38} className="mx-auto text-brand-gold" />
                 <h2 className="mt-4 text-lg font-bold text-brand-navy dark:text-[#f0ebe3]">No orders yet</h2>

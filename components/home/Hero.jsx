@@ -120,7 +120,7 @@ export default function Hero() {
           >
             <Link
               href={sliders?.[activeIndex]?.link || "#"}
-              className="btn-shop px-8 py-3.5 rounded-lg font-semibold text-white flex items-center gap-2 shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-[1.03]"
+              className="btn-shop px-8 py-3.5 rounded font-semibold text-white flex items-center gap-2 shadow-lg transition-all duration-300 hover:shadow-2xl hover:scale-[1.03]"
               style={{ backgroundColor: "#785d32" }}
             >
               <span className="btn-shimmer" />
@@ -244,7 +244,7 @@ export default function Hero() {
                 <div className="flex gap-3 flex-wrap justify-center">
                   <Link
                     href={slide.link || "#"}
-                    className="btn-shop px-6 py-3 rounded-lg font-semibold text-white flex items-center gap-2 text-sm"
+                    className="btn-shop px-6 py-3 rounded font-semibold text-white flex items-center gap-2 text-sm"
                     style={{ backgroundColor: "#785d32" }}
                   >
                     <span className="btn-shimmer" />

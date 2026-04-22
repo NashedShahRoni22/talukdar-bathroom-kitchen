@@ -116,7 +116,7 @@ export default function PaymentPage() {
     }, [redirectStatus, paymentIntent]);
 
     return (
-      <main className="min-h-screen bg-[#faf8f5] pt-28 pb-20 transition-colors duration-300 dark:bg-[#060b20]">
+      <main className="min-h-screen bg-white pt-28 pb-20 transition-colors duration-300 dark:bg-[#060b20]">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -138,7 +138,7 @@ export default function PaymentPage() {
           <motion.section
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            className="overflow-hidden rounded-3xl border border-white/70 bg-white shadow-[0_30px_70px_rgba(5,10,48,0.08)] dark:border-[#1c2444] dark:bg-[#0d1333]"
+            className="overflow-hidden rounded border border-white/70 bg-white dark:border-[#1c2444] dark:bg-[#0d1333]"
           >
             <div className="grid gap-0 lg:grid-cols-1">
               <div className="border-t border-gray-100 bg-[#faf8f5] p-8 dark:border-[#1c2444] dark:bg-[#09102a] sm:p-10">
@@ -146,7 +146,7 @@ export default function PaymentPage() {
                   Order details
                 </h2>
 
-                <div className="mt-6 space-y-3 rounded-2xl border border-gray-200 bg-white p-6 text-sm dark:border-[#243051] dark:bg-[#0d1333] shadow-sm">
+                <div className="mt-6 space-y-3 rounded border border-gray-200 bg-white p-6 text-sm dark:border-[#243051] dark:bg-[#0d1333">
                   <div className="flex items-center justify-between gap-4 py-1">
                     <span className="text-gray-500 dark:text-[#9fa8cc]">
                       Order ID

@@ -56,7 +56,7 @@ export default function Map() {
           {/* Map */}
           <motion.div
             variants={itemVariants}
-            className="rounded-lg overflow-hidden h-96 md:h-full min-h-96"
+            className="rounded overflow-hidden h-96 md:h-full min-h-96"
           >
             <iframe
               width="100%"

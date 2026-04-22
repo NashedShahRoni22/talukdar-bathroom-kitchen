@@ -20,13 +20,21 @@ export function AppProvider({ children }) {
   const [authReady, setAuthReady] = useState(false);
   const [guestToken, setGuestToken] = useState(null);
 
+  // get navbar-categories here 
+  const { data:navCategoriesData } = useGetData("navbar-categories");
+  const navCategories = navCategoriesData?.data || [];
+
+  // get room-categories here 
+  const { data:roomCategoriesData } = useGetData("room-categories");
+  const roomCategories = roomCategoriesData?.data || [];
+
   // get categories here 
   const { data:categoriesData } = useGetData("categories");
   const categories = categoriesData?.data || [];
 
   // get brands here 
   const { data: brandsData } = useGetData("brands");
-  const brands = brandsData?.data;
+  const brands = brandsData?.data || [];
 
   // Generate or retrieve guest token
   const generateGuestToken = () => {
@@ -337,6 +345,8 @@ export function AppProvider({ children }) {
         logout,
         addToCartDBGuest,
         mergeGuestCartToMain,
+        navCategories,
+        roomCategories,
         categories,
         brands
       }}

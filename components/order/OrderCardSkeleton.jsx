@@ -8,7 +8,7 @@ export default function OrderCardSkeleton({ index = 0 }) {
       initial={{ opacity: 0.5 }}
       animate={{ opacity: [0.45, 0.75, 0.45] }}
       transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut", delay: index * 0.05 }}
-      className="rounded-2xl border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5 sm:p-6"
+      className="rounded border border-[#e8dfd1] dark:border-[#1c2444] bg-white dark:bg-[#0e1430] p-5 sm:p-6"
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-2">

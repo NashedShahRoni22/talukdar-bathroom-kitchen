@@ -21,13 +21,7 @@ const team = [
     role: 'Head of Operations',
     bio: 'Expert in supply chain and quality assurance systems.',
     image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop',
-  },
-  {
-    name: 'Divya Patel',
-    role: 'Customer Excellence Manager',
-    bio: 'Dedicated to ensuring every customer has an exceptional experience.',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
-  },
+  }
 ];
 
 export default function Team() {
@@ -80,11 +74,11 @@ export default function Team() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {team.map((member, index) => (
             <motion.div key={index} variants={itemVariants} className="min-w-0">
-              <div className="bg-white dark:bg-[#162235] rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group h-full">
+              <div className="dark:bg-[#162235] rounded overflow-hidden group h-full">
                 {/* Image */}
                 <div className="relative h-80 overflow-hidden">
                   <img

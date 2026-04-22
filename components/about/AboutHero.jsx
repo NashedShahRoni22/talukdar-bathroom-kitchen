@@ -88,14 +88,14 @@ export default function AboutHero() {
               <motion.button
                 whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(120, 93, 50, 0.3)' }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 bg-brand-gold hover:bg-[#6a5028] text-white font-semibold rounded-lg transition-all duration-300"
+                className="px-8 py-3 bg-brand-gold hover:bg-[#6a5028] text-white font-semibold rounded transition-all duration-300"
               >
                 Explore Products
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05, borderColor: '#c4a97e' }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 border-2 border-[#c4a97e] text-[#c4a97e] hover:bg-[#c4a97e] hover:text-brand-navy font-semibold rounded-lg transition-all duration-300"
+                className="px-8 py-3 border-2 border-[#c4a97e] text-[#c4a97e] hover:bg-[#c4a97e] hover:text-brand-navy font-semibold rounded transition-all duration-300"
               >
                 Contact Us
               </motion.button>
@@ -140,7 +140,7 @@ export default function AboutHero() {
                 {heroImages.map((image, index) => (
                   <SwiperSlide key={index} style={{ width: '450px' }}>
                     <motion.div
-                      className="relative w-full h-112.5 rounded-2xl overflow-hidden shadow-2xl mx-auto"
+                      className="relative w-full h-112.5 rounded overflow-hidden mx-auto"
                     >
                       <img
                         src={image.src}
@@ -159,20 +159,18 @@ export default function AboutHero() {
 
               {/* Custom Navigation Arrows */}
               <motion.button
-                whileHover={{ scale: 1.15 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => swiperRef.current?.slidePrev()}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 z-10 p-3 rounded-full bg-brand-gold hover:bg-[#6a5028] text-white transition-all duration-300 shadow-lg dark:bg-brand-gold dark:hover:bg-[#c4a97e]"
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 z-10 p-3 rounded-full bg-brand-gold hover:bg-[#6a5028] text-white transition-all duration-300 dark:bg-brand-gold dark:hover:bg-[#c4a97e]"
                 aria-label="Previous slide"
               >
                 <ChevronLeft size={28} />
               </motion.button>
 
               <motion.button
-                whileHover={{ scale: 1.15 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => swiperRef.current?.slideNext()}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 z-10 p-3 rounded-full bg-brand-gold hover:bg-[#6a5028] text-white transition-all duration-300 shadow-lg dark:bg-brand-gold dark:hover:bg-[#c4a97e]"
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 z-10 p-3 rounded-full bg-brand-gold hover:bg-[#6a5028] text-white transition-all duration-300 dark:bg-brand-gold dark:hover:bg-[#c4a97e]"
                 aria-label="Next slide"
               >
                 <ChevronRight size={28} />
@@ -184,15 +182,6 @@ export default function AboutHero() {
           </motion.div>
         </div>
       </div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        className="absolute bottom-4 left-1/2 -translate-x-1/2"
-      >
-        <ArrowDown size={24} className="text-brand-gold dark:text-[#c4a97e]" />
-      </motion.div>
 
       {/* Custom Swiper Pagination Styles */}
       <style jsx>{`

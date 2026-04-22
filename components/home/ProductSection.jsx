@@ -60,7 +60,8 @@ export default function ProductSection({ title, subtitle, products, id }) {
                 hover:bg-[#050a30] hover:text-white hover:border-[#050a30]
                 dark:hover:bg-white dark:hover:text-[#050a30]
                 active:scale-95
-                transition-all duration-200 shadow-sm
+                transition-all duration-200
+                cursor-pointer
               "
             >
               <ChevronLeft size={16} strokeWidth={2.5} className="sm:hidden" />
@@ -84,7 +85,8 @@ export default function ProductSection({ title, subtitle, products, id }) {
                 hover:bg-[#050a30] hover:text-white hover:border-[#050a30]
                 dark:hover:bg-white dark:hover:text-[#050a30]
                 active:scale-95
-                transition-all duration-200 shadow-sm
+                transition-all duration-200
+                cursor-pointer
               "
             >
               <ChevronRight size={16} strokeWidth={2.5} className="sm:hidden" />
@@ -103,7 +105,7 @@ export default function ProductSection({ title, subtitle, products, id }) {
                 className="
                 cursor-pointer
                 px-4 py-2 sm:px-7 sm:py-2.5
-                rounded-lg font-semibold text-sm sm:text-base text-white
+                rounded font-semibold text-sm sm:text-base text-white
                 inline-flex items-center gap-1.5 sm:gap-2
                 bg-[#050a30] dark:bg-[#785d32]
                 hover:bg-[#785d32] dark:hover:bg-[#a07840]

@@ -52,7 +52,7 @@ export default function CTA() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="cursor-pointer px-8 py-4 rounded-lg font-semibold text-white text-lg flex items-center justify-center gap-2 bg-[#050a30] dark:bg-[#785d32]"
+                className="cursor-pointer px-8 py-4 rounded font-semibold text-white text-lg flex items-center justify-center gap-2 bg-[#050a30] dark:bg-[#785d32]"
               >
                 <Calendar size={20} />
                 Book Appointment

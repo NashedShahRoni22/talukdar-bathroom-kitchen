@@ -63,7 +63,7 @@ export default function Mission() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative h-[500px] rounded-lg overflow-hidden shadow-2xl"
+            className="relative h-[500px] rounded overflow-hidden"
           >
             <img
               src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&h=700&fit=crop"

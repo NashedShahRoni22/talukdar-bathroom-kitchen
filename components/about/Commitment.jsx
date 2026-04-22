@@ -42,7 +42,7 @@ export default function Commitment() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative h-125 rounded-lg overflow-hidden shadow-2xl"
+            className="relative h-125 rounded overflow-hidden"
           >
             <img
               src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=700&fit=crop"
@@ -102,7 +102,7 @@ export default function Commitment() {
               transition={{ delay: 0.6 }}
               className="mt-10"
             >
-              <button className="px-8 py-3 bg-brand-gold hover:bg-[#6a5028] text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg">
+              <button className="px-8 py-3 bg-brand-gold hover:bg-[#6a5028] text-white font-semibold rounded">
                 Start Your Journey With Us
               </button>
             </motion.div>

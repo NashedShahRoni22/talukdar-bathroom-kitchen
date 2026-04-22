@@ -91,10 +91,9 @@ export default function Values() {
               <motion.div
                 key={index}
                 variants={itemVariants}
-                whileHover={{ y: -8 }}
                 className="group"
               >
-                <div className="bg-white dark:bg-[#162235] rounded-lg p-8 h-full shadow-lg hover:shadow-xl transition-all duration-300 border border-transparent hover:border-brand-gold">
+                <div className="bg-white dark:bg-[#162235] rounded p-8 h-full">
                   <div className="h-16 w-16 rounded-lg flex items-center justify-center mb-6 transition-all bg-brand-pale dark:bg-[#2a3550] group-hover:bg-brand-gold">
                     <Icon size={32} className="text-brand-navy dark:text-[#c4a97e] group-hover:text-white transition-colors" />
                   </div>

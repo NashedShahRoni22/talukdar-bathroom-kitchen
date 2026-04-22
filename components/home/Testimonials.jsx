@@ -72,7 +72,7 @@ export default function Testimonials() {
                 text-[#050a30] dark:text-white bg-white dark:bg-white/5
                 hover:bg-[#050a30] hover:text-white hover:border-[#050a30]
                 dark:hover:bg-white dark:hover:text-[#050a30]
-                active:scale-95 transition-all duration-200 shadow-sm
+                active:scale-95 transition-all duration-200 cursor-pointer
               "
             >
               <ChevronLeft size={18} strokeWidth={2.5} />
@@ -86,7 +86,7 @@ export default function Testimonials() {
                 text-[#050a30] dark:text-white bg-white dark:bg-white/5
                 hover:bg-[#050a30] hover:text-white hover:border-[#050a30]
                 dark:hover:bg-white dark:hover:text-[#050a30]
-                active:scale-95 transition-all duration-200 shadow-sm
+                active:scale-95 transition-all duration-200 cursor-pointer
               "
             >
               <ChevronRight size={18} strokeWidth={2.5} />

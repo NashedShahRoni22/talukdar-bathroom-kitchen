@@ -39,7 +39,7 @@ export default function ContactPage() {
           <ContactForm />
 
           <div className="space-y-6">
-            <div className="rounded-2xl overflow-hidden border border-[#e8dcc9] dark:border-[#26344f] shadow-sm h-[360px] sm:h-[420px]">
+            <div className="rounded overflow-hidden border border-[#e8dcc9] dark:border-[#26344f] h-[360px] sm:h-[420px]">
               <iframe
                 title="Talukdar showroom location"
                 width="100%"
@@ -52,7 +52,7 @@ export default function ContactPage() {
               />
             </div>
 
-            <div className="bg-[#f7f5f2] dark:bg-[#162235] rounded-2xl p-6 sm:p-8 border border-[#e8dcc9] dark:border-[#26344f] shadow-sm">
+            <div className="bg-[#f7f5f2] dark:bg-[#162235] rounded p-6 sm:p-8 border border-[#e8dcc9] dark:border-[#26344f]">
               <h3 className="text-2xl font-bold text-[#050a30] dark:text-[#f0ebe3]" style={{ fontFamily: 'var(--font-playfair)' }}>
                 Showroom Information
               </h3>

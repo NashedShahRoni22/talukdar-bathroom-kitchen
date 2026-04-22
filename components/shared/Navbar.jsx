@@ -1,44 +1,49 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { Menu, X, ShoppingCart, Heart, Sun, Moon, Instagram, Facebook, Youtube, Twitter, UserRound } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import logo from '@/public/images/logo.png';
-import logoWhite from '@/public/images/logo-white.png';
-import { useApp } from '@/components/context/AppContext';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import {
+  Menu,
+  ShoppingCart,
+  Heart,
+  Sun,
+  Moon,
+  Instagram,
+  Facebook,
+  Youtube,
+  Twitter,
+  UserRound,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import logo from "@/public/images/logo.png";
+import logoWhite from "@/public/images/logo-white.png";
+import { useApp } from "@/components/context/AppContext";
+import Mobilebar from "./Mobilebar";
+import MegaMenu from "./MegaMenu";
+import { menuItems, socialLinks } from "./MenuItems";
 
 export default function Navbar() {
-  const {categories} = useApp();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const isHome = pathname === '/';
+  const isHome = pathname === "/";
   const isTransparent = isHome && !scrolled;
-  const { cartDBCountGuest, wishlistItems, toggleCart, isDark, toggleTheme, isAuthenticated } = useApp();
+  const {
+    cartDBCountGuest,
+    wishlistItems,
+    toggleCart,
+    isDark,
+    toggleTheme,
+    isAuthenticated,
+  } = useApp();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const menuItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Shop', href: '/shop', child: categories || [] },
-    { label: 'About', href: '/about' },
-    { label: 'Contact', href: '/contact' },
-    { label: 'Account', href: '/profile' },
-  ];
-
-  const socialLinks = [
-    { Icon: Instagram, href: '#', label: 'Instagram' },
-    { Icon: Facebook, href: '#', label: 'Facebook' },
-    { Icon: Youtube, href: '#', label: 'YouTube' },
-    { Icon: Twitter, href: '#', label: 'Twitter' },
-  ];
 
   return (
     <>
@@ -48,11 +53,11 @@ export default function Navbar() {
         transition={{ duration: 0.5 }}
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${
           isTransparent
-            ? 'bg-transparent border-b border-transparent shadow-none'
-            : 'bg-white dark:bg-[#0a0f2e] border-b border-gray-100 dark:border-[#1c2444] shadow-sm dark:shadow-none'
+            ? "bg-transparent border-b border-transparent shadow-none"
+            : "bg-white dark:bg-[#0a0f2e] border-b border-gray-100 dark:border-[#1c2444] shadow-sm dark:shadow-none"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative">
           <div className="flex justify-between items-center">
             {/* Logo */}
             <Link href="/" className="flex items-center">
@@ -68,17 +73,19 @@ export default function Navbar() {
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-9">
               {menuItems.map((item) => {
-                const isActive = 
-                  (item.href === '/' && pathname === '/') ||
-                  (item.href.startsWith('/') && pathname === item.href);
-                
+                const isActive =
+                  (item.href === "/" && pathname === "/") ||
+                  (item.href.startsWith("/") && pathname === item.href);
+
                 return (
-                  <div key={item.label} className="relative group">
+                  <div key={item.label} className="group">
                     <Link
                       href={item.href}
                       className={`flex items-center gap-1 text-base font-medium transition-all duration-200 relative py-6 -my-6 ${
-                        isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'
-                      } ${isActive ? 'text-[#c4a97e]' : 'hover:text-[#c4a97e]'}`}
+                        isTransparent
+                          ? "text-white"
+                          : "text-brand-navy dark:text-brand-pale"
+                      } ${isActive ? "text-[#c4a97e]" : "hover:text-[#c4a97e]"}`}
                     >
                       {item.label}
                       {isActive && (
@@ -90,32 +97,9 @@ export default function Navbar() {
                       )}
                     </Link>
 
-                    {item.child && item.child.length > 0 && (
-                      <div className="absolute top-10 left-0 w-64 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                        <div className="bg-white dark:bg-[#0a0f2e] border border-gray-100 dark:border-[#1c2444] rounded-xl shadow-lg overflow-hidden py-2">
-                          {item.child.map((child) => (
-                            <Link
-                              key={child.id}
-                              href={`/shop/${child.slug}`}
-                              className="group/item flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-[#1a2340] transition-colors"
-                            >
-                              {child.icon && (
-                                <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#131b36] flex items-center justify-center p-2 shrink-0">
-                                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img src={child.icon} alt={child.name} className="w-full h-full object-contain" />
-                                </div>
-                              )}
-                              <div className="flex flex-col">
-                                <span className="text-sm font-medium text-brand-navy dark:text-brand-pale transition-colors group-hover/item:text-[#c4a97e]">
-                                  {child.name}
-                                </span>
-                                <span className="text-xs text-gray-500 dark:text-gray-400">
-                                  {child.total_products} {child.total_products === 1 ? 'Product' : 'Products'}
-                                </span>
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
+                    {item.child && (
+                      <div className="absolute top-20 left-0 w-7xl z-50 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-opacity duration-300">
+                        <MegaMenu />
                       </div>
                     )}
                   </div>
@@ -131,8 +115,10 @@ export default function Navbar() {
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleTheme}
                 className={`cursor-pointer p-2.5 rounded-xl transition-colors ${
-                    isTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-[#1a2340]'
-                  }`}
+                  isTransparent
+                    ? "hover:bg-white/10"
+                    : "hover:bg-gray-100 dark:hover:bg-[#1a2340]"
+                }`}
                 aria-label="Toggle theme"
               >
                 <AnimatePresence mode="wait">
@@ -156,7 +142,12 @@ export default function Navbar() {
                       transition={{ duration: 0.2 }}
                       className="block"
                     >
-                      <Moon size={19} className={isTransparent ? 'text-white' : 'text-brand-navy'} />
+                      <Moon
+                        size={19}
+                        className={
+                          isTransparent ? "text-white" : "text-brand-navy"
+                        }
+                      />
                     </motion.span>
                   )}
                 </AnimatePresence>
@@ -164,13 +155,22 @@ export default function Navbar() {
 
               {/* Cart */}
               <Link
-                href={isAuthenticated ? '/profile' : '/login'}
+                href={isAuthenticated ? "/profile" : "/login"}
                 className={`cursor-pointer p-2.5 rounded-xl transition-colors relative ${
-                    isTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-[#1a2340]'
-                  }`}
+                  isTransparent
+                    ? "hover:bg-white/10"
+                    : "hover:bg-gray-100 dark:hover:bg-[#1a2340]"
+                }`}
                 aria-label="Account"
               >
-                <UserRound size={19} className={isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'} />
+                <UserRound
+                  size={19}
+                  className={
+                    isTransparent
+                      ? "text-white"
+                      : "text-brand-navy dark:text-brand-pale"
+                  }
+                />
                 {isAuthenticated && (
                   <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand-gold" />
                 )}
@@ -181,19 +181,30 @@ export default function Navbar() {
                 <Link
                   href="/wishlist"
                   className={`cursor-pointer p-2.5 rounded-xl transition-colors relative ${
-                      isTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-[#1a2340]'
-                    }`}
+                    isTransparent
+                      ? "hover:bg-white/10"
+                      : "hover:bg-gray-100 dark:hover:bg-[#1a2340]"
+                  }`}
                   aria-label="Wishlist"
                 >
-                  <Heart size={19} className={isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'} />
+                  <Heart
+                    size={19}
+                    className={
+                      isTransparent
+                        ? "text-white"
+                        : "text-brand-navy dark:text-brand-pale"
+                    }
+                  />
                   {wishlistItems?.length > 0 && (
                     <motion.span
                       initial={{ scale: 0.5, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-white text-xs font-bold flex items-center justify-center"
-                      style={{ backgroundColor: '#ef4444' }}
+                      style={{ backgroundColor: "#ef4444" }}
                     >
-                      {wishlistItems?.length > 99 ? '99+' : wishlistItems?.length}
+                      {wishlistItems?.length > 99
+                        ? "99+"
+                        : wishlistItems?.length}
                     </motion.span>
                   )}
                 </Link>
@@ -203,20 +214,29 @@ export default function Navbar() {
               <button
                 onClick={toggleCart}
                 className={`cursor-pointer p-2.5 rounded-xl transition-colors relative ${
-                    isTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-[#1a2340]'
-                  }`}
+                  isTransparent
+                    ? "hover:bg-white/10"
+                    : "hover:bg-gray-100 dark:hover:bg-[#1a2340]"
+                }`}
                 aria-label="Open cart"
               >
-                <ShoppingCart size={19} className={isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'} />
+                <ShoppingCart
+                  size={19}
+                  className={
+                    isTransparent
+                      ? "text-white"
+                      : "text-brand-navy dark:text-brand-pale"
+                  }
+                />
                 {cartDBCountGuest > 0 && (
                   <motion.span
                     key={cartDBCountGuest}
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-white text-xs font-bold flex items-center justify-center"
-                    style={{ backgroundColor: '#785d32' }}
+                    style={{ backgroundColor: "#785d32" }}
                   >
-                    {cartDBCountGuest > 99 ? '99+' : cartDBCountGuest}
+                    {cartDBCountGuest > 99 ? "99+" : cartDBCountGuest}
                   </motion.span>
                 )}
               </button>
@@ -224,12 +244,21 @@ export default function Navbar() {
               {/* Mobile Menu Button */}
               <button
                 className={`md:hidden cursor-pointer p-2.5 rounded-xl transition-colors ${
-                    isTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-[#1a2340]'
-                  }`}
+                  isTransparent
+                    ? "hover:bg-white/10"
+                    : "hover:bg-gray-100 dark:hover:bg-[#1a2340]"
+                }`}
                 onClick={() => setIsOpen(true)}
                 aria-label="Open menu"
               >
-                <Menu size={22} className={isTransparent ? 'text-white' : 'text-brand-navy dark:text-brand-pale'} />
+                <Menu
+                  size={22}
+                  className={
+                    isTransparent
+                      ? "text-white"
+                      : "text-brand-navy dark:text-brand-pale"
+                  }
+                />
               </button>
             </div>
           </div>
@@ -239,119 +268,12 @@ export default function Navbar() {
       {/* Full-Screen Mobile Menu Overlay */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, clipPath: 'circle(0% at calc(100% - 44px) 44px)' }}
-            animate={{ opacity: 1, clipPath: 'circle(170% at calc(100% - 44px) 44px)' }}
-            exit={{ opacity: 0, clipPath: 'circle(0% at calc(100% - 44px) 44px)' }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-60 flex flex-col md:hidden overflow-hidden"
-            style={{ backgroundColor: '#050a30' }}
-          >
-            {/* Top Bar */}
-            <div className="flex items-center justify-between px-6 py-5 shrink-0">
-              <Image
-                src={logo}
-                alt="Talukdar Logo"
-                width={120}
-                height={56}
-                className="object-contain brightness-0 invert"
-              />
-              <motion.button
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                transition={{ delay: 0.25 }}
-                onClick={() => setIsOpen(false)}
-                className="cursor-pointer p-3 rounded-full hover:bg-white/10 transition-colors"
-                aria-label="Close menu"
-              >
-                <X size={26} color="white" />
-              </motion.button>
-            </div>
-
-            {/* Gold Divider */}
-            <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
-              className="h-px mx-6 origin-left shrink-0"
-              style={{ backgroundColor: '#785d32' }}
-            />
-
-            {/* Menu Items */}
-            <div className="flex-1 flex flex-col justify-center px-8 overflow-hidden">
-              {menuItems.map((item, i) => {
-                const isActive = 
-                  (item.href === '/' && pathname === '/') ||
-                  (item.href.startsWith('/') && pathname === item.href);
-                
-                return (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.15 + i * 0.08, duration: 0.4, ease: 'easeOut' }}
-                  >
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className={`group flex items-center justify-between py-4 border-b transition-all ${
-                        isActive 
-                          ? 'border-brand-gold text-brand-pale' 
-                          : 'border-white/10 hover:border-brand-gold/60'
-                      }`}
-                    >
-                      <span
-                        className={`text-3xl font-bold transition-colors ${
-                          isActive 
-                            ? 'text-brand-pale' 
-                            : 'text-white group-hover:text-brand-pale'
-                        }`}
-                        style={{ fontFamily: 'var(--font-playfair)' }}
-                      >
-                        {item.label}
-                      </span>
-                      <span className={`text-xl transition-opacity ${
-                        isActive 
-                          ? 'text-brand-gold opacity-100' 
-                          : 'text-brand-gold opacity-0 group-hover:opacity-100'
-                      }`}>
-                        →
-                      </span>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* Bottom: Social Links */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55, duration: 0.4 }}
-              className="px-8 pb-10 pt-6 border-t border-white/10 shrink-0"
-            >
-              <p className="text-white/40 text-xs uppercase tracking-widest mb-5">Follow Us</p>
-              <div className="flex gap-4 mb-6">
-                {socialLinks.map(({ Icon, href, label }) => (
-                  <motion.a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.15, y: -3 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="cursor-pointer w-11 h-11 rounded-full border border-white/20 flex items-center justify-center hover:border-brand-gold hover:bg-brand-gold/20 transition-all"
-                    aria-label={label}
-                  >
-                    <Icon size={18} color="white" />
-                  </motion.a>
-                ))}
-              </div>
-              <p className="text-white/30 text-xs">
-                &copy; {new Date().getFullYear()} Talukdar Bathroom &amp; Kitchens
-              </p>
-            </motion.div>
-          </motion.div>
+          <Mobilebar
+            menuItems={menuItems}
+            socialLinks={socialLinks}
+            pathname={pathname}
+            setIsOpen={setIsOpen}
+          />
         )}
       </AnimatePresence>
     </>
