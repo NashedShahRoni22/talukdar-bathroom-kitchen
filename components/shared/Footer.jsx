@@ -62,8 +62,8 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
-              {menuItems.map((link) => (
-                <li key={link}>
+              {menuItems.map((link, index) => (
+                <li key={index}>
                   <Link
                     href={link.href}
                     className="text-gray-300 hover:text-white transition-colors text-sm"
@@ -79,8 +79,8 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Categories</h4>
             <ul className="space-y-2">
-              {categories.slice(0, 5).map((category) => (
-                <li key={category.id}>
+              {categories.slice(0, 5).map((category, index) => (
+                <li key={index}>
                   <Link
                     href={`/shop?category=${category.slug}`}
                     className="text-gray-300 hover:text-white transition-colors text-sm"
@@ -96,8 +96,8 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Follow us</h4>
             <ul className="space-y-2">
-              {socialLinks.map((link) => (
-                <li key={link}>
+              {socialLinks.map((link, index) => (
+                <li key={index}>
                   <Link
                     href={link.href}
                     className="text-gray-300 hover:text-white transition-colors text-sm"

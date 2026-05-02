@@ -9,8 +9,8 @@ export const menuItems = [
 ];
 
 export const socialLinks = [
-  { Icon: Instagram, href: "#", label: "Instagram" },
-  { Icon: Facebook, href: "#", label: "Facebook" },
-  { Icon: Youtube, href: "#", label: "YouTube" },
-  { Icon: Twitter, href: "#", label: "Twitter" },
+  { Icon: Instagram, href: "/", label: "Instagram" },
+  { Icon: Facebook, href: "/", label: "Facebook" },
+  { Icon: Youtube, href: "/", label: "YouTube" },
+  { Icon: Twitter, href: "/", label: "Twitter" },
 ];

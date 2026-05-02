@@ -3,26 +3,23 @@
 import { Check } from "lucide-react";
 
 export default function ShopSidebarCategory({ categoryFilters, filters, setFilters }) {
+  console.log(categoryFilters);
+  
   const handleAttributeValueChange = (attributeId, valueId) => {
     setFilters((prev) => {
-      const newAttributeValues = [...prev.attribute_values];
-      const valueKey = `${attributeId}_${valueId}`;
-      const index = newAttributeValues.indexOf(valueKey);
+      const isSelected = prev.attribute_values?.includes(valueId) || false;
+      const newIds = isSelected
+        ? prev.attribute_values.filter((id) => id !== valueId)
+        : [...(prev.attribute_values || []), valueId];
 
-      if (index > -1) {
-        newAttributeValues.splice(index, 1);
-      } else {
-        newAttributeValues.push(valueKey);
-      }
-
-      return { ...prev, attribute_values: newAttributeValues, page: 1 };
+      return { ...prev, attribute_values: newIds, page: 1 };
     });
   };
 
   const handleBrandChange = (brandId) => {
     setFilters((prev) => ({
       ...prev,
-      brand_id: prev.brand_id === brandId ? "" : brandId,
+      brand_id: prev.brand_id === String(brandId) ? "" : String(brandId), // toggle
       page: 1,
     }));
   };
@@ -65,18 +62,16 @@ export default function ShopSidebarCategory({ categoryFilters, filters, setFilte
                     className="flex cursor-pointer items-center gap-3 text-sm text-slate-600 transition hover:text-brand-gold dark:text-[#9fa8cc] dark:hover:text-brand-gold"
                   >
                     <div
-                      className={`flex h-5 w-5 items-center justify-center rounded-full border transition-colors ${
+                      className={`flex h-5 w-5 items-center justify-center rounded border transition-colors ${
                         filters.brand_id === String(brand.id)
                           ? "border-brand-gold bg-brand-gold text-white"
                           : "border-gray-300 dark:border-[#2a3460]"
                       }`}
                     >
-                      {filters.brand_id === String(brand.id) && (
-                        <div className="h-2 w-2 rounded-full bg-white" />
-                      )}
+                      {filters.brand_id === String(brand.id) && <Check size={14} />}
                     </div>
                     <input
-                      type="radio"
+                      type="checkbox"
                       name="brand"
                       className="hidden"
                       checked={filters.brand_id === String(brand.id)}
@@ -103,8 +98,7 @@ export default function ShopSidebarCategory({ categoryFilters, filters, setFilte
             </h3>
             <div className="flex flex-col space-y-2">
               {filter.values.map((value) => {
-                const valueKey = `${filter.id}_${value.id}`;
-                const isSelected = filters.attribute_values.includes(valueKey);
+                const isSelected = filters.attribute_values?.includes(value.id) || false;
 
                 return (
                   <label

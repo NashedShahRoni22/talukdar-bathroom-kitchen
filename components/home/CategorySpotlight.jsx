@@ -16,7 +16,7 @@ function CategoryCard({ category, index, className }) {
       className={className}
     >
       <Link
-        href={"/shop"}
+        href={`/shop/${category.slug}`}
         className="group relative isolate block h-full overflow-hidden rounded border border-black/10 bg-white shadow-[0_10px_35px_rgba(5,10,48,0.09)] transition-transform duration-300 dark:border-white/10 dark:bg-white/5 dark:shadow-[0_14px_40px_rgba(0,0,0,0.35)]"
       >
         <Image
@@ -110,7 +110,7 @@ export default function CategorySpotlight() {
           variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
           className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-12 lg:auto-rows-[13.5rem]"
         >
-          {categories.map((category, index) => (
+          {categories.slice(0, 5).map((category, index) => (
             <CategoryCard
               key={index}
               category={category}

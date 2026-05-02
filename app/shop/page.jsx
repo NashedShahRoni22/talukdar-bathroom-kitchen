@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { ChevronRight, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,8 +8,10 @@ import { useGetData } from "../../components/helpers/useGetData";
 import ShopSidebar from "@/components/shop/ShopSidebar";
 import ShopTopbar from "@/components/shop/ShopTopbar";
 import ShopProducts from "@/components/shop/ShopProducts";
+import { useApp } from "@/components/context/AppContext";
 
 export default function ShopPage() {
+  const { shopFilters, setShopFilters } = useApp();
   const [filters, setFilters] = useState({
     search: "",
     category_ids: [],
@@ -20,6 +22,15 @@ export default function ShopPage() {
     page: 1,
     rows: 12,
   });
+
+  // Apply shopFilters from context on mount
+  useEffect(() => {
+    if (shopFilters) {
+      setFilters(shopFilters);
+      // Clear the context filters after applying
+      setShopFilters(null);
+    }
+  }, [shopFilters, setShopFilters]);
 
   const [viewMode, setViewMode] = useState("grid");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);

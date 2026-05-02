@@ -19,6 +19,7 @@ export function AppProvider({ children }) {
   const [authEmail, setAuthEmail] = useState("");
   const [authReady, setAuthReady] = useState(false);
   const [guestToken, setGuestToken] = useState(null);
+  const [shopFilters, setShopFilters] = useState(null);
 
   // get navbar-categories here 
   const { data:navCategoriesData } = useGetData("navbar-categories");
@@ -348,7 +349,9 @@ export function AppProvider({ children }) {
         navCategories,
         roomCategories,
         categories,
-        brands
+        brands,
+        shopFilters,
+        setShopFilters
       }}
     >
       {children}

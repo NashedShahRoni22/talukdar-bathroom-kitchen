@@ -3,9 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function NavRoom() {
   const { roomCategories } = useApp();
+  const router = useRouter();
   const [activeRoom, setActiveRoom] = useState(roomCategories[0]?.id || null);
 
   const activeRoomData = roomCategories.find((cat) => cat.id === activeRoom);
@@ -20,37 +22,44 @@ export default function NavRoom() {
         className="group flex flex-col gap-2"
       >
         {roomCategories.map((cat) => (
-          <motion.button
+          <Link
             key={cat.id}
-            onClick={() => setActiveRoom(cat.id)}
-            className={`flex items-center gap-2 px-3 py-2 relative transition-colors duration-200 text-sm font-medium whitespace-nowrap ${
-              activeRoom === cat.id
-                ? "text-[#050a30] dark:text-[#f0ebe3]"
-                : "text-[#050a30]/60 dark:text-[#f0ebe3]/60"
-            }`}
-            whileHover={{ x: 4 }}
-            whileTap={{ scale: 0.98 }}
+            href={`/shop/${cat.slug}`}
+            passHref
+            legacyBehavior
           >
-            <Image
-              src={cat.icon}
-              alt={cat.name}
-              width={40}
-              height={40}
-              className="rounded flex-shrink-0 group-hover:scale-110 transition-transform duration-300"
-            />
-            <span>{cat.name}</span>
-
-            {/* Active indicator */}
-            {activeRoom === cat.id && (
-              <motion.div
-                layoutId="room-indicator"
-                className="absolute left-0 top-0 bottom-0 w-1 bg-[#785d32]"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+            <motion.a
+              onMouseEnter={() => setActiveRoom(cat.id)}
+              onClick={() => setActiveRoom(cat.id)}
+              className={`flex items-center gap-2 px-3 py-2 relative transition-colors duration-200 text-sm font-medium whitespace-nowrap cursor-pointer ${
+                activeRoom === cat.id
+                  ? "text-[#050a30] dark:text-[#f0ebe3]"
+                  : "text-[#050a30]/60 dark:text-[#f0ebe3]/60"
+              }`}
+              whileHover={{ x: 4 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Image
+                src={cat.icon}
+                alt={cat.name}
+                width={40}
+                height={40}
+                className="rounded flex-shrink-0 group-hover:scale-110 transition-transform duration-300"
               />
-            )}
-          </motion.button>
+              <span>{cat.name}</span>
+
+              {/* Active indicator */}
+              {activeRoom === cat.id && (
+                <motion.div
+                  layoutId="room-indicator"
+                  className="absolute left-0 top-0 bottom-0 w-1 bg-[#785d32]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                />
+              )}
+            </motion.a>
+          </Link>
         ))}
       </motion.div>
 
@@ -81,8 +90,8 @@ export default function NavRoom() {
               {activeRoomData.children.map((subcat) => (
                 <Link
                   key={subcat.id}
-                  href={`/shop/${activeRoomData.slug}/${subcat.slug}`}
-                  className="group/item p-4 flex flex-col items-center transition-all duration-300"
+                  href={`/shop/${subcat.slug}`}
+                  className="group/item p-4 flex flex-col items-center transition-all duration-300 cursor-pointer"
                 >
                   <div className="relative w-24 h-24 overflow-hidden rounded">
                     <Image

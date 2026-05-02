@@ -32,6 +32,7 @@ export default function CategoryShopPage() {
   const { data: filtersData, isLoading: filtersLoading } = useGetData(
     `products/categories/${slug}/filters`
   );
+  
   const categoryFilters = filtersData?.data;
   const categoryName = categoryFilters?.category_name;
 
@@ -48,7 +49,7 @@ export default function CategoryShopPage() {
 
     // Add attribute values if any are selected
     if (filters.attribute_values.length > 0) {
-      params["attribute_values[]"] = filters.attribute_values;
+      params.attribute_values = filters.attribute_values;
     }
 
     // Add brand if selected
@@ -68,6 +69,7 @@ export default function CategoryShopPage() {
     `products/category/${slug}`,
     productParams
   );
+  
   const products = productsData?.data;
   const meta = productsData?.meta;
 
