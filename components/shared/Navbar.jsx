@@ -15,6 +15,7 @@ import {
   Youtube,
   Twitter,
   UserRound,
+  Search,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/public/images/logo.png";
@@ -22,10 +23,12 @@ import logoWhite from "@/public/images/logo-white.png";
 import { useApp } from "@/components/context/AppContext";
 import Mobilebar from "./Mobilebar";
 import MegaMenu from "./MegaMenu";
+import SearchModal from "@/components/search/SearchModal";
 import { menuItems, socialLinks } from "./MenuItems";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -42,7 +45,20 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    
+    // Keyboard shortcut for search (Cmd+K or Ctrl+K)
+    const handleKeyboardSearch = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyboardSearch);
+    
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("keydown", handleKeyboardSearch);
+    };
   }, []);
 
   return (
@@ -109,12 +125,34 @@ export default function Navbar() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-1">
-              {/* Theme Toggle */}
+              {/* Desktop Only: Search Icon */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsSearchOpen(true)}
+                className={`hidden md:flex cursor-pointer p-2.5 rounded-xl transition-colors ${
+                  isTransparent
+                    ? "hover:bg-white/10"
+                    : "hover:bg-gray-100 dark:hover:bg-[#1a2340]"
+                }`}
+                aria-label="Search products"
+              >
+                <Search
+                  size={19}
+                  className={
+                    isTransparent
+                      ? "text-white"
+                      : "text-brand-navy dark:text-brand-pale"
+                  }
+                />
+              </motion.button>
+
+              {/* Desktop Only: Theme Toggle */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleTheme}
-                className={`cursor-pointer p-2.5 rounded-xl transition-colors ${
+                className={`hidden md:flex cursor-pointer p-2.5 rounded-xl transition-colors ${
                   isTransparent
                     ? "hover:bg-white/10"
                     : "hover:bg-gray-100 dark:hover:bg-[#1a2340]"
@@ -153,10 +191,10 @@ export default function Navbar() {
                 </AnimatePresence>
               </motion.button>
 
-              {/* Cart */}
+              {/* Desktop Only: Account */}
               <Link
                 href={isAuthenticated ? "/profile" : "/login"}
-                className={`cursor-pointer p-2.5 rounded-xl transition-colors relative ${
+                className={`hidden md:flex cursor-pointer p-2.5 rounded-xl transition-colors relative ${
                   isTransparent
                     ? "hover:bg-white/10"
                     : "hover:bg-gray-100 dark:hover:bg-[#1a2340]"
@@ -273,9 +311,13 @@ export default function Navbar() {
             socialLinks={socialLinks}
             pathname={pathname}
             setIsOpen={setIsOpen}
+            onSearchClick={() => setIsSearchOpen(true)}
           />
         )}
       </AnimatePresence>
+
+      {/* Search Modal */}
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 }

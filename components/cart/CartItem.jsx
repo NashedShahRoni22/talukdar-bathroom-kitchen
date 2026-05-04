@@ -39,7 +39,7 @@ export default function CartItem({ item }) {
       <div className="flex-1 min-w-0">
         <Link href={`/product/${item.slug}`}>
           <h4 className="text-sm font-semibold text-gray-800 dark:text-[#e8d9c4] leading-tight line-clamp-2 mt-0.5">
-            {item.name}
+            {item.name} ({item.variant})
           </h4>
         </Link>
 

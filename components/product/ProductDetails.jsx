@@ -6,6 +6,7 @@ import { Heart, ShoppingCart, Zap, Star } from "lucide-react";
 import toast from "react-hot-toast";
 import { useApp } from "@/components/context/AppContext";
 import ProductGallery from "./ProductGallery";
+import RelatedProducts from "./RelatedProducts";
 
 function HtmlBlock({ title, html }) {
   if (!html) return null;
@@ -32,6 +33,8 @@ export default function ProductDetails({ product }) {
   const variants = Array.isArray(product?.variants) ? product.variants : [];
   const defaultVariant = variants[0] || null;
   const gallery = Array.isArray(product?.main_image) ? product.main_image : [];
+  const relatedProducts = Array.isArray(product?.related_products) ? product.related_products : [];
+  console.log(product);
 
   const [selectedVariantId, setSelectedVariantId] = useState(
     defaultVariant?.product_variant_id || null,
@@ -355,6 +358,10 @@ export default function ProductDetails({ product }) {
             </div>
           )}
         </section>
+
+        {relatedProducts?.length > 0 && (
+          <RelatedProducts products={relatedProducts} />
+        )}
       </div>
     </main>
   );

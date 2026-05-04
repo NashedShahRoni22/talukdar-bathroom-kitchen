@@ -108,23 +108,19 @@ export default function CheckoutPage() {
         >
           <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:flex-nowrap sm:gap-4">
             <Link
-              href="/"
+              href="/sshop"
               className="flex items-center gap-1.5 text-sm text-gray-400 transition-colors hover:text-gray-700"
             >
               <ArrowLeft size={15} />
               Back to store
             </Link>
             <div className="hidden h-4 w-px bg-gray-300 dark:bg-[#2a3460] sm:block" />
-            <h1
+            <p
               className="text-2xl font-bold text-brand-navy dark:text-[#f0ebe3] md:text-3xl"
               style={{ fontFamily: 'var(--font-playfair)' }}
             >
               Checkout {step === 2 && '- Payment'}
-            </h1>
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-gray-400 sm:ml-auto">
-            <Shield size={14} />
-            Secure &amp; Encrypted
+            </p>
           </div>
         </motion.div>
 
@@ -133,28 +129,40 @@ export default function CheckoutPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.05 }}
-          className="mb-8 flex items-center justify-center gap-4"
+          className="mb-12 flex items-center justify-center gap-2 sm:gap-4"
         >
-          <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold text-sm transition-colors ${
-            step === 1 
-              ? 'bg-brand-navy text-white' 
-              : 'bg-emerald-500 text-white'
-          }`}>
-            {step === 1 ? '1' : '✓'}
+          {/* Step 1 */}
+          <div className="flex flex-col items-center gap-2">
+            <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold text-sm transition-colors ${
+              step === 1 
+                ? 'bg-brand-navy text-white' 
+                : 'bg-emerald-500 text-white'
+            }`}>
+              {step === 1 ? '1' : '✓'}
+            </div>
+            <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[#9fa8cc] whitespace-nowrap">
+              Information
+            </span>
           </div>
-          <div className={`h-1.5 w-12 transition-colors ${
+
+          {/* Connector */}
+          <div className={`h-1.5 w-8 sm:w-12 transition-colors flex-shrink-0 ${
             step === 2 ? 'bg-brand-navy' : 'bg-gray-300 dark:bg-[#2a3460]'
           }`} />
-          <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold text-sm transition-colors ${
-            step === 2 
-              ? 'bg-brand-navy text-white' 
-              : 'bg-gray-300 dark:bg-[#2a3460] text-gray-600 dark:text-[#9fa8cc]'
-          }`}>
-            2
+
+          {/* Step 2 */}
+          <div className="flex flex-col items-center gap-2">
+            <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold text-sm transition-colors ${
+              step === 2 
+                ? 'bg-brand-navy text-white' 
+                : 'bg-gray-300 dark:bg-[#2a3460] text-gray-600 dark:text-[#9fa8cc]'
+            }`}>
+              2
+            </div>
+            <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-[#9fa8cc] whitespace-nowrap">
+              Payment
+            </span>
           </div>
-          <span className="text-xs text-gray-500 dark:text-[#9fa8cc] ml-2">
-            {step === 1 ? 'Information' : 'Payment'}
-          </span>
         </motion.div>
 
         {/* Step 1: Information Form */}

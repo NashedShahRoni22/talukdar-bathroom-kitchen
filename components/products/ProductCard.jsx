@@ -8,23 +8,27 @@ import { motion } from "framer-motion";
 import { useApp } from "@/components/context/AppContext";
 
 export default function ProductCard({ p }) {
-  const { addToCartDBGuest, addToWishlist, removeFromWishlist, wishlistItems } = useApp();
+  const { addToCartDBGuest, addToWishlist, removeFromWishlist, wishlistItems } =
+    useApp();
 
   const defaultVariant = p?.variants?.[0] || p;
-  const defaultVariantId = defaultVariant?.product_variant_id;
+  const [selectedVariant, setSelectedVariant] = useState(defaultVariant);
+  const selectedVariantId = selectedVariant?.product_variant_id;
 
   // Find if this product is in the user's fetched wishlist
   const wishlistItem = wishlistItems?.find(
-    (w) => String(w?.product_variant_id) === String(defaultVariantId) || String(w?.id) === String(defaultVariantId)
+    (w) =>
+      String(w?.product_variant_id) === String(selectedVariantId) ||
+      String(w?.id) === String(selectedVariantId),
   );
 
   const [isHovering, setIsHovering] = useState(false);
 
   // Sync local wish state if API is_wishlisted is true
-  const isFavorite = Boolean(wishlistItem) || Boolean(p?.is_wishlisted);
+  const isFavorite = Boolean(wishlistItem) || Boolean(selectedVariant?.is_wishlisted);
 
   function handleAddToCart() {
-    addToCartDBGuest(defaultVariantId, 1, "increment");
+    addToCartDBGuest(selectedVariantId, 1, "increment");
   }
 
   function handleWishlistToggle(e) {
@@ -33,16 +37,19 @@ export default function ProductCard({ p }) {
 
     if (isFavorite) {
       // Pass the wishlist_id if we have it, else fallback to variant ID
-      removeFromWishlist(wishlistItem?.id || p?.wishlist_id || defaultVariantId);
+      removeFromWishlist(
+        wishlistItem?.id || p?.wishlist_id || selectedVariantId,
+      );
     } else {
-      addToWishlist(defaultVariantId);
+      addToWishlist(selectedVariantId);
     }
   }
 
-  const basePrice = defaultVariant?.price || p?.base_price;
-  const discountPrice = defaultVariant?.discount?.discount_price;
-  const discountAmount = defaultVariant?.discount?.discount_amount;
-  // const hasMultipleVariants = p?.variants?.length > 1;
+  const basePrice = selectedVariant?.price || p?.base_price;
+  const discountPrice = selectedVariant?.discount?.discount_price;
+  const discountAmount = selectedVariant?.discount?.discount_amount;
+  const variantImage = selectedVariant?.image || p?.thumbnail_image;
+  const hasMultipleVariants = p?.variants?.length > 1;
 
   return (
     <section className="relative h-full flex flex-col">
@@ -58,7 +65,7 @@ export default function ProductCard({ p }) {
         {/* Image Container */}
         <div className="relative h-64 w-full overflow-hidden bg-gray-50 dark:bg-brand-navy/50">
           <Image
-            src={p?.thumbnail_image}
+            src={variantImage}
             alt={p?.name}
             fill
             className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
@@ -69,33 +76,33 @@ export default function ProductCard({ p }) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: isHovering ? 1 : 0 }}
-            className="absolute inset-0 bg-black/70 flex items-center justify-center gap-4 z-20"
+            className="absolute top-3 right-3 flex gap-2 z-20"
           >
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="cursor-pointer p-3 rounded-full text-white transition-colors"
+              className="cursor-pointer p-2 rounded-full text-white transition-colors"
               style={{ backgroundColor: "#785d32" }}
               onClick={handleWishlistToggle}
             >
-              <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
+              <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
             </motion.button>
 
             <Link href={`/product/${p?.slug}`}>
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="cursor-pointer p-3 rounded-full text-white transition-colors"
+                className="cursor-pointer p-2 rounded-full text-white transition-colors"
                 style={{ backgroundColor: "#050a30" }}
               >
-                <Eye size={20} />
+                <Eye size={16} />
               </motion.button>
             </Link>
 
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="cursor-pointer p-3 rounded-full text-white transition-colors"
+              className="cursor-pointer p-2 rounded-full text-white transition-colors"
               style={{ backgroundColor: "#785d32" }}
               onClick={(e) => {
                 e.preventDefault();
@@ -103,7 +110,7 @@ export default function ProductCard({ p }) {
                 handleAddToCart();
               }}
             >
-              <ShoppingCart size={20} />
+              <ShoppingCart size={16} />
             </motion.button>
           </motion.div>
 
@@ -118,13 +125,44 @@ export default function ProductCard({ p }) {
               -{discountAmount}
             </div>
           )}
-        </div>
 
+          {/* Variant Selector - Show only if more than 1 variant */}
+          {hasMultipleVariants && (
+            <div className="absolute bottom-3 left-3 flex gap-2 z-40">
+              {p?.variants?.map((variant, index) => (
+                <motion.button
+                  key={variant?.product_variant_id || index}
+                  onClick={() => setSelectedVariant(variant)}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`relative rounded-lg overflow-hidden ring-2 transition-all ${
+                    selectedVariant?.product_variant_id === variant?.product_variant_id
+                      ? "ring-brand-gold"
+                      : "ring-transparent hover:ring-brand-gold/50"
+                  }`}
+                >
+                  <Image
+                    src={variant?.image}
+                    alt={variant?.variant_name || "Variant"}
+                    height={50}
+                    width={50}
+                    className="object-cover"
+                  />
+                </motion.button>
+              ))}
+            </div>
+          )}
+        </div>
         {/* Product Info */}
         <div className="flex flex-col flex-grow p-5 justify-between">
           <div className="flex-grow">
             <h3 className="font-bold text-slate-900 dark:text-[#e8d9c4] text-[15px] leading-snug mb-3 line-clamp-2">
               {p?.name}
+              {selectedVariant?.variant_name && (
+                <span className="text-sm font-medium text-slate-500 dark:text-slate-400 block">
+                  {selectedVariant?.variant_name}
+                </span>
+              )}
             </h3>
 
             {/* Price */}
@@ -145,34 +183,7 @@ export default function ProductCard({ p }) {
               )}
             </div>
           </div>
-
-          {/* <div className="mt-auto flex w-full pt-4">
-            {p?.variant_available ? (
-              <Link href={`/product/${p?.slug}`} className="block w-full">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="cursor-pointer w-full text-center px-4 py-2 rounded-lg text-white font-semibold text-sm transition-all"
-                  style={{ backgroundColor: "#785d32" }}
-                >
-                  Choose Options
-                </motion.button>
-              </Link>
-            ) : (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleAddToCart();
-                }}
-                className="cursor-pointer w-full text-center px-4 py-2 rounded-lg text-white font-semibold text-sm transition-all"
-                style={{ backgroundColor: "#785d32" }}
-              >
-                Add to Cart
-              </motion.button>
-            )}
-          </div> */}
+          
         </div>
       </motion.div>
     </section>

@@ -8,15 +8,21 @@ import Image from "next/image";
 import { Trash2, ShoppingCart } from "lucide-react";
 
 export default function WishlistPage() {
-  const { wishlistItems, isWishlistLoading, removeFromWishlist, addToCartDBGuest } = useApp();
+  const {
+    wishlistItems,
+    isWishlistLoading,
+    removeFromWishlist,
+    addToCartDBGuest,
+  } = useApp();
 
   function handleAddToCart(p, wishlist_id) {
-    addToCartDBGuest(p?.variants?.[0]?.product_variant_id || p?.product_variant_id, 1, "increment");
+    addToCartDBGuest(
+      p?.variants?.[0]?.product_variant_id || p?.product_variant_id,
+      1,
+      "increment",
+    );
     removeFromWishlist(wishlist_id);
   }
-
-  console.log(wishlistItems);
-  
 
   return (
     <PrivateRoute>
@@ -56,7 +62,8 @@ export default function WishlistPage() {
                 Your wishlist is empty
               </h2>
               <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
-                Save your favorite bathroom and kitchen items here to easily find them later or add them to your cart.
+                Save your favorite bathroom and kitchen items here to easily
+                find them later or add them to your cart.
               </p>
               <Link
                 href="/shop"
@@ -66,48 +73,43 @@ export default function WishlistPage() {
               </Link>
             </motion.div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {wishlistItems.map((item, i) => {
                 const p = item.product || item;
                 const defaultVariant = p?.variants?.[0] || p;
                 const basePrice = defaultVariant?.price || p?.base_price;
                 const discountPrice = defaultVariant?.discount?.discount_price;
-                
+
                 return (
                   <motion.div
                     key={item.wishlist_id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="group relative flex flex-col bg-white dark:bg-[#0a0f2e] rounded-2xl overflow-hidden border border-gray-100 hover:shadow hover:-translate-y-1 transition-all duration-300 h-full dark:border-[#1c2444]"
+                    className="flex bg-white dark:bg-[#0a0f2e] rounded overflow-hidden border border-gray-100 hover:shadow hover:-translate-y-1 transition-all duration-300 h-full dark:border-[#1c2444]"
                   >
-                    <div className="relative h-64 w-full overflow-hidden bg-gray-50 dark:bg-brand-navy/50">
-                      <Image
+                    <div className="w-1/3">
+                      <img
                         src={p?.thumbnail_image || p?.image}
                         alt={p?.name || p?.variant_name}
-                        fill
-                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                        className="h-full transition-transform duration-500 group-hover:scale-105 rounded-l object-cover w-full"
                       />
-                      <button
-                        onClick={() => removeFromWishlist(item.wishlist_id)}
-                        className="absolute top-3 right-3 p-2 rounded-full bg-white/95 text-red-500 hover:bg-red-500 hover:text-white backdrop-blur-sm shadow-sm transition-colors z-10"
-                        title="Remove from wishlist"
-                      >
-                        <Trash2 size={16} />
-                      </button>
                     </div>
 
-                    <div className="flex flex-col flex-grow p-4 justify-between">
+                    <div className="w-1/2 flex flex-col flex-grow p-4 justify-between">
                       <div className="mb-4">
-                        <Link href={`/product/${p?.slug || ''}`} className="hover:text-brand-gold transition-colors">
-                          <h3 className="font-bold text-slate-900 dark:text-[#e8d9c4] text-[15px] leading-snug line-clamp-2">
-                            {p?.name || p?.variant_name}
+                        <Link
+                          href={`/product/${p?.slug || ""}`}
+                          className="hover:text-brand-gold transition-colors"
+                        >
+                          <h3 className="text-slate-900 font-semibold dark:text-[#e8d9c4] text-[15px] leading-snug line-clamp-2">
+                            {p?.name} ({p?.variant})
                           </h3>
                         </Link>
                         <div className="mt-2 flex items-center gap-2">
                           {discountPrice ? (
                             <>
-                              <span className="text-lg font-extrabold text-brand-navy dark:text-[#f0ebe3]">
+                              <span className="text-lg font-bold text-brand-navy dark:text-[#f0ebe3]">
                                 ${discountPrice}
                               </span>
                               <span className="text-xs font-medium text-slate-400 line-through">
@@ -115,20 +117,29 @@ export default function WishlistPage() {
                               </span>
                             </>
                           ) : (
-                            <span className="text-lg font-extrabold text-brand-navy dark:text-[#f0ebe3]">
+                            <span className="text-lg font-bold text-brand-navy dark:text-[#f0ebe3]">
                               ${basePrice}
                             </span>
                           )}
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => handleAddToCart(p, item?.wishlist_id || item?.id)}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all bg-brand-navy text-white hover:bg-brand-gold hover:shadow-lg hover:shadow-brand-gold/20"
-                      >
-                        <ShoppingCart size={16} />
-                        Move to Cart
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() =>
+                            handleAddToCart(p, item?.wishlist_id || item?.id)
+                          }
+                          className="cursor-pointer flex items-center justify-center gap-2 size-10 rounded-full font-semibold text-sm transition-all bg-brand-gold/90 text-white hover:bg-brand-gold"
+                        >
+                          <ShoppingCart size={16} />
+                        </button>
+                        <button
+                          onClick={() => removeFromWishlist(item.wishlist_id)}
+                          className="cursor-pointer flex items-center justify-center gap-2 size-10 rounded-full font-semibold text-sm transition-all bg-red-500 text-white hover:bg-red-600"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 );
@@ -143,8 +154,18 @@ export default function WishlistPage() {
 
 function HeartIcon(props) {
   return (
-    <svg fill="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
-      <path strokeLinecap="round" strokeLinelinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+    <svg
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      {...props}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinelinejoin="round"
+        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+      />
     </svg>
   );
 }

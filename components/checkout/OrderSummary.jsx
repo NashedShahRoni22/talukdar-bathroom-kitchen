@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { useApp } from '@/components/context/AppContext';
 import { getCouponAdjustedTotal } from '@/lib/coupon';
@@ -29,6 +29,7 @@ export default function OrderSummary({
   const [isCouponApplied, setIsCouponApplied] = useState(Boolean(couponMeta?.coupon_code));
   const [isCheckingCoupon, setIsCheckingCoupon] = useState(false);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [isRemovingCoupon, setIsRemovingCoupon] = useState(false);
 
   useEffect(() => {
     setCouponCode(couponMeta?.coupon_code || '');
@@ -134,6 +135,48 @@ export default function OrderSummary({
     }
   };
 
+  const handleRemoveCoupon = async () => {
+    if (!guestToken) {
+      toast.error('Guest session not ready. Please wait a moment.');
+      return;
+    }
+
+    if (!BASE_URL) {
+      toast.error('Missing API base URL configuration.');
+      return;
+    }
+
+    setIsRemovingCoupon(true);
+
+    try {
+      const normalizedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
+      const removeCouponUrl = `${normalizedBaseUrl}remove-coupon`;
+
+      const formData = new FormData();
+      formData.append('guest_token', guestToken);
+
+      const res = await fetch(removeCouponUrl, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || data?.status !== 'success') {
+        throw new Error(data?.message || 'Failed to remove coupon.');
+      }
+
+      onCouponMetaChange?.(null);
+      setCouponCode('');
+      setIsCouponApplied(false);
+      toast.success(data?.message || 'Coupon removed successfully!');
+    } catch (err) {
+      toast.error(err?.message || 'Could not remove coupon.');
+    } finally {
+      setIsRemovingCoupon(false);
+    }
+  };
+
   return (
     <div className="sticky top-28">
       {/* Header */}
@@ -171,39 +214,45 @@ export default function OrderSummary({
               const lineTotal = Number.isFinite(price * quantity) ? price * quantity : 0;
 
               return (
-                <motion.div
+                <Link
                   key={cartId ?? index}
-                  layout
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex gap-3 p-4 bg-white dark:bg-[#111840] rounded-xl border border-gray-100 dark:border-[#1c2444] shadow-sm dark:shadow-none"
+                  href={`/product/${item.slug}`}
+                  className="block"
                 >
-                  {/* Image */}
-                  <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-gray-100">
-                    <Image src={item.thumbnail_image} alt={item.name} fill className="object-cover" />
-                  </div>
-
-                  {/* Details */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-semibold text-gray-800 dark:text-[#f0ebe3] leading-tight line-clamp-2 mt-0.5">
-                      {item.name}
-                    </h4>
-                    <p className="text-sm font-bold mt-1 text-brand-navy dark:text-[#f0ebe3]">
-                      Unit: ${price.toFixed(2)}
-                    </p>
-
-                    <div className="mt-2 flex items-center justify-between text-sm">
-                      <span className="font-medium text-gray-500 dark:text-[#9fa8cc]">
-                        Qty: {quantity}
-                      </span>
-                      <span className="font-bold text-brand-navy dark:text-[#f0ebe3]">
-                        Total: ${lineTotal.toFixed(2)}
-                      </span>
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.2 }}
+                    whileHover={{ scale: 1.02 }}
+                    className="flex gap-3 p-4 bg-white dark:bg-[#111840] rounded-xl border border-gray-100 dark:border-[#1c2444] shadow-sm dark:shadow-none cursor-pointer transition-all hover:shadow-md dark:hover:shadow-brand-gold/10"
+                  >
+                    {/* Image */}
+                    <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-gray-100">
+                      <Image src={item.thumbnail_image} alt={item.name} fill className="object-cover" />
                     </div>
-                  </div>
-                </motion.div>
+
+                    {/* Details */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-semibold text-gray-800 dark:text-[#f0ebe3] leading-tight line-clamp-2 mt-0.5 group-hover:text-brand-gold transition-colors">
+                        {item.name} ({item.variant})
+                      </h4>
+                      <p className="text-sm font-bold mt-1 text-brand-navy dark:text-[#f0ebe3]">
+                        Unit: ${price.toFixed(2)}
+                      </p>
+
+                      <div className="mt-2 flex items-center justify-between text-sm">
+                        <span className="font-medium text-gray-500 dark:text-[#9fa8cc]">
+                          Qty: {quantity}
+                        </span>
+                        <span className="font-bold text-brand-navy dark:text-[#f0ebe3]">
+                          Total: ${lineTotal.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
               );
             })
           )}
@@ -226,14 +275,25 @@ export default function OrderSummary({
               className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 transition-colors focus:border-brand-navy focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 dark:border-[#2a3460] dark:bg-[#111840] dark:text-[#f0ebe3]"
             />
 
-            <button
-              type="button"
-              onClick={handleApplyCoupon}
-              disabled={isCouponApplied || isCheckingCoupon || isApplyingCoupon}
-              className="rounded-lg bg-brand-navy px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {isCheckingCoupon ? 'Checking...' : isApplyingCoupon ? 'Applying...' : isCouponApplied ? 'Applied' : 'Apply'}
-            </button>
+            {!isCouponApplied ? (
+              <button
+                type="button"
+                onClick={handleApplyCoupon}
+                disabled={isCheckingCoupon || isApplyingCoupon}
+                className="rounded-lg bg-brand-navy px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isCheckingCoupon ? 'Checking...' : isApplyingCoupon ? 'Applying...' : 'Apply'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleRemoveCoupon}
+                disabled={isRemovingCoupon}
+                className="rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isRemovingCoupon ? 'Removing...' : 'Remove'}
+              </button>
+            )}
           </div>
 
           {isCouponApplied && couponMeta ? (
