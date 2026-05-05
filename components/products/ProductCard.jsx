@@ -125,17 +125,17 @@ export default function ProductCard({ p }) {
               -{discountAmount}
             </div>
           )}
-
+        </div>
+        {/* Product Info */}
+        <div className="flex flex-col gap-3 mt-3 flex-grow justify-between">
           {/* Variant Selector - Show only if more than 1 variant */}
           {hasMultipleVariants && (
-            <div className="absolute bottom-3 left-3 flex gap-2 z-40">
+            <div className="flex px-2 gap-2 z-40">
               {p?.variants?.map((variant, index) => (
                 <motion.button
                   key={variant?.product_variant_id || index}
                   onClick={() => setSelectedVariant(variant)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`relative rounded-lg overflow-hidden ring-2 transition-all ${
+                  className={`relative cursor-pointer overflow-hidden ring-2 transition-all ${
                     selectedVariant?.product_variant_id === variant?.product_variant_id
                       ? "ring-brand-gold"
                       : "ring-transparent hover:ring-brand-gold/50"
@@ -152,15 +152,13 @@ export default function ProductCard({ p }) {
               ))}
             </div>
           )}
-        </div>
-        {/* Product Info */}
-        <div className="flex flex-col flex-grow p-5 justify-between">
           <div className="flex-grow">
             <h3 className="font-bold text-slate-900 dark:text-[#e8d9c4] text-[15px] leading-snug mb-3 line-clamp-2">
               {p?.name}
+              {" "}
               {selectedVariant?.variant_name && (
-                <span className="text-sm font-medium text-slate-500 dark:text-slate-400 block">
-                  {selectedVariant?.variant_name}
+                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                  ({selectedVariant?.variant_name})
                 </span>
               )}
             </h3>
@@ -182,8 +180,7 @@ export default function ProductCard({ p }) {
                 </span>
               )}
             </div>
-          </div>
-          
+          </div> 
         </div>
       </motion.div>
     </section>

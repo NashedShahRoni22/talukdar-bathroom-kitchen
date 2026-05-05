@@ -39,7 +39,13 @@ export default function CartItem({ item }) {
       <div className="flex-1 min-w-0">
         <Link href={`/product/${item.slug}`}>
           <h4 className="text-sm font-semibold text-gray-800 dark:text-[#e8d9c4] leading-tight line-clamp-2 mt-0.5">
-            {item.name} ({item.variant})
+            {item.name} 
+            {" "}
+            {item.variant && (
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                ({item.variant})
+              </span>
+            )}
           </h4>
         </Link>
 

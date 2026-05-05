@@ -10,6 +10,7 @@ import {
   Truck,
   UserRound,
 } from "lucide-react";
+import Image from "next/image";
 
 function parseOrderDate(value) {
   if (!value) return null;
@@ -19,9 +20,9 @@ function parseOrderDate(value) {
   }
 
   if (typeof value === "string") {
-    const customMatch = value.trim().match(
-      /^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2})\.(\d{2})\s*(am|pm)$/i,
-    );
+    const customMatch = value
+      .trim()
+      .match(/^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2})\.(\d{2})\s*(am|pm)$/i);
 
     if (customMatch) {
       const [, day, month, year, hourStr, minuteStr, meridiem] = customMatch;
@@ -35,7 +36,13 @@ function parseOrderDate(value) {
         hour += 12;
       }
 
-      const parsed = new Date(Number(year), Number(month) - 1, Number(day), hour, minute);
+      const parsed = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        hour,
+        minute,
+      );
       return Number.isNaN(parsed.getTime()) ? null : parsed;
     }
   }
@@ -87,7 +94,11 @@ function getOrderStatusTone(status) {
 
   if (value.includes("pending")) return "pending";
   if (value.includes("processing")) return "processing";
-  if (value.includes("completed") || value.includes("delivered") || value.includes("paid")) {
+  if (
+    value.includes("completed") ||
+    value.includes("delivered") ||
+    value.includes("paid")
+  ) {
     return "success";
   }
   if (value.includes("cancel")) return "cancelled";
@@ -98,15 +109,21 @@ function StatusBadge({ status }) {
   const tone = getOrderStatusTone(status);
 
   const classes = {
-    pending: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
-    processing: "bg-brand-gold/10 text-brand-navy dark:bg-brand-gold/20 dark:text-[#f0ebe3]",
-    success: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
+    pending:
+      "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
+    processing:
+      "bg-brand-gold/10 text-brand-navy dark:bg-brand-gold/20 dark:text-[#f0ebe3]",
+    success:
+      "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
     cancelled: "bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300",
-    default: "bg-brand-pale/70 text-brand-navy dark:bg-brand-gold/25 dark:text-brand-pale",
+    default:
+      "bg-brand-pale/70 text-brand-navy dark:bg-brand-gold/25 dark:text-brand-pale",
   };
 
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${classes[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${classes[tone]}`}
+    >
       <CheckCircle2 size={13} />
       {status || "Unknown"}
     </span>
@@ -156,9 +173,16 @@ export default function OrderCard({ order, index = 0 }) {
             {order.order_details.map((item, itemIndex) => (
               <div
                 key={`${order.order_id}-${item.product_name}-${itemIndex}`}
-                className="rounded bg-white p-4 dark:bg-[#0e1430]"
+                className="rounded bg-white p-4 flex justify-between dark:bg-[#0e1430]"
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex gap-4">
+                  <Image
+                    src={item.thumbnail_image || "/placeholder.png"}
+                    alt={item.product_name}
+                    width={60}
+                    height={60}
+                    className="rounded object-cover bg-gray-100"
+                  />
                   <div>
                     <h3 className="font-semibold text-brand-navy dark:text-[#f0ebe3]">
                       {item.product_name}
@@ -166,7 +190,6 @@ export default function OrderCard({ order, index = 0 }) {
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-[#9fa8cc]">
                       {item.product_variant ? (
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-pale/60 px-2.5 py-1 text-brand-navy dark:bg-brand-gold/20 dark:text-[#f0ebe3]">
-                          <UserRound size={12} />
                           {item.product_variant}
                         </span>
                       ) : null}
@@ -174,10 +197,11 @@ export default function OrderCard({ order, index = 0 }) {
                       {item.is_combo ? <span>Combo</span> : null}
                     </div>
                   </div>
-                  <p className="font-semibold text-brand-navy dark:text-[#f0ebe3]">
-                    {formatCurrency(item.price)}
-                  </p>
                 </div>
+
+                <p className="font-semibold text-brand-navy dark:text-[#f0ebe3]">
+                  {formatCurrency(item.price)}
+                </p>
               </div>
             ))}
           </div>
@@ -209,9 +233,17 @@ export default function OrderCard({ order, index = 0 }) {
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4 text-gray-600 dark:text-[#9fa8cc]">
+                <span>GST</span>
+                <span className="font-semibold text-brand-navy dark:text-[#f0ebe3]">
+                  {formatCurrency(order.gst)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-4 text-gray-600 dark:text-[#9fa8cc]">
                 <span>Coupon discount</span>
                 <span className="font-semibold text-brand-navy dark:text-[#f0ebe3]">
-                  {order.coupon_discount ? formatCurrency(order.coupon_discount) : "—"}
+                  {order.coupon_discount
+                    ? formatCurrency(order.coupon_discount)
+                    : "—"}
                 </span>
               </div>
               <div className="border-t border-[#e8dfd1] pt-3 flex items-center justify-between gap-4 text-base font-bold text-brand-navy dark:border-[#1c2444] dark:text-[#f0ebe3]">

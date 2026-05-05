@@ -127,6 +127,8 @@ export default function CheckoutForm({
   const { cartDBGuest, totalDBGuest, authToken, isAuthenticated, guestToken } =
     useApp();
 
+  console.log(couponMeta);
+
   const normalizedCartItems = cartDBGuest.map((item) => ({
     id: item.cart_id,
     productVariantId: item.product_variant_id,
@@ -157,8 +159,8 @@ export default function CheckoutForm({
   function makeHandler(setter) {
     return (e) => {
       let { name, value } = e.target;
-      if (name === 'zip') {
-        value = value.replace(/\D/g, '').slice(0, 4);
+      if (name === "zip") {
+        value = value.replace(/\D/g, "").slice(0, 4);
       }
       setter((prev) => ({ ...prev, [name]: value }));
     };
@@ -210,10 +212,7 @@ export default function CheckoutForm({
     const tax = (cartSubtotal + shippingAmount) * 0.1;
     const grandTotal = cartSubtotal + shippingAmount + tax;
 
-    const discounted = getCouponAdjustedTotal(
-      grandTotal,
-      couponMeta,
-    );
+    const discounted = getCouponAdjustedTotal(grandTotal, couponMeta);
 
     const billingData = sameAsShipping ? shipping : billing;
 
@@ -250,7 +249,14 @@ export default function CheckoutForm({
     });
 
     formData.append("shipping_cost", String(shippingCost || 0));
+    formData.append("gst", String(tax || 0));
     formData.append("total", String(discounted.totalAfterDiscount));
+    formData.append("coupon_id", String(couponMeta.coupon_id));
+    formData.append(
+      "coupon_discount_amount",
+      String(discounted.discountAmount),
+    );
+
     formData.append("agree_terms", String(agreedTerms));
     formData.append("agree_privacy", String(agreedPrivacy));
 
@@ -333,10 +339,7 @@ export default function CheckoutForm({
         const shippingAmount = shippingCost || 0;
         const tax = (cartSubtotal + shippingAmount) * 0.1;
         const grandTotal = cartSubtotal + shippingAmount + tax;
-        const discounted = getCouponAdjustedTotal(
-          grandTotal,
-          couponMeta,
-        );
+        const discounted = getCouponAdjustedTotal(grandTotal, couponMeta);
 
         const paymentSnapshot = {
           status: "processing",

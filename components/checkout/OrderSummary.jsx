@@ -224,9 +224,7 @@ export default function OrderSummary({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.2 }}
-                    whileHover={{ scale: 1.02 }}
-                    className="flex gap-3 p-4 bg-white dark:bg-[#111840] rounded-xl border border-gray-100 dark:border-[#1c2444] shadow-sm dark:shadow-none cursor-pointer transition-all hover:shadow-md dark:hover:shadow-brand-gold/10"
+                    className="flex gap-3 p-4 bg-white dark:bg-[#111840] rounded-xl border border-gray-100 dark:border-[#1c2444] cursor-pointer dark:hover:shadow-brand-gold/10"
                   >
                     {/* Image */}
                     <div className="relative w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-gray-100">
@@ -236,7 +234,13 @@ export default function OrderSummary({
                     {/* Details */}
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-gray-800 dark:text-[#f0ebe3] leading-tight line-clamp-2 mt-0.5 group-hover:text-brand-gold transition-colors">
-                        {item.name} ({item.variant})
+                        {item.name} 
+                        {" "}
+                        {item.variant && (
+                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            ({item.variant})
+                          </span>
+                        )}
                       </h4>
                       <p className="text-sm font-bold mt-1 text-brand-navy dark:text-[#f0ebe3]">
                         Unit: ${price.toFixed(2)}
