@@ -53,6 +53,48 @@ function InputField({
   );
 }
 
+function SelectField({
+  label,
+  name,
+  value,
+  onChange,
+  error,
+  options = [],
+  disabled = false,
+  span2 = false,
+}) {
+  return (
+    <div className={span2 ? "col-span-2" : "col-span-1"}>
+      <label className="block text-sm font-medium text-gray-600 dark:text-[#9fa8cc] mb-1.5">
+        {label}
+      </label>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none transition-colors bg-white dark:bg-[#111840] dark:text-[#f0ebe3] ${
+          error
+            ? "border-red-400 focus:border-red-400"
+            : "border-gray-200 dark:border-[#2a3460] focus:border-brand-navy dark:focus:border-[#c4a97e]"
+        } ${
+          disabled
+            ? "opacity-50 cursor-not-allowed"
+            : "cursor-pointer"
+        }`}
+      >
+        <option value="">{disabled ? `Loading ${label.toLowerCase()}...` : `Select ${label}`}</option>
+        {options.map((opt) => (
+          <option key={opt.id} value={opt.id}>
+            {opt.name}
+          </option>
+        ))}
+      </select>
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+    </div>
+  );
+}
+
 function Checkbox({ checked, onChange, children }) {
   return (
     <label className="flex items-start gap-3 cursor-pointer select-none">
@@ -86,7 +128,7 @@ function Checkbox({ checked, onChange, children }) {
   );
 }
 
-function AddressForm({ title, prefix, data, onChange, errors }) {
+function AddressForm({ title, prefix, data, onChange, errors, districts, cities, onStateChange, isLoadingCities }) {
   const field = (name, label, opts = {}) => (
     <InputField
       key={name}
@@ -96,6 +138,36 @@ function AddressForm({ title, prefix, data, onChange, errors }) {
       onChange={onChange}
       error={errors?.[`${prefix}_${name}`]}
       {...opts}
+    />
+  );
+
+  const stateSelect = (
+    <SelectField
+      key="state"
+      label="State"
+      name="state"
+      value={data.state}
+      onChange={(e) => {
+        onChange(e);
+        onStateChange?.(e.target.value);
+      }}
+      error={errors?.[`${prefix}_state`]}
+      options={districts}
+      span2={false}
+    />
+  );
+
+  const citySelect = (
+    <SelectField
+      key="city"
+      label="Suburb"
+      name="city"
+      value={data.city}
+      onChange={onChange}
+      error={errors?.[`${prefix}_city`]}
+      options={cities}
+      disabled={isLoadingCities || !data.state}
+      span2={false}
     />
   );
 
@@ -110,8 +182,8 @@ function AddressForm({ title, prefix, data, onChange, errors }) {
         {field("email", "Email Address", { type: "email", span2: true })}
         {field("phone", "Phone Number", { type: "tel", span2: true })}
         {field("address", "Street Address", { span2: true })}
-        {field("city", "City")}
-        {field("state", "State / Province")}
+        {stateSelect}
+        {citySelect}
         {field("zip", "Postcode")}
       </div>
     </div>
@@ -146,6 +218,88 @@ export default function CheckoutForm({
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [districts, setDistricts] = useState([]);
+  const [shippingCities, setShippingCities] = useState([]);
+  const [billingCities, setBillingCities] = useState([]);
+  const [isLoadingDistricts, setIsLoadingDistricts] = useState(true);
+  const [isLoadingShippingCities, setIsLoadingShippingCities] = useState(false);
+  const [isLoadingBillingCities, setIsLoadingBillingCities] = useState(false);
+
+  // Fetch districts on mount
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      try {
+        setIsLoadingDistricts(true);
+        const response = await fetch(`${BASE_URL}get-districts`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.data && Array.isArray(result.data)) {
+            setDistricts(result.data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch districts:", err);
+      } finally {
+        setIsLoadingDistricts(false);
+      }
+    };
+
+    fetchDistricts();
+  }, []);
+
+  // Fetch cities for shipping when state changes
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (!shipping.state) {
+        setShippingCities([]);
+        return;
+      }
+
+      try {
+        setIsLoadingShippingCities(true);
+        const response = await fetch(`${BASE_URL}get-cities/${shipping.state}`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.data && Array.isArray(result.data)) {
+            setShippingCities(result.data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch cities:", err);
+      } finally {
+        setIsLoadingShippingCities(false);
+      }
+    };
+
+    fetchCities();
+  }, [shipping.state]);
+
+  // Fetch cities for billing when state changes
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (!billing.state) {
+        setBillingCities([]);
+        return;
+      }
+
+      try {
+        setIsLoadingBillingCities(true);
+        const response = await fetch(`${BASE_URL}get-cities/${billing.state}`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.data && Array.isArray(result.data)) {
+            setBillingCities(result.data);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch cities:", err);
+      } finally {
+        setIsLoadingBillingCities(false);
+      }
+    };
+
+    fetchCities();
+  }, [billing.state]);
 
   useEffect(() => {
     onShippingMetaChange?.({
@@ -220,8 +374,8 @@ export default function CheckoutForm({
     formData.append("phone", shipping.phone.trim());
     formData.append("email", shipping.email.trim());
     formData.append("street", shipping.address.trim());
-    formData.append("city", shipping.city.trim());
-    formData.append("state", shipping.state.trim());
+    formData.append("city", shipping.city);
+    formData.append("state", shipping.state);
     formData.append("post_code", shipping.zip.trim());
     formData.append("additional_info", "");
 
@@ -231,8 +385,8 @@ export default function CheckoutForm({
     formData.append("billing_phone", billingData.phone.trim());
     formData.append("billing_email", billingData.email.trim());
     formData.append("billing_street", billingData.address.trim());
-    formData.append("billing_city", billingData.city.trim());
-    formData.append("billing_state", billingData.state.trim());
+    formData.append("billing_city", billingData.city);
+    formData.append("billing_state", billingData.state);
     formData.append("billing_post_code", billingData.zip.trim());
     formData.append("billing_additional_info", "");
     formData.append("payment_method", "online_payment");
@@ -249,7 +403,7 @@ export default function CheckoutForm({
     formData.append("shipping_cost", String(shippingCost || 0));
     formData.append("gst", String(tax || 0));
     formData.append("total", String(discounted.totalAfterDiscount));
-    formData.append("coupon_id", String(couponMeta.coupon_id));
+    formData.append("coupon_id", String(couponMeta?.coupon_id || ""));
     formData.append(
       "coupon_discount_amount",
       String(discounted.discountAmount),
@@ -378,6 +532,12 @@ export default function CheckoutForm({
         data={shipping}
         onChange={makeHandler(setShipping)}
         errors={errors}
+        districts={districts}
+        cities={shippingCities}
+        onStateChange={() => {
+          setShipping((prev) => ({ ...prev, city: "" }));
+        }}
+        isLoadingCities={isLoadingShippingCities}
       />
 
       {/* Billing same toggle */}
@@ -406,6 +566,12 @@ export default function CheckoutForm({
               data={billing}
               onChange={makeHandler(setBilling)}
               errors={errors}
+              districts={districts}
+              cities={billingCities}
+              onStateChange={() => {
+                setBilling((prev) => ({ ...prev, city: "" }));
+              }}
+              isLoadingCities={isLoadingBillingCities}
             />
           </motion.div>
         )}
